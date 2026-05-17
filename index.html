@@ -1,4 +1,4 @@
-#v4.8.1
+#v4.8.2
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1782,7 +1782,7 @@ td:last-child{padding-right:13px;text-align:center}
   <!-- RIGHT-NOW STATUS -->
   <section class="now fade-in" style="animation-delay:.05s">
     <div class="now-eyebrow"><span class="now-pulse"></span>Right-now status · Mid-May 2026</div>
-    <h2>Read before planning your first trip</h2>
+    <h2>Key Information for Upcoming Trip</h2>
     <ul class="now-list">
       <li><strong>Federal ARS (red snapper) private opens May 22</strong> · 2 fish / 16″ min in federal waters. TPWD will announce a closure date when state quota approaches. <em>[VERIFY at tpwd.texas.gov]</em></li>
       <li><strong>Federal ARS for-hire:</strong> June 1 – Oct 26, 2026 (147 days). 2 fish / 16″.</li>
@@ -3884,10 +3884,10 @@ function updateLeaderboard(sub){
   var topCatcher = Object.entries(catchCount).sort((a,b)=>b[1]-a[1])[0];
   var el1=document.getElementById('lbMostCatches'), el1n=document.getElementById('lbMostCatchesN');
   if(el1){ el1.textContent=topCatcher?topCatcher[0]:'—'; el1n.textContent=topCatcher?topCatcher[1]+' catch'+(topCatcher[1]===1?'':'es'):''; }
-  // Biggest catch (by weight)
-  var heaviest = sub.filter(c=>c.weight>0).sort((a,b)=>b.weight-a.weight)[0];
+  // Biggest catch (by overall length)
+  var longest = sub.filter(c=>c.length>0).sort((a,b)=>b.length-a.length)[0];
   var el2=document.getElementById('lbBiggest'), el2n=document.getElementById('lbBiggestN');
-  if(el2){ el2.textContent=heaviest?(heaviest.angler||'Unknown'):'—'; el2n.textContent=heaviest?heaviest.weight.toFixed(1)+' lbs · '+heaviest.species:''; }
+  if(el2){ el2.textContent=longest?(longest.angler||'Unknown'):'—'; el2n.textContent=longest?longest.length.toFixed(1)+' in · '+longest.species:''; }
   // Most species variety
   var speciesMap = {};
   sub.forEach(function(c){ if(c.angler&&c.species){ if(!speciesMap[c.angler]) speciesMap[c.angler]=new Set(); speciesMap[c.angler].add(c.species); } });
