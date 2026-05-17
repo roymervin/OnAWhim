@@ -1,4 +1,5 @@
-#v4.5.4
+#4.5.5
+#v4.5.2
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -3812,59 +3813,22 @@ const LON = -95.3677;
 
 // ═══ DATA STORE ══════════════════════════════════════════════════
 const KEY = 'onawhim_v3';
-const PENDING_KEY = 'onawhim_pending_sync_v1';
 let catches = [], sortAsc = false, preset = 'all';
-
-window.firebaseReady = false;
-window.db = null;
-window.fb = null;
-
-function load(){
-  try{ catches = JSON.parse(localStorage.getItem(KEY)||'[]') }catch{ catches=[] }
-}
-
-function saveLocal(){
-  localStorage.setItem(KEY, JSON.stringify(catches));
-}
-
-function save(){
-  saveLocal();
-}
-
-async function saveCatchToCloud(catchData){
-  if(!window.firebaseReady || !window.db || !window.fb){
-    throw new Error('Firebase not configured');
-  }
-  await window.fb.addDoc(
-    window.fb.collection(window.db,'catches'),
-    {
-      ...catchData,
-      createdAt: window.fb.serverTimestamp()
-    }
-  );
-}
-
-async function syncPendingCatches(){
-  if(!window.firebaseReady) return;
-  let pending=[];
-  try{ pending = JSON.parse(localStorage.getItem(PENDING_KEY)||'[]') }catch(e){}
-  if(!pending.length) return;
-
-  for(const c of pending){
-    try{
-      await saveCatchToCloud(c);
-    }catch(err){
-      console.warn('Pending sync failed', err);
-      return;
-    }
-  }
-  localStorage.removeItem(PENDING_KEY);
-}
-
-window.addEventListener('online', syncPendingCatches);
+function load(){ try{ catches = JSON.parse(localStorage.getItem(KEY)||'[]') }catch{ catches=[] } }
+function save(){ localStorage.setItem(KEY, JSON.stringify(catches)) }
 
 // ═══ BOOT (deferred to tab init) ═══════════════════════════════
 // catch log initialised when user first opens the tab - see tab switch
+window.addEventListener('load', ()=>{
+  if(window.oawFirebase){
+    window.oawFirebase.startSync(function(remoteCatches){
+      catches = remoteCatches;
+      try{ localStorage.setItem(KEY, JSON.stringify(catches)); }catch(e){}
+      renderTable();
+      updateStats();
+    });
+  }
+});
 
 // ═══ DATE UTILS ══════════════════════════════════════════════════
 function today(){ return new Date().toISOString().split('T')[0] }
@@ -4185,15 +4149,10 @@ function addEntry(){
   e.photos = pendingPhotos.map(function(p, i){
     return {id: p.id, path: basePath + p.id + '.jpg', data: p.data};
   });
-  catches.push(e); saveLocal(); renderTable(); updateStats(); clearForm();
-
-  saveCatchToCloud(e).catch(function(err){
-    console.warn('Cloud save failed, queued for sync', err);
-    let pending=[];
-    try{ pending=JSON.parse(localStorage.getItem(PENDING_KEY)||'[]') }catch(e){}
-    pending.push(e);
-    localStorage.setItem(PENDING_KEY, JSON.stringify(pending));
-  });
+  catches.push(e); save(); renderTable(); updateStats(); clearForm();
+  if(window.oawFirebase){
+    window.oawFirebase.addCatch(e).catch(err=>console.warn('Firebase save failed', err));
+  }
   toast('✓ Catch logged — tight lines!');
 }
 
@@ -4428,21 +4387,8 @@ function transferToDevice(){
     // Inject a bootstrap <script> right before 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  onSnapshot,
-  serverTimestamp,
-  query,
-  orderBy
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-/*
-  TODO:
-  Replace the placeholder values below with your Firebase config
-  from Firebase Console > Project Settings > General > Your Apps
-*/
 const firebaseConfig = {
   apiKey: "AIzaSyBKLfhyxZTn4t7RlRCRTfb8DgzLlPY2sFc",
   authDomain: "onawhim-85c14.firebaseapp.com",
@@ -4453,41 +4399,20 @@ const firebaseConfig = {
   appId: "1:582396606776:web:2c17b5ef75a96fde7f29cd"
 };
 
-const isConfigured =
-  firebaseConfig.apiKey !== "PASTE_API_KEY_HERE";
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-if(isConfigured){
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  window.db = db;
-  window.fb = {
-    collection,
-    addDoc,
-    onSnapshot,
-    serverTimestamp,
-    query,
-    orderBy
-  };
-  window.firebaseReady = true;
-
-  const q = query(collection(db, 'catches'), orderBy('createdAt', 'desc'));
-
-  onSnapshot(q, (snapshot) => {
-    window.catches = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-
-    if(typeof renderTable === 'function') renderTable();
-    if(typeof updateStats === 'function') updateStats();
-    if(typeof syncPendingCatches === 'function') syncPendingCatches();
-  });
-
-  console.log('Firebase shared catch log enabled');
-} else {
-  console.warn('Firebase not configured. Using local catch log only.');
-}
+window.oawFirebase = {
+ async addCatch(catchData){
+   return await addDoc(collection(db,'catches'), {...catchData, createdAt: serverTimestamp()});
+ },
+ startSync(callback){
+   const q = query(collection(db,'catches'), orderBy('createdAt','desc'));
+   return onSnapshot(q, snap => {
+      callback(snap.docs.map(d => ({firebaseId:d.id, ...d.data()})));
+   });
+ }
+};
 </script>
 
 </body> that pre-loads
@@ -4507,130 +4432,64 @@ if(isConfigured){
     // Insert before 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  onSnapshot,
-  serverTimestamp,
-  query,
-  orderBy
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-/*
-  TODO:
-  Replace the placeholder values below with your Firebase config
-  from Firebase Console > Project Settings > General > Your Apps
-*/
 const firebaseConfig = {
-  apiKey: "PASTE_API_KEY_HERE",
-  authDomain: "PASTE_PROJECT.firebaseapp.com",
-  projectId: "PASTE_PROJECT_ID",
-  storageBucket: "PASTE_PROJECT.appspot.com",
-  messagingSenderId: "PASTE_SENDER_ID",
-  appId: "PASTE_APP_ID"
+  apiKey: "AIzaSyBKLfhyxZTn4t7RlRCRTfb8DgzLlPY2sFc",
+  authDomain: "onawhim-85c14.firebaseapp.com",
+  databaseURL: "https://onawhim-85c14-default-rtdb.firebaseio.com",
+  projectId: "onawhim-85c14",
+  storageBucket: "onawhim-85c14.firebasestorage.app",
+  messagingSenderId: "582396606776",
+  appId: "1:582396606776:web:2c17b5ef75a96fde7f29cd"
 };
 
-const isConfigured =
-  firebaseConfig.apiKey !== "PASTE_API_KEY_HERE";
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-if(isConfigured){
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  window.db = db;
-  window.fb = {
-    collection,
-    addDoc,
-    onSnapshot,
-    serverTimestamp,
-    query,
-    orderBy
-  };
-  window.firebaseReady = true;
-
-  const q = query(collection(db, 'catches'), orderBy('createdAt', 'desc'));
-
-  onSnapshot(q, (snapshot) => {
-    window.catches = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-
-    if(typeof renderTable === 'function') renderTable();
-    if(typeof updateStats === 'function') updateStats();
-    if(typeof syncPendingCatches === 'function') syncPendingCatches();
-  });
-
-  console.log('Firebase shared catch log enabled');
-} else {
-  console.warn('Firebase not configured. Using local catch log only.');
-}
+window.oawFirebase = {
+ async addCatch(catchData){
+   return await addDoc(collection(db,'catches'), {...catchData, createdAt: serverTimestamp()});
+ },
+ startSync(callback){
+   const q = query(collection(db,'catches'), orderBy('createdAt','desc'));
+   return onSnapshot(q, snap => {
+      callback(snap.docs.map(d => ({firebaseId:d.id, ...d.data()})));
+   });
+ }
+};
 </script>
 
 </body>
     var finalHtml = htmlSrc.replace(/<\/body>/i, injectScript + '
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  onSnapshot,
-  serverTimestamp,
-  query,
-  orderBy
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-/*
-  TODO:
-  Replace the placeholder values below with your Firebase config
-  from Firebase Console > Project Settings > General > Your Apps
-*/
 const firebaseConfig = {
-  apiKey: "PASTE_API_KEY_HERE",
-  authDomain: "PASTE_PROJECT.firebaseapp.com",
-  projectId: "PASTE_PROJECT_ID",
-  storageBucket: "PASTE_PROJECT.appspot.com",
-  messagingSenderId: "PASTE_SENDER_ID",
-  appId: "PASTE_APP_ID"
+  apiKey: "AIzaSyBKLfhyxZTn4t7RlRCRTfb8DgzLlPY2sFc",
+  authDomain: "onawhim-85c14.firebaseapp.com",
+  databaseURL: "https://onawhim-85c14-default-rtdb.firebaseio.com",
+  projectId: "onawhim-85c14",
+  storageBucket: "onawhim-85c14.firebasestorage.app",
+  messagingSenderId: "582396606776",
+  appId: "1:582396606776:web:2c17b5ef75a96fde7f29cd"
 };
 
-const isConfigured =
-  firebaseConfig.apiKey !== "PASTE_API_KEY_HERE";
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-if(isConfigured){
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  window.db = db;
-  window.fb = {
-    collection,
-    addDoc,
-    onSnapshot,
-    serverTimestamp,
-    query,
-    orderBy
-  };
-  window.firebaseReady = true;
-
-  const q = query(collection(db, 'catches'), orderBy('createdAt', 'desc'));
-
-  onSnapshot(q, (snapshot) => {
-    window.catches = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-
-    if(typeof renderTable === 'function') renderTable();
-    if(typeof updateStats === 'function') updateStats();
-    if(typeof syncPendingCatches === 'function') syncPendingCatches();
-  });
-
-  console.log('Firebase shared catch log enabled');
-} else {
-  console.warn('Firebase not configured. Using local catch log only.');
-}
+window.oawFirebase = {
+ async addCatch(catchData){
+   return await addDoc(collection(db,'catches'), {...catchData, createdAt: serverTimestamp()});
+ },
+ startSync(callback){
+   const q = query(collection(db,'catches'), orderBy('createdAt','desc'));
+   return onSnapshot(q, snap => {
+      callback(snap.docs.map(d => ({firebaseId:d.id, ...d.data()})));
+   });
+ }
+};
 </script>
 
 </body>');
@@ -5428,65 +5287,32 @@ async function fetchLbWeather(dateVal) {
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  onSnapshot,
-  serverTimestamp,
-  query,
-  orderBy
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-/*
-  TODO:
-  Replace the placeholder values below with your Firebase config
-  from Firebase Console > Project Settings > General > Your Apps
-*/
 const firebaseConfig = {
-  apiKey: "PASTE_API_KEY_HERE",
-  authDomain: "PASTE_PROJECT.firebaseapp.com",
-  projectId: "PASTE_PROJECT_ID",
-  storageBucket: "PASTE_PROJECT.appspot.com",
-  messagingSenderId: "PASTE_SENDER_ID",
-  appId: "PASTE_APP_ID"
+  apiKey: "AIzaSyBKLfhyxZTn4t7RlRCRTfb8DgzLlPY2sFc",
+  authDomain: "onawhim-85c14.firebaseapp.com",
+  databaseURL: "https://onawhim-85c14-default-rtdb.firebaseio.com",
+  projectId: "onawhim-85c14",
+  storageBucket: "onawhim-85c14.firebasestorage.app",
+  messagingSenderId: "582396606776",
+  appId: "1:582396606776:web:2c17b5ef75a96fde7f29cd"
 };
 
-const isConfigured =
-  firebaseConfig.apiKey !== "PASTE_API_KEY_HERE";
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-if(isConfigured){
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  window.db = db;
-  window.fb = {
-    collection,
-    addDoc,
-    onSnapshot,
-    serverTimestamp,
-    query,
-    orderBy
-  };
-  window.firebaseReady = true;
-
-  const q = query(collection(db, 'catches'), orderBy('createdAt', 'desc'));
-
-  onSnapshot(q, (snapshot) => {
-    window.catches = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-
-    if(typeof renderTable === 'function') renderTable();
-    if(typeof updateStats === 'function') updateStats();
-    if(typeof syncPendingCatches === 'function') syncPendingCatches();
-  });
-
-  console.log('Firebase shared catch log enabled');
-} else {
-  console.warn('Firebase not configured. Using local catch log only.');
-}
+window.oawFirebase = {
+ async addCatch(catchData){
+   return await addDoc(collection(db,'catches'), {...catchData, createdAt: serverTimestamp()});
+ },
+ startSync(callback){
+   const q = query(collection(db,'catches'), orderBy('createdAt','desc'));
+   return onSnapshot(q, snap => {
+      callback(snap.docs.map(d => ({firebaseId:d.id, ...d.data()})));
+   });
+ }
+};
 </script>
 
 </body>
