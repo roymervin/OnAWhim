@@ -1,4 +1,4 @@
-#v4.8
+#v4.8.1
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -4336,7 +4336,7 @@ function loadJSON(evt){
       save();renderTable();updateStats();updateDataBarInfo();
       var skipped=incoming.length-added;
       var msg='✓ Loaded '+added+' new entr'+(added===1?'y':'ies');
-      if(skipped) msg+=' ('+skipped+' duplicate'+(skipped===1?'':'s')+' skipped)';
+      // Duplicate skipping disabled
       toast(msg);
     }catch(err){toast('⚠ Could not read file. Is it a valid OnAWhim JSON?');}
   };
@@ -4472,17 +4472,13 @@ function loadCSV(evt){
         if(!obj.status) obj.status='Kept';
         // Generate a unique id
         obj.id='csv-'+Date.now()+'-'+r+'-'+Math.random().toString(36).slice(2,7);
-        // Skip exact duplicate (same date+angler+species+status)
-        var dup=catches.some(function(c){
-          return c.date===obj.date&&c.angler===obj.angler&&c.species===obj.species&&c.status===obj.status&&c.weight===obj.weight;
-        });
-        if(dup){skipped++;continue;}
+        // Allow duplicate imports
         catches.push(obj);
         added++;
       }
       save();renderTable();updateStats();updateDataBarInfo();
       var msg='\u2713 Imported '+added+' catch'+(added===1?'':'es')+' from CSV';
-      if(skipped) msg+=' ('+skipped+' duplicate'+(skipped===1?'':'s')+' skipped)';
+      // Duplicate skipping disabled
       if(badDate) msg+=' ('+badDate+' row'+(badDate===1?'':'s')+' had invalid dates)';
       toast(msg);
     }catch(err){
