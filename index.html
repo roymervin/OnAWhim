@@ -1782,7 +1782,7 @@ td:last-child{padding-right:13px;text-align:center}
   <!-- RIGHT-NOW STATUS -->
   <section class="now fade-in" style="animation-delay:.05s">
     <div class="now-eyebrow"><span class="now-pulse"></span>Right-now status · Mid-May 2026</div>
-    <h2>Key Information for Upcoming Trip</h2>
+    <h2>Read before planning your first trip</h2>
     <ul class="now-list">
       <li><strong>Federal ARS (red snapper) private opens May 22</strong> · 2 fish / 16″ min in federal waters. TPWD will announce a closure date when state quota approaches. <em>[VERIFY at tpwd.texas.gov]</em></li>
       <li><strong>Federal ARS for-hire:</strong> June 1 – Oct 26, 2026 (147 days). 2 fish / 16″.</li>
@@ -4588,19 +4588,19 @@ function getPrizedFish(todayCatches) {
 
 function lbLeaderForPeriod(catchArr, label) {
   // Returns {mostCatches, biggest, mostSpecies} for the given array
-  var countMap = {}, weightMap = {}, speciesMap = {};
+  var countMap = {}, lengthMap = {}, speciesMap = {};
   catchArr.forEach(function(c){
     var a = c.angler || 'Unknown';
     countMap[a] = (countMap[a]||0)+1;
-    if(c.weight > 0){
-      if(!weightMap[a] || c.weight > weightMap[a].weight) weightMap[a] = c;
+    if(c.length > 0){
+      if(!lengthMap[a] || c.length > lengthMap[a].length) lengthMap[a] = c;
     }
     if(c.species){ if(!speciesMap[a]) speciesMap[a] = new Set(); speciesMap[a].add(c.species); }
   });
   var topCount   = Object.entries(countMap).sort(function(a,b){return b[1]-a[1];})[0];
-  var topWeight  = Object.entries(weightMap).sort(function(a,b){return b[1].weight-a[1].weight;})[0];
+  var topLength  = Object.entries(lengthMap).sort(function(a,b){return b[1].length-a[1].length;})[0];
   var topSpecies = Object.entries(speciesMap).map(function(e){return [e[0],e[1].size];}).sort(function(a,b){return b[1]-a[1];})[0];
-  return { topCount, topWeight, topSpecies, weightMap };
+  return { topCount, topLength, topSpecies, lengthMap };
 }
 
 function renderLbRows(panel, data) {
@@ -4620,15 +4620,15 @@ function renderLbRows(panel, data) {
   html += '<div class="lb-row">';
   html += '<div class="lb-row-body">';
   html += '<div class="lb-row-cat">Biggest Fish</div>';
-  if(data.topWeight) {
-    var bEntry = data.topWeight[1];
-    html += '<div class="lb-row-name">' + esc(data.topWeight[0]) + '</div>';
-    html += '<div class="lb-row-val">' + bEntry.weight.toFixed(1) + ' lbs · ' + esc(bEntry.species) + '</div>';
-  } else { html += '<div class="lb-empty">No weight logged</div>'; }
+  if(data.topLength) {
+    var bEntry = data.topLength[1];
+    html += '<div class="lb-row-name">' + esc(data.topLength[0]) + '</div>';
+    html += '<div class="lb-row-val">' + bEntry.length.toFixed(1) + ' in · ' + esc(bEntry.species) + '</div>';
+  } else { html += '<div class="lb-empty">No length logged</div>'; }
   html += '</div>';
   // Photo
-  if(data.topWeight) {
-    var bEntry = data.topWeight[1];
+  if(data.topLength) {
+    var bEntry = data.topLength[1];
     if(bEntry.photos && bEntry.photos.length) {
       html += '<img class="lb-row-img" src="' + bEntry.photos[0].data + '" alt="catch photo">';
     }
@@ -4867,7 +4867,7 @@ function renderLbRowsHoriz(panel, data) {
   if(!panel) return;
   var cols = [
     { cat: 'Most Catches', name: data.topCount ? data.topCount[0] : null, val: data.topCount ? data.topCount[1] + ' catch' + (data.topCount[1]===1?'':'es') : null, photo: null },
-    { cat: 'Biggest Fish',  name: data.topWeight ? data.topWeight[0] : null, val: data.topWeight ? data.topWeight[1].weight.toFixed(1) + ' lbs · ' + data.topWeight[1].species : null, photo: data.topWeight && data.topWeight[1].photos && data.topWeight[1].photos.length ? data.topWeight[1].photos[0].data : null },
+    { cat: 'Biggest Fish',  name: data.topLength ? data.topLength[0] : null, val: data.topLength ? data.topLength[1].length.toFixed(1) + ' in · ' + data.topLength[1].species : null, photo: data.topLength && data.topLength[1].photos && data.topLength[1].photos.length ? data.topLength[1].photos[0].data : null },
     { cat: 'Most Species',  name: data.topSpecies ? data.topSpecies[0] : null, val: data.topSpecies ? data.topSpecies[1] + ' species' : null, photo: null },
   ];
   panel.innerHTML = cols.map(function(col){
