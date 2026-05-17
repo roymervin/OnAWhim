@@ -1,5 +1,4 @@
-#4.5.5
-#v4.5.2
+#v4.7
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -3819,16 +3818,6 @@ function save(){ localStorage.setItem(KEY, JSON.stringify(catches)) }
 
 // ═══ BOOT (deferred to tab init) ═══════════════════════════════
 // catch log initialised when user first opens the tab - see tab switch
-window.addEventListener('load', ()=>{
-  if(window.oawFirebase){
-    window.oawFirebase.startSync(function(remoteCatches){
-      catches = remoteCatches;
-      try{ localStorage.setItem(KEY, JSON.stringify(catches)); }catch(e){}
-      renderTable();
-      updateStats();
-    });
-  }
-});
 
 // ═══ DATE UTILS ══════════════════════════════════════════════════
 function today(){ return new Date().toISOString().split('T')[0] }
@@ -4150,9 +4139,6 @@ function addEntry(){
     return {id: p.id, path: basePath + p.id + '.jpg', data: p.data};
   });
   catches.push(e); save(); renderTable(); updateStats(); clearForm();
-  if(window.oawFirebase){
-    window.oawFirebase.addCatch(e).catch(err=>console.warn('Firebase save failed', err));
-  }
   toast('✓ Catch logged — tight lines!');
 }
 
@@ -4384,38 +4370,7 @@ function transferToDevice(){
     var cklJson = '';
     try { cklJson = localStorage.getItem('onawhim-checklist-v1') || ''; } catch(e){}
 
-    // Inject a bootstrap <script> right before 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBKLfhyxZTn4t7RlRCRTfb8DgzLlPY2sFc",
-  authDomain: "onawhim-85c14.firebaseapp.com",
-  databaseURL: "https://onawhim-85c14-default-rtdb.firebaseio.com",
-  projectId: "onawhim-85c14",
-  storageBucket: "onawhim-85c14.firebasestorage.app",
-  messagingSenderId: "582396606776",
-  appId: "1:582396606776:web:2c17b5ef75a96fde7f29cd"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-window.oawFirebase = {
- async addCatch(catchData){
-   return await addDoc(collection(db,'catches'), {...catchData, createdAt: serverTimestamp()});
- },
- startSync(callback){
-   const q = query(collection(db,'catches'), orderBy('createdAt','desc'));
-   return onSnapshot(q, snap => {
-      callback(snap.docs.map(d => ({firebaseId:d.id, ...d.data()})));
-   });
- }
-};
-</script>
-
-</body> that pre-loads
+    // Inject a bootstrap <script> right before </body> that pre-loads
     // the data into localStorage when the file is opened on the new device.
     // We do this so the page initialises with all the data already present.
     var injectScript = '<script id=\"oaw-transfer-bootstrap\">' +
@@ -4429,70 +4384,8 @@ window.oawFirebase = {
       '}catch(e){}' +
     '<\/script>';
 
-    // Insert before 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBKLfhyxZTn4t7RlRCRTfb8DgzLlPY2sFc",
-  authDomain: "onawhim-85c14.firebaseapp.com",
-  databaseURL: "https://onawhim-85c14-default-rtdb.firebaseio.com",
-  projectId: "onawhim-85c14",
-  storageBucket: "onawhim-85c14.firebasestorage.app",
-  messagingSenderId: "582396606776",
-  appId: "1:582396606776:web:2c17b5ef75a96fde7f29cd"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-window.oawFirebase = {
- async addCatch(catchData){
-   return await addDoc(collection(db,'catches'), {...catchData, createdAt: serverTimestamp()});
- },
- startSync(callback){
-   const q = query(collection(db,'catches'), orderBy('createdAt','desc'));
-   return onSnapshot(q, snap => {
-      callback(snap.docs.map(d => ({firebaseId:d.id, ...d.data()})));
-   });
- }
-};
-</script>
-
-</body>
-    var finalHtml = htmlSrc.replace(/<\/body>/i, injectScript + '
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBKLfhyxZTn4t7RlRCRTfb8DgzLlPY2sFc",
-  authDomain: "onawhim-85c14.firebaseapp.com",
-  databaseURL: "https://onawhim-85c14-default-rtdb.firebaseio.com",
-  projectId: "onawhim-85c14",
-  storageBucket: "onawhim-85c14.firebasestorage.app",
-  messagingSenderId: "582396606776",
-  appId: "1:582396606776:web:2c17b5ef75a96fde7f29cd"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-window.oawFirebase = {
- async addCatch(catchData){
-   return await addDoc(collection(db,'catches'), {...catchData, createdAt: serverTimestamp()});
- },
- startSync(callback){
-   const q = query(collection(db,'catches'), orderBy('createdAt','desc'));
-   return onSnapshot(q, snap => {
-      callback(snap.docs.map(d => ({firebaseId:d.id, ...d.data()})));
-   });
- }
-};
-</script>
-
-</body>');
+    // Insert before </body>
+    var finalHtml = htmlSrc.replace(/<\/body>/i, injectScript + '</body>');
 
     // Download as a self-contained .html file
     var d = new Date().toISOString().slice(0,10);
@@ -5284,36 +5177,5 @@ async function fetchLbWeather(dateVal) {
 })();
 
 </script>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBKLfhyxZTn4t7RlRCRTfb8DgzLlPY2sFc",
-  authDomain: "onawhim-85c14.firebaseapp.com",
-  databaseURL: "https://onawhim-85c14-default-rtdb.firebaseio.com",
-  projectId: "onawhim-85c14",
-  storageBucket: "onawhim-85c14.firebasestorage.app",
-  messagingSenderId: "582396606776",
-  appId: "1:582396606776:web:2c17b5ef75a96fde7f29cd"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-window.oawFirebase = {
- async addCatch(catchData){
-   return await addDoc(collection(db,'catches'), {...catchData, createdAt: serverTimestamp()});
- },
- startSync(callback){
-   const q = query(collection(db,'catches'), orderBy('createdAt','desc'));
-   return onSnapshot(q, snap => {
-      callback(snap.docs.map(d => ({firebaseId:d.id, ...d.data()})));
-   });
- }
-};
-</script>
-
 </body>
 </html>
