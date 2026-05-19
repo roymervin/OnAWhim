@@ -1,0 +1,741 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OnAWhim · Fishing Dashboard</title>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+``
+
+
+  <style>
+    :root{
+      --paper:#f0f4f8;
+      --paper-deep:#e2eaf2;
+      --paper-dark:#c8d8e8;
+      --ink:#0f2235;
+      --ink-soft:#2a4a68;
+      --ink-faint:#4a6a88;
+      --teal:#0e7fa0;
+      --teal-deep:#0a6682;
+      --coral:#c94b30;
+      --coral-deep:#a83520;
+      --gold:#a07010;
+      --gold-deep:#7a5208;
+      --shadow: rgba(10,40,80,.12);
+      --shadow-deep: rgba(10,40,80,.22);
+      --f-display:'Fraunces',Georgia,serif;
+      --f-body:'Plus Jakarta Sans','Helvetica Neue',sans-serif;
+      --f-mono:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+      --radius: 14px;
+      --touch: 44px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+    body{
+      font-family:var(--f-body);
+      color:var(--ink);
+      background:var(--paper);
+      min-height:100vh;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(14,127,160,.07), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(201,75,48,.05), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 0% 80%, rgba(160,112,16,.04), transparent 60%);
+    }
+    body::after{
+      content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+      background:
+        linear-gradient(90deg, rgba(14,127,160,.05) 1px, transparent 1px) 0 0/40px 100%,
+        linear-gradient(0deg, rgba(14,127,160,.05) 1px, transparent 1px) 0 0/100% 40px;
+    }
+    .top{position:sticky;top:0;z-index:10;background:linear-gradient(180deg, rgba(226,234,242,.98), rgba(226,234,242,.90));
+      border-bottom:1px solid var(--paper-dark);backdrop-filter:blur(10px)}
+    .top-inner{max-width:1200px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .brand{display:flex;flex-direction:column;gap:2px}
+    .eyebrow{font-family:var(--f-mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--teal-deep)}
+    .title{font-family:var(--f-display);font-weight:800;font-size:28px;letter-spacing:-.02em;line-height:1}
+    .sub{font-family:var(--f-display);font-style:italic;color:var(--ink-faint);font-size:13px}
+    .status-pill{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:8px 12px;border-radius:999px;
+      border:1px solid rgba(14,127,160,.25);background:rgba(14,127,160,.08);color:var(--teal-deep)}
+    .wrap{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:18px 16px 60px}
+    .banner{display:none;margin-bottom:14px;border-radius:10px;padding:12px 14px;
+      background:rgba(201,75,48,.08);border:1px solid rgba(201,75,48,.25);border-left:5px solid var(--coral);color:var(--coral-deep)}
+    .banner code{font-family:var(--f-mono)}
+    .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 14px}
+    .tab{min-height:var(--touch);border-radius:10px;padding:0 14px;display:flex;align-items:center;gap:8px;cursor:pointer;
+      background:rgba(210,228,248,.7);border:1px solid rgba(14,127,160,.20);color:var(--ink-faint);
+      font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+    .tab.active{background:rgba(14,127,160,.16);border-color:rgba(14,127,160,.35);color:var(--teal-deep)}
+    .grid{display:grid;grid-template-columns: 1.1fr .9fr;gap:14px}
+    @media(max-width:980px){.grid{grid-template-columns:1fr}}
+    .card{background:linear-gradient(180deg, rgba(240,246,252,.92), rgba(226,234,242,.98));
+      border:1px solid rgba(14,127,160,.16);border-radius:10px;box-shadow:0 8px 22px var(--shadow)}
+    .card-hd{padding:14px 16px;border-bottom:1px dashed var(--paper-dark);display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .card-hd h2{font-family:var(--f-display);font-weight:800;font-size:20px;letter-spacing:-.01em}
+    .note{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
+    .card-bd{padding:16px}
+    .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    label.lab{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
+    input,select,textarea,button{
+      min-height:var(--touch);
+      border-radius:8px;
+      border:1px solid rgba(14,127,160,.22);
+      background:rgba(220,234,248,.9);
+      color:var(--ink);
+      font-family:var(--f-body);
+      font-size:14px;
+      padding:10px 12px;
+      outline:none;
+    }
+    select{cursor:pointer}
+    textarea{min-height:90px;resize:vertical}
+    input:focus,select:focus,textarea:focus{border-color:rgba(14,127,160,.55);box-shadow:0 0 0 2px rgba(14,127,160,.14)}
+    .btn{cursor:pointer;border:1px solid rgba(14,127,160,.35);background:rgba(14,127,160,.14);
+      font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal-deep)}
+    .btn:hover{background:rgba(14,127,160,.22)}
+    .btn.gold{border-color:rgba(200,144,67,.45);background:rgba(200,144,67,.14);color:var(--gold-deep)}
+    .btn.gold:hover{background:rgba(200,144,67,.20)}
+    .kv{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    @media(max-width:640px){.kv{grid-template-columns:1fr}}
+    .k{background:rgba(14,127,160,.06);border:1px solid rgba(14,127,160,.14);border-radius:10px;padding:12px}
+    .k .k-l{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
+    .k .k-v{font-family:var(--f-display);font-weight:800;font-size:22px;margin-top:4px}
+    .bigfish{margin-top:10px;border-radius:10px;padding:14px;
+      background:linear-gradient(180deg,rgba(200,144,67,.16),rgba(226,234,242,.92));
+      border:1px solid rgba(200,144,67,.35);border-left:6px solid var(--gold)}
+    .bigfish strong{font-family:var(--f-display);font-size:18px}
+    .small{margin-top:6px;font-family:var(--f-mono);font-size:11px;color:var(--ink-faint)}
+    .lb-item{display:flex;justify-content:space-between;align-items:center;gap:12px;
+      background:rgba(240,246,252,.96);border:1px solid rgba(14,127,160,.14);border-left:4px solid var(--teal);
+      border-radius:10px;padding:12px;margin-bottom:10px}
+    .lb-item.r1{border-left-color:var(--gold)}
+    .lb-item.r2{border-left-color:var(--coral)}
+    .rank{font-family:var(--f-display);font-weight:900;font-size:22px;width:40px;text-align:center;color:var(--ink-faint)}
+    .who{flex:1;min-width:0}
+    .nm{font-family:var(--f-display);font-weight:800}
+    .mt{font-size:12px;color:var(--ink-faint);margin-top:2px}
+    .sc{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;color:var(--teal-deep);font-weight:700;white-space:nowrap}
+    table{width:100%;border-collapse:collapse;font-size:13px;background:rgba(240,246,252,.92);border:1px solid rgba(14,127,160,.12);border-radius:10px;overflow:hidden}
+    thead{background:rgba(14,127,160,.08)}
+    th{font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);text-align:left;padding:10px}
+    td{padding:10px;border-top:1px solid rgba(14,127,160,.08)}
+    .tag{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+      padding:3px 8px;border-radius:999px;border:1px solid rgba(14,127,160,.25);background:rgba(14,127,160,.08);color:var(--teal-deep)}
+    .tag.keep{border-color:rgba(90,138,107,.45);background:rgba(90,138,107,.14);color:#3a6a4a}
+    .tag.rel{border-color:rgba(200,144,67,.45);background:rgba(200,144,67,.14);color:var(--gold-deep)}
+    .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
+      background:rgba(240,246,252,.98);border:1px solid rgba(14,127,160,.20);border-radius:10px;
+      padding:10px 14px;box-shadow:0 10px 26px var(--shadow-deep);
+      font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;color:var(--ink-soft);
+      opacity:0;pointer-events:none;transition:opacity .2s, transform .2s}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+    .footer{margin-top:16px;color:var(--ink-faint);font-size:12px;font-style:italic}
+  </style>
+</head>
+
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <div class="brand">
+        <div class="eyebrow">F/V <span style="color:var(--ink);font-weight:700">OnAWhim</span> · Fishing Dashboard</div>
+        <div class="title">Catch Log <span style="font-weight:500;font-style:italic;color:var(--teal-deep)">+ Leaderboard</span></div>
+        <div class="sub">Log catches, auto-build trip leaderboards, and review stats — all live from Firestore.</div>
+      </div>
+      <div class="status-pill" id="status">starting…</div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="banner" id="fileBanner">
+      <b>Heads up:</b> You opened this as <code>file://</code>. Firebase module imports can be blocked.
+      Run a local server instead: <code>python -m http.server 8000</code> then open <code>http://localhost:8000/onawhim_dashboard_v1.html</code>.
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-tab="dash">Dashboard</button>
+      <button class="tab" data-tab="log">Log a Catch</button>
+      <button class="tab" data-tab="raw">Catches (Table)</button>
+    </div>
+
+    <!-- DASHBOARD TAB -->
+    <section id="tab-dash">
+      <div class="grid">
+        <div class="card">
+          <div class="card-hd">
+            <h2>Trip Leaderboard</h2>
+            <div class="note" id="docsNote">docs: —</div>
+          </div>
+          <div class="card-bd">
+            <div class="controls" style="margin-bottom:10px">
+              <label class="lab">Trip</label>
+              <select id="tripSelect"></select>
+              <button class="btn gold" id="btnLatest">Use latest trip</button>
+              <button class="btn" id="btnCopyLink">Copy link</button>
+            </div>
+
+            <div class="kv" id="tripKpis"></div>
+            <div class="bigfish" id="bigFish">Waiting for data…</div>
+
+            <div style="height:12px"></div>
+            <div id="leaderboard"></div>
+
+            <div class="footer">Tip: The leaderboard ranks by <b>most fish</b>; ties break by <b>biggest weight</b>.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd">
+            <h2>Quick Stats</h2>
+            <div class="note">live</div>
+          </div>
+          <div class="card-bd">
+            <div class="kv" id="globalKpis"></div>
+            <div style="height:10px"></div>
+            <div class="footer">
+              Stats are calculated from all documents in <code>catches</code>.
+            </div>
+            <details style="margin-top:12px">
+              <summary style="font-family:var(--f-mono)">Show schema debug</summary>
+              <pre id="schemaDebug" style="margin-top:10px">—</pre>
+            </details>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOG TAB -->
+    <section id="tab-log" style="display:none">
+      <div class="card">
+        <div class="card-hd">
+          <h2>Log a Catch</h2>
+          <div class="note">writes to Firestore</div>
+        </div>
+        <div class="card-bd">
+          <div class="controls" style="margin-bottom:10px">
+            <label class="lab">Trip</label>
+            <select id="tripSelectForm"></select>
+            <button class="btn" id="btnNewTrip">New trip from date</button>
+          </div>
+
+          <div class="grid" style="grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <label class="lab">Date</label>
+              <input id="fDate" type="date" />
+            </div>
+            <div>
+              <label class="lab">Angler (real name)</label>
+              <select id="fAngler">
+  		<option value="">Select Angler</option>
+  		<option>Roy de Ocampo</option>
+  		<option>Brandon de Ocampo</option>
+  		<option>Levi de Ocampo</option>
+  		<option>Joie de Ocampo</option>
+  		<option>Kim de Ocampo</option>
+  		<option>Boyd Nabas</option>
+  		<option>Gerard Reyes</option>
+  		<option>Luther Salvan</option>
+  		<option>Daniel Salvan</option>
+  		<option>Curtis Aldinger</option>
+  		<option>Kevin Hall</option>
+  		<option>Betsy Hall</option>
+  		<option>Paul Pierson</option>
+  		<option>William Ling</option>
+  		<option>Elizabeth Ling</option>
+  		<option>Christopher Ling</option>
+  		<option>Other</option>
+	       </select>
+
+            </div>
+            <div>
+              <label class="lab">Species</label>		
+		<select id="fSpecies">
+  		<option value="">Select Species</option>
+  		<option>Red Snapper</option>
+  		<option>Vermillion Snapper</option>
+  		<option>Lane Snapper</option>
+  		<option>Mangrove Snapper</option>
+  		<option>Snapper (Other)</option>
+  		<option>Greater Amberjack</option>
+  		<option>Almaco Jack</option>
+  		<option>Jack Crevalle</option>
+  		<option>Blue Runner</option>
+  		<option>Mahi Mahi</option>
+  		<option>Tuna (Blackfin)</option>
+  		<option>Tuna (Yellowfin)</option>
+  		<option>Tuna (Skipjack)</option>
+  		<option>Tuna (Other)</option>
+  		<option>Grouper (Scamp)</option>
+  		<option>Grouper (Yelloweye)</option>
+  		<option>Grouper (Black)</option>
+  		<option>Grouper (Strawberry)</option>
+  		<option>Grouper (Red)</option>
+  		<option>Wahoo</option>
+  		<option>Mackerel (King)</option>
+  		<option>Mackerel (Spanish)</option>
+  		<option>Triggerfish (Gray)</option>
+  		<option>Triggerfish (Ocean)</option>
+  		<option>Sheepshead</option>
+	       </select>
+
+            </div>
+            <div>
+              <label class="lab">Weight (lb)</label>
+              <input id="fWeight" type="number" step="0.1" min="0" placeholder="18.0" />
+		
+		<div>
+  		 <label class="lab">Length (in)</label>
+  		 <select id="fLength"></select>
+		</div>
+
+		<div>
+  		 <label class="lab">Location / Spot</label>
+  		 <select id="fLocation"></select>
+		</div>
+
+            </div>
+            <div>
+              <label class="lab">Kept / Released</label>
+              <select id="fKept">
+                <option value="kept">Kept</option>
+                <option value="released">Released</option>
+              </select>
+            </div>
+            <div>
+              <label class="lab">Method (optional)</label>
+              <input id="fMethod" type="text" placeholder="Live bait / Jig / Trolling" />
+            </div>
+            <div style="grid-column:1/-1">
+              <label class="lab">Notes (optional)</label>
+              <textarea id="fNotes" placeholder="Where, how, what worked…"></textarea>
+            </div>
+          </div>
+
+          <div class="controls" style="margin-top:12px">
+            <button class="btn gold" id="btnSubmit">Submit Catch</button>
+            <button class="btn" id="btnClear">Clear</button>
+          </div>
+
+          <div class="footer">This form writes <b>both</b> camelCase and PascalCase fields to stay compatible with your existing documents.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RAW TABLE TAB -->
+    <section id="tab-raw" style="display:none">
+      <div class="card">
+        <div class="card-hd">
+          <h2>Catches</h2>
+          <div class="note" id="tableNote">—</div>
+        </div>
+        <div class="card-bd">
+          <div class="controls" style="margin-bottom:10px">
+            <label class="lab">Trip</label>
+            <select id="tripSelectTable"></select>
+            <label class="lab">Search</label>
+            <input id="search" type="text" placeholder="angler or species…" />
+          </div>
+
+          <div style="overflow:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Angler</th>
+                  <th>Species</th>
+                  <th>Weight</th>
+                  <th>Status</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+
+          <div class="footer">Tip: This table is filtered locally (fast + resilient).</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="toast" id="toast">Saved.</div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBKLfhyxZTn4t7RlRCRTfb8DgzLlPY2sFc",
+      authDomain: "onawhim-85c14.firebaseapp.com",
+      projectId: "onawhim-85c14",
+      storageBucket: "onawhim-85c14.firebasestorage.app",
+      messagingSenderId: "582396606776",
+      appId: "1:582396606776:web:2c17b5ef75a96fde7f29cd"
+    };
+
+    const $ = (id)=>document.getElementById(id);
+
+	// Populate Length dropdown
+	setTimeout(() => {
+  	const lengthSel = $('fLength');
+  		if (lengthSel && !lengthSel.options.length) {
+    			for (let i = 0; i <= 100; i++) {
+      			const opt = document.createElement('option');
+		      opt.value = i;
+      		      opt.textContent = i;
+      		lengthSel.appendChild(opt);
+    		}
+    		lengthSel.value = "0";
+  	  }
+
+ 	// Populate Location dropdown
+  	const locSel = $('fLocation');
+  		if (locSel && !locSel.options.length) {
+    			for (let i = 0; i <= 10; i++) {
+      			const val = String(i).padStart(3, '0') + '.000';
+      			const opt = document.createElement('option');
+      			opt.value = val;
+      			opt.textContent = val;
+      		locSel.appendChild(opt);
+    		}
+    		locSel.value = "000.000";
+  	}
+}, 0);
+
+    if(location.protocol === 'file:') $('fileBanner').style.display = 'block';
+
+    const toast = (msg)=>{
+      const t = $('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(()=>t.classList.remove('show'), 1700);
+    }
+
+    const pick = (obj, keys)=>{
+      for(const k of keys){
+        if(obj && Object.prototype.hasOwnProperty.call(obj,k) && obj[k] !== undefined && obj[k] !== null && obj[k] !== '') return obj[k];
+      }
+      return undefined;
+    }
+
+    const toNumber = (v)=>{
+      if(typeof v === 'number') return Number.isFinite(v) ? v : undefined;
+      if(typeof v === 'string'){
+        const num = parseFloat(v.replace(/[^0-9.]+/g,''));
+        return Number.isFinite(num) ? num : undefined;
+      }
+      return undefined;
+    }
+
+    function normalize(raw){
+      const tripId = pick(raw, ['tripId','TripID','TripId','tripID','Tripid']);
+      const angler = pick(raw, ['angler','Angler','anglerName','AnglerName','name','Name']) || 'Unknown';
+      const species = pick(raw, ['species','Species','fish','Fish','fishSpecies','FishSpecies']) || 'Unknown';
+      const weight = toNumber(pick(raw, ['weight','Weight','lbs','Lbs','pounds','Pounds'])) || 0;
+      const kept = pick(raw, ['kept','Kept','status','Status']) ?? '';
+      const method = pick(raw, ['method','Method']) ?? '';
+      const notes = pick(raw, ['notes','Notes','note','Note']) ?? '';
+      const date = pick(raw, ['date','Date','tripDate','TripDate']) ?? '';
+      const ts = pick(raw, ['timestamp','Timestamp','createdAt','CreatedAt']) ?? null;
+      return { tripId, angler, species, weight, kept, method, notes, date, ts, _raw: raw };
+    }
+
+    function safe(v){ return (v===undefined||v===null||v==='') ? '—' : String(v); }
+
+    let all = [];
+    let tripIds = [];
+    let selectedTrip = null;
+
+    const tabButtons = Array.from(document.querySelectorAll('.tab'));
+    const tabPanels = { dash: $('tab-dash'), log: $('tab-log'), raw: $('tab-raw') };
+
+    function showTab(key){
+      tabButtons.forEach(b=>b.classList.toggle('active', b.dataset.tab===key));
+      Object.entries(tabPanels).forEach(([k,el])=> el.style.display = (k===key) ? '' : 'none');
+    }
+    tabButtons.forEach(b=> b.addEventListener('click', ()=> showTab(b.dataset.tab)));
+
+    function computeTrips(){
+      const set = new Set();
+      all.forEach(c=>{ if(c.tripId) set.add(String(c.tripId)); });
+      tripIds = Array.from(set).sort();
+    }
+
+    function chooseLatestTrip(){
+      let best = null;
+      let bestTs = -Infinity;
+      const byTrip = new Map();
+      for(const c of all){
+        if(!c.tripId) continue;
+        const t = String(c.tripId);
+        const cur = byTrip.get(t) || {maxTs: null};
+        const tsNum = toNumber(c.ts);
+        if(tsNum !== undefined){
+          cur.maxTs = cur.maxTs===null ? tsNum : Math.max(cur.maxTs, tsNum);
+        }
+        byTrip.set(t, cur);
+      }
+      for(const [t,info] of byTrip.entries()){
+        if(info.maxTs!==null && info.maxTs > bestTs){ best=t; bestTs=info.maxTs; }
+      }
+      if(!best) best = tripIds.length ? tripIds[tripIds.length-1] : null;
+      return best;
+    }
+
+    function renderAll(){
+      renderKpis();
+      renderLeaderboard();
+      renderTable();
+    }
+
+    function syncTripSelects(){
+      const selects = [$('tripSelect'), $('tripSelectForm'), $('tripSelectTable')];
+      selects.forEach(sel=>{
+        sel.innerHTML='';
+        if(!tripIds.length){
+          const o=document.createElement('option');o.value='';o.textContent='No trips found';sel.appendChild(o);sel.disabled=true;
+          return;
+        }
+        sel.disabled=false;
+        tripIds.forEach(t=>{
+          const o=document.createElement('option');o.value=t;o.textContent=t;sel.appendChild(o);
+        });
+      });
+
+      const urlTrip = new URLSearchParams(location.search).get('trip');
+      const next = (urlTrip && tripIds.includes(urlTrip)) ? urlTrip : (selectedTrip || chooseLatestTrip());
+      selectedTrip = next;
+      selects.forEach(sel=>{ if(!sel.disabled) sel.value = selectedTrip; });
+
+      renderAll();
+    }
+
+    function setTrip(t){
+      selectedTrip = t || null;
+      const url = new URL(location.href);
+      if(selectedTrip) url.searchParams.set('trip', selectedTrip);
+      history.replaceState({},'',url);
+      syncTripSelects();
+    }
+
+    $('tripSelect').addEventListener('change', e=> setTrip(e.target.value));
+    $('tripSelectForm').addEventListener('change', e=> setTrip(e.target.value));
+    $('tripSelectTable').addEventListener('change', e=> setTrip(e.target.value));
+
+    $('btnLatest').addEventListener('click', ()=>{
+      const latest = chooseLatestTrip();
+      if(latest) setTrip(latest);
+    });
+
+    $('btnCopyLink').addEventListener('click', async ()=>{
+      const url = new URL(location.href);
+      if(selectedTrip) url.searchParams.set('trip', selectedTrip);
+      try{
+        await navigator.clipboard.writeText(url.toString());
+        toast('Link copied');
+      } catch {
+        toast('Copy failed');
+      }
+    });
+
+    const filtered = ()=> selectedTrip ? all.filter(c=>String(c.tripId||'')===String(selectedTrip)) : [];
+
+    function renderKpis(){
+      const list = filtered();
+      const anglersSet = new Set(list.map(c=>c.angler).filter(Boolean));
+      const totalFish = list.length;
+
+      $('tripKpis').innerHTML = `
+        <div class="k"><div class="k-l">Trip</div><div class="k-v" style="font-size:16px">${safe(selectedTrip)}</div></div>
+        <div class="k"><div class="k-l">Anglers</div><div class="k-v">${anglersSet.size}</div></div>
+        <div class="k"><div class="k-l">Fish</div><div class="k-v">${totalFish}</div></div>
+      `;
+
+      const big = [...list].sort((a,b)=>(b.weight||0)-(a.weight||0))[0];
+      if(!big || (big.weight||0)===0){
+        $('bigFish').innerHTML = `<strong>Big Fish:</strong> —<div class="small">Add numeric <code>Weight</code> or <code>weight</code> to your catch entries.</div>`;
+      } else {
+        $('bigFish').innerHTML = `<strong>Big Fish:</strong> ${big.weight} lb ${safe(big.species)}<div class="small">Angler: ${safe(big.angler)} · Trip: ${safe(big.tripId)}</div>`;
+      }
+
+      const globalAnglers = new Set(all.map(c=>c.angler).filter(Boolean));
+      const globalTrips = new Set(all.map(c=>c.tripId).filter(Boolean));
+      $('globalKpis').innerHTML = `
+        <div class="k"><div class="k-l">Trips</div><div class="k-v">${globalTrips.size}</div></div>
+        <div class="k"><div class="k-l">Anglers</div><div class="k-v">${globalAnglers.size}</div></div>
+        <div class="k"><div class="k-l">Catches</div><div class="k-v">${all.length}</div></div>
+      `;
+
+      const raw = all[0]? all[0]._raw : null;
+      const dbg = { docs: all.length, sampleKeys: raw?Object.keys(raw).sort():[], sample: raw };
+      $('schemaDebug').textContent = JSON.stringify(dbg, null, 2);
+
+      $('docsNote').textContent = `docs: ${all.length}`;
+      $('tableNote').textContent = `${filtered().length} catches in selected trip`;
+    }
+
+    function renderLeaderboard(){
+      const list = filtered();
+      const board = $('leaderboard');
+      board.innerHTML = '';
+      if(!selectedTrip){ board.textContent = 'No trip selected.'; return; }
+      if(!list.length){ board.textContent = 'No catches for this trip yet.'; return; }
+
+      const map = new Map();
+      list.forEach(c=>{
+        const a = c.angler || 'Unknown';
+        const entry = map.get(a) || { total:0, fish:[] };
+        entry.total += 1;
+        entry.fish.push(c);
+        map.set(a, entry);
+      });
+
+      const ranked = Array.from(map.entries()).sort((A,B)=>{
+        const a=A[1], b=B[1];
+        if(b.total!==a.total) return b.total-a.total;
+        const aMax=Math.max(...a.fish.map(x=>x.weight||0));
+        const bMax=Math.max(...b.fish.map(x=>x.weight||0));
+        return bMax-aMax;
+      });
+
+      ranked.forEach(([name,data],idx)=>{
+        const counts = data.fish.reduce((acc,f)=>{
+          const sp=f.species||'Unknown';
+          acc[sp]=(acc[sp]||0)+1;
+          return acc;
+        },{});
+        const summary = Object.entries(counts).map(([s,n])=>`${n} ${s}`).join(' · ');
+        const el = document.createElement('div');
+        el.className = `lb-item ${idx===0?'r1':idx===1?'r2':''}`;
+        el.innerHTML = `
+          <div class="rank">${idx+1}</div>
+          <div class="who"><div class="nm">${name}</div><div class="mt">${summary}</div></div>
+          <div class="sc">${data.total} fish</div>
+        `;
+        board.appendChild(el);
+      });
+    }
+
+    function renderTable(){
+      const list = filtered();
+      const q = ($('search').value||'').trim().toLowerCase();
+      const rows = list.filter(c=>{
+        if(!q) return true;
+        return (c.angler||'').toLowerCase().includes(q) || (c.species||'').toLowerCase().includes(q);
+      });
+      const tbody = $('tableBody');
+      tbody.innerHTML='';
+      rows
+        .slice()
+        .sort((a,b)=> (toNumber(b.ts)||0) - (toNumber(a.ts)||0))
+        .forEach(c=>{
+          const tr = document.createElement('tr');
+          const status = (String(c.kept).toLowerCase()==='released') ? 'released' : 'kept';
+          tr.innerHTML = `
+            <td>${safe(c.date)}</td>
+            <td>${safe(c.angler)}</td>
+            <td>${safe(c.species)}</td>
+            <td>${c.weight ? `${c.weight}` : '—'}</td>
+            <td><span class="tag ${status==='released'?'rel':'keep'}">${status}</span></td>
+            <td>${safe(c.notes)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+    }
+
+    $('search').addEventListener('input', ()=> renderTable());
+
+    function formatTripIdFromDate(dateStr){
+      if(!dateStr) return '';
+      const [y,m,d] = dateStr.split('-');
+      if(!y||!m||!d) return '';
+      return `trip_${y}_${m}_${d}`;
+    }
+
+    $('btnNewTrip').addEventListener('click', ()=>{
+      const d = $('fDate').value;
+      const t = formatTripIdFromDate(d);
+      if(!t){ toast('Pick a date first'); return; }
+      if(!tripIds.includes(t)) tripIds.push(t);
+      tripIds.sort();
+      setTrip(t);
+      toast('Trip set');
+    });
+
+    $('btnClear').addEventListener('click', ()=>{
+      ['fAngler','fSpecies','fWeight','fMethod','fNotes'].forEach(id=> $(id).value='');
+      $('fKept').value='kept';
+      toast('Cleared');
+    });
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    $('btnSubmit').addEventListener('click', async ()=>{
+      const trip = $('tripSelectForm').value || selectedTrip;
+      const date = $('fDate').value;
+      const angler = $('fAngler').value.trim();
+      const species = $('fSpecies').value.trim();
+      const weight = toNumber($('fWeight').value);
+      const kept = $('fKept').value;
+      const method = $('fMethod').value.trim();
+      const notes = $('fNotes').value.trim();
+      const length = $('fLength') ? parseInt($('fLength').value || 0) : 0;
+      const location = $('fLocation') ? $('fLocation').value : '';
+
+      if(!trip){ toast('Select a trip'); return; }
+      if(!date){ toast('Pick a date'); return; }
+      if(!angler){ toast('Angler required'); return; }
+      if(!species){ toast('Species required'); return; }
+
+      const payload = {
+        tripId: trip, angler, species, 
+	weight: weight ?? 0,
+	length,
+	location,
+
+        kept, method, notes, date,
+        timestamp: Date.now(), createdAt: serverTimestamp(),
+        TripID: trip, Angler: angler, Species: species, 
+	Weight: weight ?? 0,
+	Length: length,
+	Location: location
+
+        Status: kept, Method: method, Notes: notes, Date: date, Timestamp: Date.now()
+      };
+
+      try{
+        await addDoc(collection(db,'catches'), payload);
+        toast('Saved catch');
+        showTab('dash');
+      } catch (e){
+        console.error(e);
+        toast('Save failed (check Firestore rules)');
+        $('status').textContent = 'error';
+      }
+    });
+
+    $('status').textContent = 'connecting…';
+
+    onSnapshot(collection(db,'catches'), (snap)=>{
+      const rows = [];
+      snap.forEach(d=> rows.push(d.data()));
+      all = rows.map(r=> normalize(r));
+      computeTrips();
+      if(!selectedTrip){
+        selectedTrip = new URLSearchParams(location.search).get('trip') || chooseLatestTrip();
+      }
+      syncTripSelects();
+      $('status').textContent = 'live';
+    }, (err)=>{
+      console.error(err);
+      $('status').textContent = 'firestore error';
+    });
+
+  </script>
+</body>
+</html>
