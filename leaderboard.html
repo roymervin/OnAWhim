@@ -435,6 +435,17 @@
   .species-emoji{font-size:22px;line-height:1;flex-shrink:0;margin-top:1px;}
   .species-name{font-family:var(--f-display);font-weight:600;font-size:14.5px;color:var(--ink);line-height:1.2;}
   .species-meta{font-size:11.5px;color:var(--ink-faint);margin-top:3px;line-height:1.45;}
+.species-photo{
+width:100%;
+max-width:220px;
+height:auto;
+display:block;
+margin:8px auto 10px;
+border-radius:8px;
+background:#fff;
+padding:4px;
+border:1px solid rgba(14,127,160,.15);
+}
 
   /* bullet sections */
   .bul{font-size:13.5px;color:var(--ink-soft);line-height:1.65;}
@@ -5168,7 +5179,7 @@ async function fetchLbWeather(dateVal) {
   });
 
   // Explicitly initialise display state - fixes Chrome rendering
-  var initTab = 'ref';
+  var initTab = 'leaderboard';
   if(LOCKED_TABS.indexOf(initTab) !== -1) initTab = 'ref';
   switchTab(initTab);
 })();

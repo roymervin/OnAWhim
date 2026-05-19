@@ -5064,7 +5064,7 @@ async function fetchLbWeather(dateVal) {
 (function(){
   var PASSCODE = 'OAW2026';
   var LOCKED_TABS = ['charts', 'satellite', 'log', 'calculator'];
-  var unlocked = false;
+  var unlocked = true; // standalone page auto-unlock fix
   var pendingTab = null;
 
   var tabBtns = document.querySelectorAll('.tab');
@@ -5168,9 +5168,19 @@ async function fetchLbWeather(dateVal) {
   });
 
   // Explicitly initialise display state - fixes Chrome rendering
-  var initTab = 'ref';
+  var initTab = 'charts';
   if(LOCKED_TABS.indexOf(initTab) !== -1) initTab = 'ref';
   switchTab(initTab);
+
+  // Standalone page fallback fix
+  document.addEventListener('DOMContentLoaded', function(){
+    try {
+      switchTab('charts');
+    } catch(e) {
+      console.error('Standalone page init error:', e);
+    }
+  });
+
 })();
 
 </script>
