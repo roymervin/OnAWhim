@@ -528,6 +528,19 @@
 </script>
 
 <!-- Module: Firestore leaderboards (safe; won't break tabs if it fails) -->
+  
+<script>
+  // ✅ Always-on tab switching (won’t break if Firebase module fails)
+  function switchTab(id, el){
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById(id);
+    if(target) target.classList.add('active');
+
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    if(el) el.classList.add('active');
+  }
+</script>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
