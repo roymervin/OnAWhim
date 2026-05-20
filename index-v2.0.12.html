@@ -536,38 +536,27 @@
     </div>
   </div>
 
-  <!-- ✅ NEW: TRIP SUMMARY TAB -->
+  <!-- ✅ TRIP SUMMARY TAB -->
   <div id="tripSummary" class="page">
     <div class="panel">
       <h2>🧾 Trip Summary</h2>
 
-      <!-- TOP -->
-      <div class="ts-section">
-        <div style="font-size:13px; letter-spacing:.4px; text-transform:uppercase; color:rgba(205,231,240,0.95); opacity:.9;">
-          Today's Conditions
-        </div>
-        <div class="hint">Same live NOAA conditions cards shown on the dashboard.</div>
-        <div class="cond-grid" id="tsConditions">Loading...</div>
-      </div>
-
-      <!-- MIDDLE -->
       <div class="ts-section">
         <div style="font-size:13px; letter-spacing:.4px; text-transform:uppercase; color:rgba(205,231,240,0.95); opacity:.9;">
           Daily Catch Highlights
         </div>
-        <div class="hint">Select a date to view catch log highlights for that day.</div>
+        <div class="hint">Select a date (only days with catches are shown) to view catch log highlights for that day.</div>
 
         <div class="filters" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
           <div class="filter-card" style="max-width:320px;">
             <label>Date</label>
-            <input type="date" id="tsDate">
+            <select id="tsDate"></select>
           </div>
         </div>
 
         <div id="tsHighlights" class="mini-grid"></div>
       </div>
 
-      <!-- BOTTOM -->
       <div class="ts-section">
         <div style="font-size:13px; letter-spacing:.4px; text-transform:uppercase; color:rgba(205,231,240,0.95); opacity:.9;">
           Angler Breakdown (by Species)
@@ -839,6 +828,7 @@
 
     const $ = (id)=>document.getElementById(id);
 
+    // keep your original esc behavior
     const esc = (v)=> String(v ?? "")
       .replaceAll("&","&")
       .replaceAll("<","<")
@@ -878,7 +868,6 @@
       });
     }
 
-    // ✅ fixed count function (no Map/get misuse)
     function countBy(arr, key){
       const m = {};
       for(const d of arr){
@@ -943,7 +932,7 @@
       renderTotalsBar(computeTotals(filtered));
       renderTable(filtered);
 
-      // ✅ keep dashboard + leaderboards + trip summary in sync
+      // keep dashboard + leaderboards + trip summary live
       renderMiniLeaderboards();
       renderLeaderboards();
       renderTripSummary();
@@ -1219,6 +1208,7 @@
         allDocs = snap.docs.map(s=>({ _id: s.id, ...s.data() }));
         applyFilters();
         refreshLeaderboardsAnglerOptions();
+        refreshTripSummaryDateOptions();
         renderTripSummary();
       }, (err)=>{
         console.error(err);
@@ -1265,6 +1255,43 @@
 
     // ===== Trip Summary =====
     const tsDate = document.getElementById("tsDate");
+
+    function getTripSummaryAvailableDates(){
+      const dates = Array.from(new Set(allDocs.map(d => d?.date).filter(Boolean)));
+      dates.sort();
+      dates.reverse();
+      return dates;
+    }
+
+    function refreshTripSummaryDateOptions(){
+      if(!tsDate) return;
+      const dates = getTripSummaryAvailableDates();
+      const today = new Date().toISOString().slice(0,10);
+      const current = tsDate.value;
+
+      tsDate.innerHTML = "";
+
+      if(!dates.length){
+        const o = document.createElement("option");
+        o.value = today;
+        o.textContent = today;
+        tsDate.appendChild(o);
+        tsDate.value = today;
+        return;
+      }
+
+      for(const d of dates){
+        const o = document.createElement("option");
+        o.value = d;
+        o.textContent = d;
+        tsDate.appendChild(o);
+      }
+
+      if(current && dates.includes(current)) tsDate.value = current;
+      else if(dates.includes(today)) tsDate.value = today;
+      else tsDate.value = dates[0];
+    }
+
     function tripSummaryDate(){
       return (tsDate?.value) || new Date().toISOString().slice(0,10);
     }
@@ -1288,17 +1315,18 @@
       const date = tripSummaryDate();
       const dayDocs = allDocs.filter(d => d?.date === date);
 
-      // Biggest fish by length
+      const keptCt = dayDocs.filter(d => (d.keptReleased || d.status) === "Kept").length;
+      const relCt  = dayDocs.filter(d => (d.keptReleased || d.status) === "Released").length;
+      const totalCt = keptCt + relCt;
+
       const numericLen = dayDocs.filter(d => safeNum(d.length) != null);
       const biggest = numericLen.length
         ? numericLen.reduce((a,b)=> safeNum(b.length) > safeNum(a.length) ? b : a, numericLen[0])
         : null;
 
-      // Angler most catch
       const anglerCounts = countBy(dayDocs, "angler");
       const topAngler = anglerCounts[0] || null;
 
-      // Angler most species
       const speciesByAngler = new Map();
       for(const d of dayDocs){
         if(!d?.angler || !d?.species) continue;
@@ -1312,17 +1340,23 @@
 
       if(!dayDocs.length){
         highlightsEl.innerHTML = [
+          tsCard("Total Fish Caught", `<span class="accent">0</span>`, `Kept <span class="pill"><b>0</b></span> · Released <span class="pill"><b>0</b></span>`),
           tsCard("Biggest Fish (Length)", `<span class="accent">—</span>`, `No catches logged on <span class="mono">${esc(date)}</span>.`),
           tsCard("Angler with the Most Catch", `<span class="accent">—</span>`, "No data for selected date."),
           tsCard("Angler with the Most Species", `<span class="accent">—</span>`, "No data for selected date.")
         ].join("");
 
-        headEl.innerHTML = `<th>Angler</th><th>Total</th><th>Unique Species</th>`;
-        bodyEl.innerHTML = `<tr><td colspan="3" style="opacity:.7;">No catch log entries for ${esc(date)}.</td></tr>`;
+        headEl.innerHTML = `<th>Angler</th><th>Total</th><th>Kept</th><th>Released</th><th>Unique Species</th>`;
+        bodyEl.innerHTML = `<tr><td colspan="5" style="opacity:.7;">No catch log entries for ${esc(date)}.</td></tr>`;
         return;
       }
 
       highlightsEl.innerHTML = [
+        tsCard(
+          "Total Fish Caught",
+          `<span class="accent">${esc(totalCt)}</span>`,
+          `Kept <span class="pill"><b>${esc(keptCt)}</b></span> · Released <span class="pill"><b>${esc(relCt)}</b></span>`
+        ),
         tsCard(
           "Biggest Fish (Length)",
           biggest ? `<span class="accent">${esc(biggest.length)}</span> in` : `<span class="accent">—</span>`,
@@ -1340,29 +1374,38 @@
         )
       ].join("");
 
-      // Bottom table: pivot by species for that date
       const speciesList = Array.from(new Set(dayDocs.map(d=>d?.species).filter(Boolean))).sort();
       const anglers = Array.from(new Set(dayDocs.map(d=>d?.angler).filter(Boolean))).sort();
 
       headEl.innerHTML = [
         `<th>Angler</th>`,
         `<th>Total</th>`,
+        `<th>Kept</th>`,
+        `<th>Released</th>`,
         `<th>Unique Species</th>`,
         ...speciesList.map(s => `<th>${esc(s)}</th>`)
       ].join("");
 
-      const counts = new Map();
+      const stats = new Map();
       for(const d of dayDocs){
-        if(!d?.angler || !d?.species) continue;
+        if(!d?.angler) continue;
         const key = d.angler;
-        if(!counts.has(key)) counts.set(key, new Map());
-        const m = counts.get(key);
-        m.set(d.species, (m.get(d.species) || 0) + 1);
+        if(!stats.has(key)) stats.set(key, { kept:0, released:0, species:new Map() });
+        const s = stats.get(key);
+        const status = (d.keptReleased || d.status || "");
+        if(status === "Kept") s.kept += 1;
+        else if(status === "Released") s.released += 1;
+        if(d?.species){
+          s.species.set(d.species, (s.species.get(d.species) || 0) + 1);
+        }
       }
 
       bodyEl.innerHTML = anglers.map(a=>{
-        const m = counts.get(a) || new Map();
-        const total = Array.from(m.values()).reduce((p,c)=>p+c,0);
+        const st = stats.get(a) || { kept:0, released:0, species:new Map() };
+        const m = st.species;
+        const total = (st.kept + st.released) || Array.from(m.values()).reduce((p,c)=>p+c,0);
+        const kept = st.kept;
+        const released = st.released;
         const uniq = m.size;
         const cells = speciesList.map(s => (m.get(s) || 0));
 
@@ -1370,6 +1413,8 @@
           <tr>
             <td>${esc(a)}</td>
             <td><span class="pill"><b>${esc(total)}</b></span></td>
+            <td><span class="pill"><b>${esc(kept)}</b></span></td>
+            <td><span class="pill"><b>${esc(released)}</b></span></td>
             <td><span class="pill"><b>${esc(uniq)}</b></span></td>
             ${cells.map(v => `<td>${v ? `<span class="pill"><b>${esc(v)}</b></span>` : ""}</td>`).join("")}
           </tr>
@@ -1379,8 +1424,8 @@
 
     function initTripSummaryUI(){
       if(!tsDate) return;
-      tsDate.value = new Date().toISOString().slice(0,10);
       tsDate.addEventListener("change", renderTripSummary);
+      refreshTripSummaryDateOptions();
       renderTripSummary();
     }
 
@@ -1394,21 +1439,16 @@
         el.innerHTML = `
           <div class="mini-card">
             <div class="mini-k">Top Angler</div>
-            <div class="mini-v">
-              <span class="accent">—</span>
-            </div>
+            <div class="mini-v"><span class="accent">—</span></div>
             <div class="mini-sub">total fish caught</div>
           </div>
           <div class="mini-card">
             <div class="mini-k">Top Species</div>
-            <div class="mini-v">
-              <span class="accent">—</span>
-            </div>
+            <div class="mini-v"><span class="accent">—</span></div>
           </div>
           <div class="mini-card">
             <div class="mini-k">Biggest Fish</div>
             <div class="mini-v">—</div>
-            <div class="mini-sub"></div>
           </div>
           <div class="mini-card">
             <div class="mini-k">% Kept of All Catches</div>
@@ -1753,9 +1793,6 @@
       `;
       document.getElementById("conditions").innerHTML = conditionsHtml;
 
-      const tsCondEl = document.getElementById("tsConditions");
-      if(tsCondEl) tsCondEl.innerHTML = conditionsHtml;
-
       document.getElementById("status").innerHTML = `
         <div class="${stat.cls}" style="font-weight:900;">${stat.text}</div>
         <div style="opacity:.9; margin-top:6px;">Score: ${s}/8</div>
@@ -1784,9 +1821,9 @@
       initTripSummaryUI();
       startCatchListener();
 
-      // initial renders
       renderMiniLeaderboards();
       renderLeaderboards();
+      refreshTripSummaryDateOptions();
       renderTripSummary();
     }
 
