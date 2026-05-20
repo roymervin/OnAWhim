@@ -1,0 +1,862 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OnAWhim Offshore</title>
+
+<style>
+  :root{
+    --teal:#00d4c6;
+    --glass:rgba(255,255,255,0.07);
+    --glass2:rgba(255,255,255,0.05);
+    --stroke:rgba(255,255,255,0.10);
+    --stroke2:rgba(255,255,255,0.08);
+    --good:#00d084;
+    --ok:#fcb900;
+    --bad:#ff4d4d;
+
+    /* filter card override */
+    --filterBg: rgba(0,0,0,0.28);
+    --filterStroke: rgba(0,212,198,0.18);
+  }
+
+  body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    color:white;
+    background:
+      linear-gradient(rgba(11,31,42,0.86), rgba(11,31,42,0.96)),
+      url("https://images.unsplash.com/photo-1484387436194-cf7cb70800ce?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080");
+    background-size:cover;
+    background-position:center;
+    background-attachment:fixed;
+  }
+
+  /* HERO */
+  .hero{
+    height:22vh;
+    background:
+      linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.82)),
+      url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e");
+    background-size:cover;
+    background-position:center;
+    padding:18px 40px;
+  }
+  .hero h1{ margin:0; font-size:32px; }
+  .hero p{ margin:6px 0 0; opacity:0.85; }
+
+  /* CONDITIONS */
+  .condition-wrap{ margin-top:10px; max-width:520px; }
+  .cond-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .cond-card{
+    background:var(--glass2);
+    backdrop-filter: blur(12px);
+    border:1px solid var(--stroke2);
+    padding:10px;
+    border-radius:10px;
+    text-align:center;
+  }
+  .cond-label{ font-size:11px; opacity:0.72; }
+  .cond-value{ font-size:28px; color:var(--teal); font-weight:650; }
+  .glow{ text-shadow: 0 0 6px rgba(0,212,198,0.75), 0 0 14px rgba(0,212,198,0.45); }
+
+  /* TABS */
+  .nav-tabs{
+    display:flex;
+    gap:10px;
+    padding:10px 20px;
+    overflow-x:auto;
+    background:rgba(0,0,0,0.45);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .tab{
+    padding:8px 14px;
+    border-radius:8px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.10);
+    cursor:pointer;
+    white-space:nowrap;
+    user-select:none;
+    transition:0.2s;
+    font-size:13px;
+  }
+  .tab:hover{ background:rgba(255,255,255,0.10); }
+  .tab.active{ background:rgba(0,212,198,0.18); border-color:rgba(0,212,198,0.45); color:var(--teal); }
+
+  /* PAGES */
+  .page{ display:none; padding:20px; }
+  .page.active{ display:block; }
+
+  /* PANELS */
+  .panel{
+    max-width:1020px;
+    background:var(--glass);
+    border:1px solid var(--stroke);
+    border-radius:14px;
+    padding:16px;
+    backdrop-filter: blur(14px);
+  }
+  .panel h2{ margin:0 0 10px; }
+  .hint{ font-size:12px; opacity:0.78; margin-top:8px; }
+
+  /* DASHBOARD */
+  .decision-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:520px; }
+  .decision-card{
+    background:var(--glass);
+    border:1px solid var(--stroke);
+    border-radius:12px;
+    padding:14px;
+    text-align:center;
+    backdrop-filter: blur(14px);
+    min-height:110px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  .good{ color:var(--good); }
+  .ok{ color:var(--ok); }
+  .bad{ color:var(--bad); }
+
+  /* CATCH LOG */
+  .authbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:flex-end;
+    margin:10px 0 14px;
+  }
+  .authbar .mini{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.10);
+    border-radius:12px;
+    padding:10px;
+    flex:1;
+    min-width:260px;
+  }
+
+  .form-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+  }
+
+  /* Filters moved near bottom; styled differently */
+  .filters{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin:12px 0 10px;
+  }
+  .filter-card{
+    background: var(--filterBg);
+    border: 1px solid var(--filterStroke);
+    border-radius: 12px;
+    padding: 10px;
+    backdrop-filter: blur(12px);
+  }
+  .filter-card label{
+    display:block;
+    font-size:11px;
+    opacity:0.8;
+    margin-bottom:6px;
+    color: rgba(205,231,240,0.95);
+  }
+
+  .field{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:10px;
+    padding:10px;
+  }
+  .field label{ display:block; font-size:11px; opacity:0.75; margin-bottom:6px; }
+  input, select, textarea{
+    width:100%;
+    box-sizing:border-box;
+    background:rgba(0,0,0,0.25);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:8px;
+    padding:10px;
+    color:white;
+    outline:none;
+  }
+  textarea{ min-height:90px; resize:vertical; grid-column:1/-1; }
+  input::placeholder{ color:rgba(255,255,255,0.55); }
+  select option{ color:#0b1f2a; }
+
+  .actions{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
+  .btn{
+    background:rgba(0,212,198,0.18);
+    border:1px solid rgba(0,212,198,0.45);
+    color:var(--teal);
+    padding:10px 12px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:800;
+    letter-spacing:0.2px;
+  }
+  .btn.secondary{
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.12);
+    color:white;
+    font-weight:650;
+  }
+
+  .table-wrap{ margin-top:10px; overflow:auto; border-radius:12px; border:1px solid rgba(255,255,255,0.10); }
+  table{ width:100%; border-collapse:collapse; min-width:1150px; background:rgba(0,0,0,0.18); }
+  th, td{ padding:10px; border-bottom:1px solid rgba(255,255,255,0.08); text-align:left; font-size:12px; }
+  th{ position:sticky; top:0; background:rgba(0,0,0,0.35); backdrop-filter: blur(10px); z-index:1; }
+  .pill{
+    display:inline-block;
+    padding:4px 8px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,0.12);
+    background:rgba(255,255,255,0.05);
+    font-size:11px;
+  }
+
+  /* ✅ Kept/Released color chips */
+  .status-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:800;
+    border:1px solid rgba(255,255,255,0.12);
+    background:rgba(255,255,255,0.06);
+    white-space:nowrap;
+  }
+  .status-chip::before{
+    content:'';
+    width:8px;
+    height:8px;
+    border-radius:999px;
+    display:inline-block;
+    background:rgba(255,255,255,0.5);
+  }
+  .kept{
+    border-color: rgba(0,208,132,0.35);
+    background: rgba(0,208,132,0.10);
+    color: rgba(192,255,226,0.95);
+  }
+  .kept::before{ background: var(--good); }
+  .released{
+    border-color: rgba(255,77,77,0.30);
+    background: rgba(255,77,77,0.10);
+    color: rgba(255,210,210,0.95);
+  }
+  .released::before{ background: var(--bad); }
+
+  @media(max-width:768px){
+    .cond-grid{ grid-template-columns:repeat(2,1fr); }
+    .decision-row{ grid-template-columns:1fr; }
+    .form-grid{ grid-template-columns:1fr; }
+    .filters{ grid-template-columns:1fr; }
+    .hero{ padding:16px 16px; height:28vh; }
+    .condition-wrap, .decision-row{ max-width:100%; }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="hero">
+  <h1>Everything... On A Whim!</h1>
+  <p>Offshore Planning Dashboard</p>
+
+  <div class="condition-wrap">
+    <div class="cond-grid" id="conditions">Loading...</div>
+  </div>
+</div>
+
+<div class="nav-tabs">
+  <div class="tab active" onclick="switchTab('dashboard', this)">Dashboard</div>
+  <div class="tab" onclick="switchTab('guide', this)">Captain's Guide</div>
+  <div class="tab" onclick="switchTab('log', this)">Catch Log</div>
+  <div class="tab" onclick="switchTab('calc', this)">Trip Calculator</div>
+  <div class="tab" onclick="switchTab('charter', this)">Charter Options</div>
+  <div class="tab" onclick="switchTab('reports', this)">Trip Reports</div>
+  <div class="tab" onclick="switchTab('albums', this)">Albums</div>
+  <div class="tab" onclick="switchTab('videos', this)">Videos</div>
+</div>
+
+<div id="dashboard" class="page active">
+  <div class="panel">
+    <h2>Go / No-Go Decision Guide</h2>
+    <div class="decision-row">
+      <div class="decision-card" id="status">Loading...</div>
+      <div class="decision-card" id="bite">Loading...</div>
+      <div class="decision-card">
+        <div style="color:var(--teal); font-weight:800;">Fishable Days</div>
+        <div style="font-size:24px; color:var(--teal); margin-top:6px;" id="fishable">Loading...</div>
+      </div>
+    </div>
+    <div class="hint">Numbers glow when conditions score ≥ 6/8.</div>
+  </div>
+</div>
+
+<div id="guide" class="page">
+  <div class="panel">
+    <h2>Captain's Guide</h2>
+    <div class="hint">Placeholder — content coming soon.</div>
+  </div>
+</div>
+
+<div id="log" class="page">
+  <div class="panel">
+    <h2>Catch Log (1 entry = 1 fish)</h2>
+
+    <!-- AUTH BAR -->
+    <div class="authbar">
+      <!-- Sign-in card (will hide after login) -->
+      <div class="mini" id="signInCard">
+        <div style="font-weight:800; color:var(--teal);">Captain Sign-In</div>
+        <div class="hint">Your Firestore rules require sign-in for writes. Public can still read catches.</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+          <div>
+            <label style="font-size:11px; opacity:.75;">Email</label>
+            <input id="authEmail" type="email" placeholder="captain@email.com" />
+          </div>
+          <div>
+            <label style="font-size:11px; opacity:.75;">Password</label>
+            <input id="authPassword" type="password" placeholder="••••••••" />
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="btnSignIn">Sign In</button>
+        </div>
+      </div>
+
+      <!-- Session card (no UID displayed) -->
+      <div class="mini">
+        <div style="font-weight:800; color:var(--teal);">Session</div>
+        <div class="hint">Write access is allowed only when signed in as the captain.</div>
+        <div style="margin-top:10px; line-height:1.6;">
+          <div>Auth Status: <span id="authStatus" class="pill">Checking…</span></div>
+          <div>Write Enabled: <span id="writeEnabled" class="pill">No</span></div>
+        </div>
+        <div class="actions">
+          <button class="btn secondary" id="btnSignOut" disabled>Sign Out</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <div class="form-grid">
+      <div class="field">
+        <label>Trip Name</label>
+        <select id="trip" required></select>
+      </div>
+
+      <div class="field">
+        <label>Date</label>
+        <input id="date" type="date" required>
+      </div>
+
+      <div class="field">
+        <label>Location</label>
+        <input id="location" placeholder="Freeport / 40–80 ft / Coordinates" />
+      </div>
+
+      <div class="field">
+        <label>Angler</label>
+        <select id="angler" required></select>
+      </div>
+
+      <div class="field">
+        <label>Species</label>
+        <select id="species" required></select>
+      </div>
+
+      <div class="field">
+        <label>Bait</label>
+        <select id="bait"></select>
+      </div>
+
+      <div class="field">
+        <label>Kept / Released</label>
+        <select id="keptReleased" required>
+          <option value="Kept">Kept</option>
+          <option value="Released">Released</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Length (inches)</label>
+        <input id="length" type="number" min="0" step="0.1" placeholder="e.g., 18.5" />
+      </div>
+
+      <div class="field">
+        <label>Weight (lbs)</label>
+        <input id="weight" type="number" min="0" step="0.1" placeholder="e.g., 6.2" />
+      </div>
+
+      <div class="field" style="grid-column:1/-1;">
+        <label>Notes</label>
+        <textarea id="notes" placeholder="Conditions, depth, structure, rig, hooks, etc…"></textarea>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="btnSave" disabled>Save Entry</button>
+      <button class="btn secondary" id="btnClear">Clear Form</button>
+      <button class="btn secondary" id="btnExport">Export CSV</button>
+    </div>
+
+    <div class="hint">Reads are public. Writes require signing in as captain (per your rules). Filters apply near the table below.</div>
+
+    <!-- ✅ FILTERS MOVED HERE (RIGHT ABOVE TABLE) -->
+    <div class="filters">
+      <div class="filter-card">
+        <label>Filter by Trip</label>
+        <select id="filterTrip"></select>
+      </div>
+      <div class="filter-card">
+        <label>Filter by Angler</label>
+        <select id="filterAngler"></select>
+      </div>
+      <div class="filter-card">
+        <label>Filter by Species</label>
+        <select id="filterSpecies"></select>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Trip</th>
+            <th>Angler</th>
+            <th>Species</th>
+            <th>Status</th>
+            <th>Len (in)</th>
+            <th>Wt (lb)</th>
+            <th>Bait</th>
+            <th>Location</th>
+            <th>Notes</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="entries"></tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<div id="calc" class="page"><div class="panel"><h2>Trip Calculator</h2><div class="hint">Placeholder — content coming soon.</div></div></div>
+<div id="charter" class="page"><div class="panel"><h2>Charter Options</h2><div class="hint">Placeholder — content coming soon.</div></div></div>
+<div id="reports" class="page"><div class="panel"><h2>Trip Reports</h2><div class="hint">Placeholder — content coming soon.</div></div></div>
+<div id="albums" class="page"><div class="panel"><h2>Albums</h2><div class="hint">Placeholder — content coming soon.</div></div></div>
+<div id="videos" class="page"><div class="panel"><h2>Videos</h2><div class="hint">Placeholder — content coming soon.</div></div></div>
+
+<script type="module">
+  // Tabs
+  window.switchTab = function(id, el){
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    el.classList.add('active');
+  };
+
+  // NOAA (Dashboard)
+  async function getBuoy(){
+    try{
+      const res = await fetch('https://www.ndbc.noaa.gov/data/realtime2/42019.txt');
+      const text = await res.text();
+      const row = text.split('\n')[2].trim().split(/\s+/);
+      return {
+        wind: parseFloat(row[6]) || 10,
+        seas: parseFloat(row[8]) || 2,
+        period: parseFloat(row[9]) || 6,
+        temp: parseFloat(row[10]) || 78
+      };
+    }catch{
+      return {wind:10,seas:2,period:6,temp:78};
+    }
+  }
+
+  function score(c){
+    let s=0;
+    if(c.wind<=10) s+=3; else if(c.wind<=15) s+=2; else s+=1;
+    if(c.seas<=2) s+=3; else if(c.seas<=4) s+=2; else s+=1;
+    if(c.period>=9) s+=2; else if(c.period>=7) s+=1; else s-=1;
+    return Math.max(0,s);
+  }
+  function labelScore(s){
+    if(s>=6) return {text:'✅ Offshore Excellent', cls:'good'};
+    if(s>=4) return {text:'🟡 Fishable Window', cls:'ok'};
+    return {text:'❌ Stay Nearshore', cls:'bad'};
+  }
+  function biteText(c,s){
+    if(s>=6 && c.period>=8) return '🔥 Strong Bite';
+    if(s>=4) return '🟡 Moderate Bite';
+    return '❌ Tough Conditions';
+  }
+  function monthly(){
+    let total=0;
+    for(let i=0;i<30;i++){
+      const s = score({ wind:Math.random()*20, seas:Math.random()*6, period:Math.random()*10 });
+      if(s>=4) total++;
+    }
+    return total;
+  }
+
+  // Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getFirestore, collection, addDoc, deleteDoc, doc,
+    query, orderBy, limit, onSnapshot, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBKLfhyxZTn4t7RlRCRTfb8DgzLlPY2sFc",
+    authDomain: "onawhim-85c14.firebaseapp.com",
+    projectId: "onawhim-85c14",
+    storageBucket: "onawhim-85c14.firebasestorage.app",
+    messagingSenderId: "582396606776",
+    appId: "1:582396606776:web:2c17b5ef75a96fde7f29cd"
+  };
+
+  const CAPTAIN_UID = "X4dxUNgOmyPYFjFKUzF7boE5OTd2";
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const catchesCol = collection(db, "catches"); // Option A
+
+  // Trip list updated with Alaska trips
+  const TRIPS = [
+    "May ARS Opener","May ARS 02",
+    "June.Trip.01","June.Trip.02","June.Trip.03","June.Trip.04",
+    "July.Trip.01","July.Trip.02","July.Trip.03","July.Trip.04",
+    "August.Trip.01","August.Trip.02","August.Trip.03","August.Trip.04",
+    "Alaska (Homer)","Alaska (Seward)","Alaska (Whittier)"
+  ];
+
+  const ANGLERS = [
+    "Roy de Ocampo","Brandon de Ocampo","Levi de Ocampo","Joie de Ocampo","Bench de Ocampo",
+    "William Ling","Elizabeth Ling","Christopher Ling",
+    "Majd Basharat","Boyd Nabas","Gerard Reyes",
+    "Luther Salvan","Daniel Salvan","Khenny Bocala","Val Garcia"
+  ];
+
+  const SPECIES = [
+    "Red Snapper","Vermillion Snapper (Beeliner)","Lane Snapper","Mangrove Snapper","Mutton Snapper",
+    "Grouper (Gag)","Grouper (Scamp)","Grouper (Rockhind)","Grouper (Strawberry)","Grouper (Other)",
+    "Tuna (Blackfin)","Tuna (Yellowfin)","Tuna (Other)","Wahoo","Mahi Mahi","Sheepshead",
+    "Mackerel (Spanish)","Mackerel (King)","Barracuda","Shark",
+    "Triggerfish (Gray)","Triggerfish (Oceanic)",
+    "Halibut","Salmon (King)","Salmon (Silver)","Salmon (Sockeye)",
+    "Rockfish (Black)","Rockfish (China)","Ling Cod","Pacific Cod","Black Cod"
+  ];
+
+  const BAITS = [
+    "Cut Squid","Shrimp","Pinfish (Live)","Pinfish (Dead)","Croacker (Live)","Croacker (Dead)",
+    "Mullet (Live)","Other Fish","Jig (Diamond)","Jig (Imposter)","Jig (Other)"
+  ];
+
+  const $ = (id)=>document.getElementById(id);
+  const esc = (v)=> (v??"").toString().replaceAll("<","&lt;").replaceAll(">","&gt;");
+
+  function fillSelect(selectEl, items, placeholder){
+    selectEl.innerHTML = "";
+    const opt0 = document.createElement("option");
+    opt0.value = "";
+    opt0.textContent = placeholder;
+    selectEl.appendChild(opt0);
+    items.forEach(x=>{
+      const o = document.createElement("option");
+      o.value = x;
+      o.textContent = x;
+      selectEl.appendChild(o);
+    });
+  }
+  function fillFilterSelect(selectEl, items){
+    selectEl.innerHTML = "";
+    const all = document.createElement("option");
+    all.value = "ALL";
+    all.textContent = "All";
+    selectEl.appendChild(all);
+    items.forEach(x=>{
+      const o = document.createElement("option");
+      o.value = x;
+      o.textContent = x;
+      selectEl.appendChild(o);
+    });
+  }
+
+  let isCaptain = false;
+  let allDocs = [];
+  let unsub = null;
+
+  function setWriteEnabled(enabled){
+    $("btnSave").disabled = !enabled;
+    $("btnSignOut").disabled = !enabled;
+    $("writeEnabled").textContent = enabled ? "Yes" : "No";
+  }
+
+  async function doSignIn(){
+    const email = $("authEmail").value.trim();
+    const pass  = $("authPassword").value;
+    if(!email || !pass){
+      alert("Enter email and password to sign in.");
+      return;
+    }
+    try{
+      await signInWithEmailAndPassword(auth, email, pass);
+    }catch(e){
+      alert("Sign-in failed: " + (e?.message || e));
+    }
+  }
+  async function doSignOut(){
+    try{ await signOut(auth); }
+    catch(e){ alert("Sign-out failed: " + (e?.message || e)); }
+  }
+
+  function getFilters(){
+    return {
+      trip: $("filterTrip").value,
+      angler: $("filterAngler").value,
+      species: $("filterSpecies").value
+    };
+  }
+
+  function applyFilters(){
+    const f = getFilters();
+    let filtered = allDocs.slice();
+    if(f.trip !== "ALL") filtered = filtered.filter(d => d.trip === f.trip);
+    if(f.angler !== "ALL") filtered = filtered.filter(d => d.angler === f.angler);
+    if(f.species !== "ALL") filtered = filtered.filter(d => d.species === f.species);
+    renderTable(filtered);
+  }
+
+  function renderTable(list){
+    const tbody = $("entries");
+    if(!list.length){
+      tbody.innerHTML = `<tr><td colspan="11" style="opacity:.7;">No entries match your filters yet.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = list.map(d=>{
+      const statusClass = (d.keptReleased === "Kept") ? "kept" : "released";
+      const statusChip = `<span class="status-chip ${statusClass}">${esc(d.keptReleased)}</span>`;
+
+      const delBtn = isCaptain
+        ? `<button class="btn secondary" style="padding:6px 10px;" data-id="${d._id}">Delete</button>`
+        : "";
+
+      return `
+        <tr>
+          <td>${esc(d.date)}</td>
+          <td><span class="pill">${esc(d.trip)}</span></td>
+          <td>${esc(d.angler)}</td>
+          <td>${esc(d.species)}</td>
+          <td>${statusChip}</td>
+          <td>${esc(d.length)}</td>
+          <td>${esc(d.weight)}</td>
+          <td>${esc(d.bait)}</td>
+          <td>${esc(d.location)}</td>
+          <td>${esc(d.notes)}</td>
+          <td>${delBtn}</td>
+        </tr>
+      `;
+    }).join("");
+
+    tbody.querySelectorAll("button[data-id]").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const id = btn.getAttribute("data-id");
+        if(!confirm("Delete this entry?")) return;
+        try{
+          await deleteDoc(doc(db, "catches", id));
+        }catch(e){
+          alert("Delete failed: " + (e?.message || e));
+        }
+      });
+    });
+  }
+
+  async function saveCatch(){
+    if(!isCaptain){
+      alert("You must be signed in as the captain to save.");
+      return;
+    }
+
+    const entry = {
+      trip: $("trip").value,
+      date: $("date").value,
+      location: $("location").value.trim(),
+      angler: $("angler").value,
+      species: $("species").value,
+      bait: $("bait").value,
+      keptReleased: $("keptReleased").value,
+      length: $("length").value,
+      weight: $("weight").value,
+      notes: $("notes").value.trim(),
+      createdAt: serverTimestamp(),
+      createdBy: auth.currentUser?.uid || null
+    };
+
+    if(!entry.trip || !entry.date || !entry.angler || !entry.species || !entry.keptReleased){
+      alert("Please select Trip, Date, Angler, Species, and Kept/Released.");
+      return;
+    }
+
+    try{
+      await addDoc(catchesCol, entry);
+      clearForm();
+    }catch(e){
+      alert("Save failed: " + (e?.message || e));
+    }
+  }
+
+  function clearForm(){
+    $("trip").value = "";
+    $("date").value = new Date().toISOString().slice(0,10);
+    $("location").value="";
+    $("angler").value="";
+    $("species").value="";
+    $("bait").value="";
+    $("keptReleased").value="Kept";
+    $("length").value="";
+    $("weight").value="";
+    $("notes").value="";
+  }
+
+  function exportCSV(){
+    const f = getFilters();
+    let list = allDocs.slice();
+    if(f.trip !== "ALL") list = list.filter(d => d.trip === f.trip);
+    if(f.angler !== "ALL") list = list.filter(d => d.angler === f.angler);
+    if(f.species !== "ALL") list = list.filter(d => d.species === f.species);
+
+    if(!list.length){
+      alert("No entries to export for current filters.");
+      return;
+    }
+
+    const headers = ["date","trip","angler","species","status","length_in","weight_lb","bait","location","notes"];
+    const escCSV = (v)=> `"${(v??"").toString().replaceAll('"','""')}"`;
+    const rows = [headers.join(",")].concat(
+      list.map(d => [
+        d.date, d.trip, d.angler, d.species, d.keptReleased,
+        d.length, d.weight, d.bait, d.location, d.notes
+      ].map(escCSV).join(","))
+    );
+
+    const blob = new Blob([rows.join("\n")], {type:"text/csv;charset=utf-8;"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `onawhim_catch_log_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function attachFilterListeners(){
+    ["filterTrip","filterAngler","filterSpecies"].forEach(id=>{
+      $(id).addEventListener("change", applyFilters);
+    });
+  }
+
+  function startCatchListener(){
+    const q = query(catchesCol, orderBy("date","desc"), limit(500));
+    if(unsub) unsub();
+    unsub = onSnapshot(q, (snap)=>{
+      allDocs = snap.docs.map(s=>({ _id: s.id, ...s.data() }));
+      applyFilters();
+    }, (err)=>{
+      console.error(err);
+      $("entries").innerHTML = `<tr><td colspan="11" style="opacity:.7;">Could not load from Firestore. Check rules and run via http://localhost.</td></tr>`;
+    });
+  }
+
+  $("btnSignIn").addEventListener("click", doSignIn);
+  $("btnSignOut").addEventListener("click", doSignOut);
+  $("btnSave").addEventListener("click", saveCatch);
+  $("btnClear").addEventListener("click", clearForm);
+  $("btnExport").addEventListener("click", exportCSV);
+
+  onAuthStateChanged(auth, (user)=>{
+    if(user){
+      // Hide sign-in card after login (your request)
+      $("signInCard").style.display = "none";
+
+      // Status without showing UID
+      isCaptain = (user.uid === CAPTAIN_UID);
+      $("authStatus").textContent = isCaptain ? "Signed in (Captain)" : "Signed in (Read-only)";
+      $("writeEnabled").textContent = isCaptain ? "Yes" : "No";
+      $("writeEnabled").style.borderColor = isCaptain ? "rgba(0,208,132,.45)" : "rgba(255,255,255,.12)";
+      $("writeEnabled").style.color = isCaptain ? "var(--good)" : "white";
+      setWriteEnabled(isCaptain);
+
+      // Show sign out if logged in
+      $("btnSignOut").disabled = false;
+    } else {
+      // show sign-in card if logged out
+      $("signInCard").style.display = "block";
+
+      $("authStatus").textContent = "Signed out";
+      isCaptain = false;
+      setWriteEnabled(false);
+      $("btnSignOut").disabled = true;
+    }
+    applyFilters();
+  });
+
+  async function init(){
+    // Dashboard
+    const c = await getBuoy();
+    const s = score(c);
+    const stat = labelScore(s);
+    const glow = (s>=6) ? "glow" : "";
+
+    document.getElementById("conditions").innerHTML = `
+      <div class="cond-card"><div class="cond-label">Wind</div><div class="cond-value ${glow}">${c.wind}</div></div>
+      <div class="cond-card"><div class="cond-label">Seas</div><div class="cond-value ${glow}">${c.seas}</div></div>
+      <div class="cond-card"><div class="cond-label">Period</div><div class="cond-value ${glow}">${c.period}</div></div>
+      <div class="cond-card"><div class="cond-label">Temp</div><div class="cond-value ${glow}">${c.temp}</div></div>
+    `;
+
+    document.getElementById("status").innerHTML = `
+      <div class="${stat.cls}" style="font-weight:900;">${stat.text}</div>
+      <div style="opacity:.9; margin-top:6px;">Score: ${s}/8</div>
+    `;
+
+    document.getElementById("bite").innerHTML = `
+      <div style="color:var(--teal); font-weight:900;">Fishing Outlook</div>
+      <div style="margin-top:6px;">${biteText(c,s)}</div>
+    `;
+
+    document.getElementById("fishable").textContent = `${monthly()} days`;
+
+    // Dropdowns
+    fillSelect($("trip"), TRIPS, "Select a trip…");
+    fillSelect($("angler"), ANGLERS, "Select angler…");
+    fillSelect($("species"), SPECIES, "Select species…");
+    fillSelect($("bait"), BAITS, "Select bait…");
+
+    fillFilterSelect($("filterTrip"), TRIPS);
+    fillFilterSelect($("filterAngler"), ANGLERS);
+    fillFilterSelect($("filterSpecies"), SPECIES);
+
+    $("date").value = new Date().toISOString().slice(0,10);
+
+    attachFilterListeners();
+    startCatchListener();
+    applyFilters();
+  }
+
+  init();
+</script>
+
+</body>
+</html>
