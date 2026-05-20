@@ -1172,49 +1172,89 @@ function lbBestDay(data){
   return d ? `${d[0]} (${d[1]})` : "-";
 }
 
+
 function lbStats(data){
   if(!data.length) return [];
 
-  const biggest = lbBiggest(data);
-  const bestTrip = lbCountBy(data,"trip")[0];
-  const topAngler = lbCountBy(data,"angler")[0];
-  const species = lbCountBy(data,"species")[0];
+  // Helpers
+  const count = key => {
+    const m = {};
+    data.forEach(d=>{
+      if(!d[key]) return;
+      m[d[key]] = (m.get?.(d[key])||m[d[key]]||0)+1;
+    });
+    return Object.entries(m).sort((a,b)=>b[1]-a[1]);
+  };
 
+  const biggest = data.reduce((a,b)=> +b.length > +a.length ? b : a, data[0]);
+
+  const heaviest = data.reduce((a,b)=> +b.weight > +a.weight ? b : a, data[0]);
+
+  const tripCounts = count("trip");
+  const anglerCounts = count("angler");
+  const speciesCounts = count("species");
+
+  const bestTrip = tripCounts[0];
+  const topAngler = anglerCounts[0];
+  const topSpecies = speciesCounts[0];
+
+  const bestDay = count("date")[0];
+
+  const monthCounts = {};
+  data.forEach(d=>{
+    if(!d.date) return;
+    const m = d.date.slice(0,7);
+    monthCounts[m] = (monthCounts[m]||0)+1;
+  });
+  const bestMonth = Object.entries(monthCounts).sort((a,b)=>b[1]-a[1])[0];
+
+  // kept %
   const kept = data.filter(x=>x.keptReleased==="Kept").length;
   const rel = data.filter(x=>x.keptReleased==="Released").length;
   const total = kept+rel;
 
-  const bestMonth = lbCountBy(data, d=>{
-    return d.date ? d.date.slice(0,7) : "";
-  })[0];
+  // unique species
+  const uniqueSpecies = new Set(data.map(d=>d.species)).size;
+
+  // Top 3 medals list renderer
+  const medals = arr => `
+    ${arr.slice(0,3).map((e,i)=>`
+      <div style="display:flex;justify-content:space-between;margin-top:6px;">
+        <span>${["🥇","🥈","🥉"][i]} ${e[0]}</span>
+        <b>${e[1]}</b>
+      </div>
+    `).join("")}
+  `;
 
   // Most diverse trip
-  const speciesByTrip = {};
+  const tripSpecies = {};
   data.forEach(d=>{
-    if(!speciesByTrip[d.trip]) speciesByTrip[d.trip] = new Set();
-    speciesByTrip[d.trip].add(d.species);
+    if(!tripSpecies[d.trip]) tripSpecies[d.trip] = new Set();
+    tripSpecies[d.trip].add(d.species);
   });
-
-  let diverse = "";
-  let max = 0;
-  Object.entries(speciesByTrip).forEach(([k,v])=>{
-    if(v.size > max){
-      max = v.size;
-      diverse = k;
-    }
+  let diverseTrip="", max=0;
+  Object.entries(tripSpecies).forEach(([k,v])=>{
+    if(v.size>max){ max=v.size; diverseTrip=k; }
   });
 
   return [
-    ["Biggest Fish", biggest.species + " ("+biggest.length+" in)"],
-    ["Most Caught Species", species?.[0] + " ("+species?.[1]+")"],
-    ["Top Angler", topAngler?.[0] + " ("+topAngler?.[1]+")"],
-    ["Best Trip", bestTrip?.[0]+" ("+bestTrip?.[1]+")"],
-    ["Best Day", lbBestDay(data)],
-    ["Best Month", bestMonth?.[0]+" ("+bestMonth?.[1]+")"],
+    ["Biggest Fish", `${biggest.species} (${biggest.length} in)`],
+    ["Heaviest Fish", `${heaviest.species} (${heaviest.weight} lb)`],
+    ["Most Caught Species", `${topSpecies?.[0]} (${topSpecies?.[1]})`],
+    ["Top Angler", `${topAngler?.[0]} (${topAngler?.[1]})`],
+    ["Best Trip", `${bestTrip?.[0]} (${bestTrip?.[1]})`],
+    ["Best Day", `${bestDay?.[0]} (${bestDay?.[1]})`],
+    ["Best Month", `${bestMonth?.[0]} (${bestMonth?.[1]})`],
     ["Kept %", total ? Math.round(kept/total*100)+"%" : "-"],
-    ["Most Diverse Trip", diverse + " ("+max+" species)"]
+    ["Unique Species", uniqueSpecies],
+    ["Most Diverse Trip", `${diverseTrip} (${max})`],
+
+    // Medal-style cards
+    ["Top 3 Anglers", medals(anglerCounts)],
+    ["Top 3 Species", medals(speciesCounts)]
   ];
 }
+
 
 // Render
 function renderLeaderboards(){
