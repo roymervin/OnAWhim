@@ -294,15 +294,16 @@
 
 <div class="nav-tabs">
   <div class="tab active" onclick="switchTab('dashboard', this)">Dashboard</div>
-  <div class="tab" onclick="switchTab('leaderboards')">Leaderboards</div>
   <div class="tab" onclick="switchTab('log', this)">Catch Log</div>
-  <div class="tab" onclick="switchTab('guide', this)">Captain's Guide</div>
-  <div class="tab" onclick="switchTab('calc', this)">Trip Calculator</div>
-  <div class="tab" onclick="switchTab('charter', this)">Charter Options</div>
-  <div class="tab" onclick="switchTab('reports', this)">Trip Reports</div>
-  <div class="tab" onclick="switchTab('albums', this)">Albums</div>
-  <div class="tab" onclick="switchTab('videos', this)">Videos</div>
-
+  <div class="tab" onclick="switchTab('leaderboards', this)">Leaderboards</div>
+    <!-- ***hide for now******************************************************  
+    <div class="tab" onclick="switchTab('guide', this)">Captain's Guide</div>
+    <div class="tab" onclick="switchTab('calc', this)">Trip Calculator</div>
+    <div class="tab" onclick="switchTab('charter', this)">Charter Options</div>
+    <div class="tab" onclick="switchTab('reports', this)">Trip Reports</div>
+    <div class="tab" onclick="switchTab('albums', this)">Albums</div>
+    <div class="tab" onclick="switchTab('videos', this)">Videos</div>
+    -->
 </div>
 
 <div id="dashboard" class="page active">
@@ -1129,6 +1130,134 @@
     try{ await signOut(auth); }
     catch(e){ alert("Sign-out failed: " + (e?.message || e)); }
   }
+
+// ✅ ===== LEADERBOARDS MODULE (SAFE MERGE) =====
+
+const lbTrip = document.getElementById("lbTrip");
+
+const LB_TRIPS = [
+  "All",
+  "April.Trip.01","April.Trip.02",
+  "May ARS Opener","May ARS 02",
+  "June.Trip.01","June.Trip.02","June.Trip.03","June.Trip.04",
+  "July.Trip.01","July.Trip.02","July.Trip.03","July.Trip.04",
+  "August.Trip.01","August.Trip.02","August.Trip.03","August.Trip.04",
+  "Alaska (Homer)","Alaska (Seward)","Alaska (Whittier)"
+];
+
+LB_TRIPS.forEach(t=>{
+  const o=document.createElement("option");
+  o.value=t;
+  o.textContent=t;
+  if(lbTrip) lbTrip.appendChild(o);
+});
+
+function lbCountBy(arr, key){
+  const map = {};
+  arr.forEach(d=>{
+    if(!d[key]) return;
+    map[d[key]] = (map[d[key]] || 0) + 1;
+  });
+  return Object.entries(map).sort((a,b)=>b[1]-a[1]);
+}
+
+function lbBiggest(data){
+  return data.reduce((a,b)=>{
+    return (+b.length > +a.length ? b : a);
+  }, data[0]);
+}
+
+function lbBestDay(data){
+  const d = lbCountBy(data,"date")[0];
+  return d ? `${d[0]} (${d[1]})` : "-";
+}
+
+function lbStats(data){
+  if(!data.length) return [];
+
+  const biggest = lbBiggest(data);
+  const bestTrip = lbCountBy(data,"trip")[0];
+  const topAngler = lbCountBy(data,"angler")[0];
+  const species = lbCountBy(data,"species")[0];
+
+  const kept = data.filter(x=>x.keptReleased==="Kept").length;
+  const rel = data.filter(x=>x.keptReleased==="Released").length;
+  const total = kept+rel;
+
+  const bestMonth = lbCountBy(data, d=>{
+    return d.date ? d.date.slice(0,7) : "";
+  })[0];
+
+  // Most diverse trip
+  const speciesByTrip = {};
+  data.forEach(d=>{
+    if(!speciesByTrip[d.trip]) speciesByTrip[d.trip] = new Set();
+    speciesByTrip[d.trip].add(d.species);
+  });
+
+  let diverse = "";
+  let max = 0;
+  Object.entries(speciesByTrip).forEach(([k,v])=>{
+    if(v.size > max){
+      max = v.size;
+      diverse = k;
+    }
+  });
+
+  return [
+    ["Biggest Fish", biggest.species + " ("+biggest.length+" in)"],
+    ["Most Caught Species", species?.[0] + " ("+species?.[1]+")"],
+    ["Top Angler", topAngler?.[0] + " ("+topAngler?.[1]+")"],
+    ["Best Trip", bestTrip?.[0]+" ("+bestTrip?.[1]+")"],
+    ["Best Day", lbBestDay(data)],
+    ["Best Month", bestMonth?.[0]+" ("+bestMonth?.[1]+")"],
+    ["Kept %", total ? Math.round(kept/total*100)+"%" : "-"],
+    ["Most Diverse Trip", diverse + " ("+max+" species)"]
+  ];
+}
+
+// Render
+function renderLeaderboards(){
+  const el = document.getElementById("cards");
+  if(!el) return;
+
+  let data = allDocs || [];
+
+  const trip = lbTrip.value;
+  if(trip && trip !== "All"){
+    data = data.filter(d=>d.trip===trip);
+  }
+
+  el.innerHTML = lbStats(data).map(x=>`
+    <div style="
+      background:rgba(255,255,255,0.07);
+      border:1px solid rgba(255,255,255,0.12);
+      padding:14px;
+      border-radius:12px;">
+      <div style="font-size:12px; opacity:.7;">${x[0]}</div>
+      <div style="
+        font-size:20px;
+        font-weight:900;
+        color:#00d4c6;">
+        ${x[1]}
+      </div>
+    </div>
+  `).join("");
+}
+
+// Hook to existing Firestore updates
+const originalApplyFilters = applyFilters;
+applyFilters = function(){
+  originalApplyFilters();
+  renderLeaderboards();
+};
+
+if(lbTrip){
+  lbTrip.addEventListener("change", renderLeaderboards);
+}
+
+
+  
 </script>
 
 </body>
