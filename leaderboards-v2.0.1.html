@@ -1,0 +1,401 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OnAWhim Offshore</title>
+
+<style>
+  :root{
+    --teal:#00d4c6;
+    --glass:rgba(255,255,255,0.07);
+    --glass2:rgba(255,255,255,0.05);
+    --stroke:rgba(255,255,255,0.10);
+    --stroke2:rgba(255,255,255,0.08);
+    --good:#00d084;
+    --ok:#fcb900;
+    --bad:#ff4d4d;
+
+    --filterBg: rgba(0,0,0,0.28);
+    --filterStroke: rgba(0,212,198,0.18);
+  }
+
+  body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    color:white;
+    background:
+      linear-gradient(rgba(11,31,42,0.86), rgba(11,31,42,0.96)),
+      url("https://images.unsplash.com/photo-1484387436194-cf7cb70800ce?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080");
+    background-size:cover;
+    background-position:center;
+    background-attachment:fixed;
+  }
+
+  .hero{
+    height:22vh;
+    background:
+      linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.82)),
+      url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e");
+    background-size:cover;
+    background-position:center;
+    padding:18px 40px;
+  }
+  .hero h1{ margin:0; font-size:32px; }
+  .hero p{ margin:6px 0 0; opacity:0.85; }
+
+  .condition-wrap{ margin-top:10px; max-width:520px; }
+  .cond-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .cond-card{
+    background:var(--glass2);
+    backdrop-filter: blur(12px);
+    border:1px solid var(--stroke2);
+    padding:10px;
+    border-radius:10px;
+    text-align:center;
+  }
+  .cond-label{ font-size:11px; opacity:0.72; }
+  .cond-value{ font-size:28px; color:var(--teal); font-weight:650; }
+  .glow{ text-shadow: 0 0 6px rgba(0,212,198,0.75), 0 0 14px rgba(0,212,198,0.45); }
+
+  .nav-tabs{
+    display:flex;
+    gap:10px;
+    padding:10px 20px;
+    overflow-x:auto;
+    background:rgba(0,0,0,0.45);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .tab{
+    padding:8px 14px;
+    border-radius:8px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.10);
+    cursor:pointer;
+    white-space:nowrap;
+    user-select:none;
+    transition:0.2s;
+    font-size:13px;
+  }
+  .tab:hover{ background:rgba(255,255,255,0.10); }
+  .tab.active{ background:rgba(0,212,198,0.18); border-color:rgba(0,212,198,0.45); color:var(--teal); }
+
+  .page{ display:none; padding:20px; }
+  .page.active{ display:block; }
+
+  .panel{
+    max-width:1020px;
+    background:var(--glass);
+    border:1px solid var(--stroke);
+    border-radius:14px;
+    padding:16px;
+    backdrop-filter: blur(14px);
+  }
+  .panel h2{ margin:0 0 10px; }
+  .hint{ font-size:12px; opacity:0.78; margin-top:8px; }
+
+  .decision-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:520px; }
+  .decision-card{
+    background:var(--glass);
+    border:1px solid var(--stroke);
+    border-radius:12px;
+    padding:14px;
+    text-align:center;
+    backdrop-filter: blur(14px);
+    min-height:110px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  .good{ color:var(--good); }
+  .ok{ color:var(--ok); }
+  .bad{ color:var(--bad); }
+
+  /* ✅ Dashboard Leaderboard Snapshot */
+  .lb-snapshot{
+    margin-top:14px;
+    max-width:520px;
+  }
+  .lb-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:10px;
+    margin:10px 0 8px;
+  }
+  .lb-title h3{ margin:0; font-size:14px; opacity:0.9; }
+  .lb-title a{
+    color:var(--teal);
+    text-decoration:none;
+    font-size:12px;
+    opacity:.9;
+  }
+  .lb-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+  }
+  .lb-card{
+    background:rgba(0,0,0,0.22);
+    border:1px solid rgba(0,212,198,0.16);
+    border-radius:12px;
+    padding:12px;
+    backdrop-filter: blur(12px);
+  }
+  .lb-card .k{ font-size:11px; opacity:.75; }
+  .lb-card .v{ margin-top:6px; font-weight:900; color:var(--teal); font-size:14px; line-height:1.2; }
+
+  /* Catch Log layout (keeping minimal here; your existing catch log page can remain) */
+  .placeholder{
+    opacity:.8;
+    line-height:1.5;
+  }
+
+  @media(max-width:768px){
+    .cond-grid{ grid-template-columns:repeat(2,1fr); }
+    .decision-row{ grid-template-columns:1fr; }
+    .hero{ padding:16px 16px; height:28vh; }
+    .condition-wrap, .decision-row, .lb-snapshot{ max-width:100%; }
+    .lb-grid{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="hero">
+  <h1>Everything... On A Whim!</h1>
+  <p>Offshore Planning Dashboard</p>
+
+  <div class="condition-wrap">
+    <div class="cond-grid" id="conditions">Loading...</div>
+  </div>
+</div>
+
+<div class="nav-tabs">
+  <div class="tab active" data-page="dashboard" onclick="switchTab('dashboard', this)">Dashboard</div>
+  <div class="tab" data-page="guide" onclick="switchTab('guide', this)">Captain's Guide</div>
+  <div class="tab" data-page="log" onclick="switchTab('log', this)">Catch Log</div>
+  <div class="tab" onclick="window.location.href='leaderboards.html'">Leaderboards</div>
+  <div class="tab" data-page="calc" onclick="switchTab('calc', this)">Trip Calculator</div>
+  <div class="tab" data-page="charter" onclick="switchTab('charter', this)">Charter Options</div>
+  <div class="tab" data-page="reports" onclick="switchTab('reports', this)">Trip Reports</div>
+  <div class="tab" data-page="albums" onclick="switchTab('albums', this)">Albums</div>
+  <div class="tab" data-page="videos" onclick="switchTab('videos', this)">Videos</div>
+</div>
+
+<div id="dashboard" class="page active">
+  <div class="panel">
+    <h2>Go / No-Go Decision Guide</h2>
+    <div class="decision-row">
+      <div class="decision-card" id="status">Loading...</div>
+      <div class="decision-card" id="bite">Loading...</div>
+      <div class="decision-card">
+        <div style="color:var(--teal); font-weight:800;">Fishable Days</div>
+        <div style="font-size:24px; color:var(--teal); margin-top:6px;" id="fishable">Loading...</div>
+      </div>
+    </div>
+
+    <!-- ✅ Leaderboard summary embedded on Dashboard -->
+    <div class="lb-snapshot">
+      <div class="lb-title">
+        <h3>Leaderboard Snapshot</h3>
+        <a href="leaderboards.html">View full Leaderboards →</a>
+      </div>
+      <div class="lb-grid" id="lbSnapshot">
+        <div class="lb-card"><div class="k">Biggest Fish</div><div class="v">Loading…</div></div>
+        <div class="lb-card"><div class="k">Best Trip</div><div class="v">Loading…</div></div>
+        <div class="lb-card"><div class="k">Top Angler</div><div class="v">Loading…</div></div>
+        <div class="lb-card"><div class="k">% Kept</div><div class="v">Loading…</div></div>
+      </div>
+      <div class="hint">Snapshot is computed from your Firestore <code>/catches</code> collection.</div>
+    </div>
+  </div>
+</div>
+
+<div id="guide" class="page"><div class="panel"><h2>Captain's Guide</h2><div class="placeholder">Placeholder — content coming soon.</div></div></div>
+<div id="log" class="page"><div class="panel"><h2>Catch Log</h2><div class="placeholder">Use your existing Catch Log page here. (We kept this file focused on Dashboard + Leaderboards integration.)</div></div></div>
+<div id="calc" class="page"><div class="panel"><h2>Trip Calculator</h2><div class="placeholder">Placeholder — content coming soon.</div></div></div>
+<div id="charter" class="page"><div class="panel"><h2>Charter Options</h2><div class="placeholder">Placeholder — content coming soon.</div></div></div>
+<div id="reports" class="page"><div class="panel"><h2>Trip Reports</h2><div class="placeholder">Placeholder — content coming soon.</div></div></div>
+<div id="albums" class="page"><div class="panel"><h2>Albums</h2><div class="placeholder">Placeholder — content coming soon.</div></div></div>
+<div id="videos" class="page"><div class="panel"><h2>Videos</h2><div class="placeholder">Placeholder — content coming soon.</div></div></div>
+
+<!-- ✅ Non-module script: tabs + NOAA conditions (always works) -->
+<script>
+  function switchTab(id, el){
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById(id);
+    if(target) target.classList.add('active');
+
+    document.querySelectorAll('.tab[data-page]').forEach(t => t.classList.remove('active'));
+    if(el && el.dataset && el.dataset.page) el.classList.add('active');
+  }
+
+  async function getBuoy(){
+    try{
+      const res = await fetch("https://www.ndbc.noaa.gov/data/realtime2/42019.txt");
+      const text = await res.text();
+      const row = text.split("\n")[2].trim().split(/\s+/);
+      return {
+        wind: parseFloat(row[6]) || 10,
+        seas: parseFloat(row[8]) || 2,
+        period: parseFloat(row[9]) || 6,
+        temp: parseFloat(row[10]) || 78
+      };
+    }catch{
+      return {wind:10,seas:2,period:6,temp:78};
+    }
+  }
+
+  function score(c){
+    let s=0;
+    if(c.wind<=10) s+=3; else if(c.wind<=15) s+=2; else s+=1;
+    if(c.seas<=2) s+=3; else if(c.seas<=4) s+=2; else s+=1;
+    if(c.period>=9) s+=2; else if(c.period>=7) s+=1; else s-=1;
+    return Math.max(0,s);
+  }
+  function labelScore(s){
+    if(s>=6) return {text:"✅ Offshore Excellent", cls:"good"};
+    if(s>=4) return {text:"🟡 Fishable Window", cls:"ok"};
+    return {text:"❌ Stay Nearshore", cls:"bad"};
+  }
+  function biteText(c,s){
+    if(s>=6 && c.period>=8) return "🔥 Strong Bite";
+    if(s>=4) return "🟡 Moderate Bite";
+    return "❌ Tough Conditions";
+  }
+  function monthly(){
+    let total=0;
+    for(let i=0;i<30;i++){
+      const s = score({ wind:Math.random()*20, seas:Math.random()*6, period:Math.random()*10 });
+      if(s>=4) total++;
+    }
+    return total;
+  }
+
+  (async function initDashboard(){
+    const c = await getBuoy();
+    const s = score(c);
+    const stat = labelScore(s);
+    const glow = (s>=6) ? "glow" : "";
+
+    document.getElementById("conditions").innerHTML = `
+      <div class="cond-card"><div class="cond-label">Wind</div><div class="cond-value ${glow}">${c.wind}</div></div>
+      <div class="cond-card"><div class="cond-label">Seas</div><div class="cond-value ${glow}">${c.seas}</div></div>
+      <div class="cond-card"><div class="cond-label">Period</div><div class="cond-value ${glow}">${c.period}</div></div>
+      <div class="cond-card"><div class="cond-label">Temp</div><div class="cond-value ${glow}">${c.temp}</div></div>
+    `;
+
+    document.getElementById("status").innerHTML = `
+      <div class="${stat.cls}" style="font-weight:900;">${stat.text}</div>
+      <div style="opacity:.9; margin-top:6px;">Score: ${s}/8</div>
+    `;
+    document.getElementById("bite").innerHTML = `
+      <div style="color:var(--teal); font-weight:900;">Fishing Outlook</div>
+      <div style="margin-top:6px;">${biteText(c,s)}</div>
+    `;
+    document.getElementById("fishable").textContent = `${monthly()} days`;
+  })();
+</script>
+
+<!-- ✅ Module script: reads Firestore for Leaderboard Snapshot -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBKLfhyxZTn4t7RlRCRTfb8DgzLlPY2sFc",
+    authDomain: "onawhim-85c14.firebaseapp.com",
+    projectId: "onawhim-85c14",
+    storageBucket: "onawhim-85c14.firebasestorage.app",
+    messagingSenderId: "582396606776",
+    appId: "1:582396606776:web:2c17b5ef75a96fde7f29cd"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  function safeNum(v){ const n = Number(v); return Number.isFinite(n) ? n : null; }
+
+  function mostCommon(arr){
+    const m = new Map();
+    for(const x of arr){
+      if(!x) continue;
+      m.set(x, (m.get(x)||0)+1);
+    }
+    let best=null, bestCount=0;
+    for(const [k,c] of m.entries()){
+      if(c>bestCount){ best=k; bestCount=c; }
+    }
+    return best ? { key: best, count: bestCount } : null;
+  }
+
+  function computeSnapshot(data){
+    if(!data.length){
+      return {
+        biggest:"—",
+        bestTrip:"—",
+        topAngler:"—",
+        keptPct:"—"
+      };
+    }
+
+    // biggest fish by length
+    let biggest = null;
+    for(const d of data){
+      const len = safeNum(d.length);
+      if(len==null) continue;
+      if(!biggest || len > biggest.len) biggest = { len, species: d.species || "Unknown" };
+    }
+
+    // best trip by total catches
+    const tripMode = mostCommon(data.map(d=>d.trip));
+
+    // top angler by total catches
+    const anglerMode = mostCommon(data.map(d=>d.angler));
+
+    // kept vs released %
+    let kept=0, total=0;
+    for(const d of data){
+      const st = (d.keptReleased || d.status || "").toLowerCase();
+      if(st !== "kept" && st !== "released") continue;
+      total++;
+      if(st === "kept") kept++;
+    }
+    const keptPct = total ? Math.round((kept/total)*100) : null;
+
+    return {
+      biggest: biggest ? `${biggest.species} (${biggest.len} in)` : "—",
+      bestTrip: tripMode ? `${tripMode.key} (${tripMode.count})` : "—",
+      topAngler: anglerMode ? `${anglerMode.key} (${anglerMode.count})` : "—",
+      keptPct: keptPct==null ? "—" : `${keptPct}%`
+    };
+  }
+
+  async function loadSnapshot(){
+    try{
+      const snap = await getDocs(collection(db, "catches"));
+      const data = snap.docs.map(d=>d.data());
+      const s = computeSnapshot(data);
+
+      const cards = document.querySelectorAll("#lbSnapshot .lb-card .v");
+      if(cards.length >= 4){
+        cards[0].textContent = s.biggest;
+        cards[1].textContent = s.bestTrip;
+        cards[2].textContent = s.topAngler;
+        cards[3].textContent = s.keptPct;
+      }
+    }catch(e){
+      // If Firestore fails, don't break the rest of the page
+      console.error("Leaderboard snapshot failed:", e);
+    }
+  }
+
+  loadSnapshot();
+</script>
+
+</body>
+</html>
