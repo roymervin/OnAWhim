@@ -1205,86 +1205,69 @@
 
   // ===== Dashboard mini leaderboards =====
   function renderMiniLeaderboards(){
-    const el = document.getElementById("miniLeaderboards");
-    if(!el) return;
 
-    const data = allDocs.slice();
-    if(!data.length){
-    el.innerHTML = `
-  <div class="mini-card">
-    <div class="mini-k">Top Angler</div>
-    <div class="mini-v">
-      <span class="accent">${esc(topAngler?.[0] || "—")}</span>
-      ${topAngler ? ` ${topAngler[1]}` : ""}
-    </div>
-    <div class="mini-sub">
-      total fish caught
-    </div>
-  </div>
+function renderMiniLeaderboards(){
+  const el = document.getElementById("miniLeaderboards");
+  if(!el) return;
 
-  <div class="mini-card">
-    <div class="mini-k">Top Species</div>
-    <div class="mini-v">
-      <span class="accent">${esc(topSpecies?.[0] || "—")}</span>
-      ${topSpecies ? ` ${topSpecies[1]}` : ""}
-    </div>
-  </div>
+  const data = allDocs.slice();
 
-  <div class="mini-card">
-    <div class="mini-k">Biggest Fish</div>
-    <div class="mini-v">
-      ${biggest ? `<span class="accent">${esc(biggest.length)}</span> in` : "—"}
-    </div>
-    <div class="mini-sub">
-      ${biggest ? esc(biggest.species || "Unknown species") : ""}
-    </div>
-  </div>
+  // Compute stats safely (works even when there is no data yet)
+  const topAngler  = data.length ? countBy(data, "angler")[0]  : null;
+  const topSpecies = data.length ? countBy(data, "species")[0] : null;
 
-  <div class="mini-card">
-    <div class="mini-k">% Kept of All Catches</div>
-    <div class="mini-v">
-      ${keptPct == null ? "—" : `<span class="accent">${keptPct}%</span>`}
-    </div>
-    <div class="mini-sub">
-      kept ${keptCt} • released ${relCt}
-    </div>
-  </div>
-`;
+  const numericLen = data.filter(d => safeNum(d.length) != null);
+  const biggest = numericLen.length
+    ? numericLen.reduce((a,b)=> safeNum(b.length) > safeNum(a.length) ? b : a, numericLen[0])
+    : null;
 
-      return;
-    }
+  const keptCt  = data.filter(d => (d.keptReleased || d.status) === "Kept").length;
+  const relCt   = data.filter(d => (d.keptReleased || d.status) === "Released").length;
+  const totalCt = keptCt + relCt;
+  const keptPct = totalCt ? Math.round((keptCt/totalCt) * 100) : null;
 
-    const topAngler = countBy(data,"angler")[0];
-    const topSpecies = countBy(data,"species")[0];
-
-    const numericLen = data.filter(d=>safeNum(d.length)!=null);
-    const biggest = numericLen.length
-      ? numericLen.reduce((a,b)=> safeNum(b.length) > safeNum(a.length) ? b : a, numericLen[0])
-      : null;
-
-    const keptCt = data.filter(d=>(d.keptReleased||d.status)==="Kept").length;
-    const relCt = data.filter(d=>(d.keptReleased||d.status)==="Released").length;
-    const totalCt = keptCt+relCt;
-    const keptPct = totalCt ? Math.round((keptCt/totalCt)*100) : null;
-
-    el.innerHTML = `
-      <div class="mini-card">
-        <div class="mini-k">Top Angler</div>
-        <div class="mini-v"><span class="accent">${esc(topAngler?.[0]||"—")}</span> ${topAngler?`(${topAngler[1]})`:""}</div>
+  // Always render the same structure so mini-card descriptions never disappear.
+  el.innerHTML = `
+    <div class="mini-card">
+      <div class="mini-k">Top Angler</div>
+      <div class="mini-v">
+        <span class="accent">${esc(topAngler?.[0] || "—")}</span>
+        ${topAngler ? `(${topAngler[1]})` : ""}
       </div>
-      <div class="mini-card">
-        <div class="mini-k">Top Species</div>
-        <div class="mini-v"><span class="accent">${esc(topSpecies?.[0]||"—")}</span> ${topSpecies?`(${topSpecies[1]})`:""}</div>
+      <div class="mini-sub">total fish caught (all logged entries)</div>
+    </div>
+
+    <div class="mini-card">
+      <div class="mini-k">Top Species</div>
+      <div class="mini-v">
+        <span class="accent">${esc(topSpecies?.[0] || "—")}</span>
+        ${topSpecies ? `(${topSpecies[1]})` : ""}
       </div>
-      <div class="mini-card">
-        <div class="mini-k">Biggest Fish</div>
-        <div class="mini-v">${biggest ? `<span class="accent">${esc(biggest.length)}</span> in` : "—"}</div>
+      <div class="mini-sub">most frequently logged species</div>
+    </div>
+
+    <div class="mini-card">
+      <div class="mini-k">Biggest Fish</div>
+      <div class="mini-v">
+        ${biggest ? `<span class="accent">${esc(biggest.length)}</span> in` : "—"}
       </div>
-      <div class="mini-card">
-        <div class="mini-k">% Kept</div>
-        <div class="mini-v">${keptPct==null ? "—" : `<span class="accent">${keptPct}%</span>`}</div>
+      <div class="mini-sub">
+        ${biggest
+          ? `${esc(biggest.species || "Unknown species")} • ${esc(biggest.angler || "—")}`
+          : "based on Length (inches)"}
       </div>
-    `;
+    </div>
+
+    <div class="mini-card">
+      <div class="mini-k">% Kept</div>
+      <div class="mini-v">
+        ${keptPct == null ? "—" : `<span class="accent">${keptPct}%</span>`}
+      </div>
+      <div class="mini-sub">kept ${keptCt} • released ${relCt}</div>
+    </div>
+  `;
+}
+
   }
 
   // ===== Leaderboards (Pro) =====
