@@ -1551,10 +1551,10 @@
     const glow = (s>=6) ? "glow" : "";
 
     document.getElementById("conditions").innerHTML = `
-      <div class="cond-card"><div class="cond-label">Wind</div><div class="cond-value ${glow}">${c.wind}</div></div>
-      <div class="cond-card"><div class="cond-label">Seas</div><div class="cond-value ${glow}">${c.seas}</div></div>
-      <div class="cond-card"><div class="cond-label">Period</div><div class="cond-value ${glow}">${c.period}</div></div>
-      <div class="cond-card"><div class="cond-label">Temp</div><div class="cond-value ${glow}">${c.temp}</div></div>
+      <div class="cond-card"><div class="cond-label">Wind (mph)</div><div class="cond-value ${glow}">${c.wind}</div></div>
+      <div class="cond-card"><div class="cond-label">Seas (ft)</div><div class="cond-value ${glow}">${c.seas}</div></div>
+      <div class="cond-card"><div class="cond-label">Period (sec)</div><div class="cond-value ${glow}">${c.period}</div></div>
+      <div class="cond-card"><div class="cond-label">Temp (F)</div><div class="cond-value ${glow}">${c.temp}</div></div>
     `;
 
     document.getElementById("status").innerHTML = `
