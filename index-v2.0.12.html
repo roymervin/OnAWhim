@@ -1203,12 +1203,50 @@
 
     const data = allDocs.slice();
     if(!data.length){
-      el.innerHTML = `
-        <div class="mini-card"><div class="mini-k">Top Angler</div><div class="mini-v">—</div></div>
-        <div class="mini-card"><div class="mini-k">Top Species</div><div class="mini-v">—</div></div>
-        <div class="mini-card"><div class="mini-k">Biggest Fish</div><div class="mini-v">—</div></div>
-        <div class="mini-card"><div class="mini-k">% Kept</div><div class="mini-v">—</div></div>
-      `;
+
+el.innerHTML = `
+  <div class="mini-card">
+    <div class="mini-k">Top Angler</div>
+    <div class="mini-v">
+      <span class="accent">${esc(topAngler?.[0] || "—")}</span>
+      ${topAngler ? `(${topAngler[1]})` : ""}
+    </div>
+    <div style="font-size:11px; opacity:.6; margin-top:4px;">
+      total fish caught
+    </div>
+  </div>
+
+  <div class="mini-card">
+    <div class="mini-k">Top Species</div>
+    <div class="mini-v">
+      <span class="accent">${esc(topSpecies?.[0] || "—")}</span>
+      ${topSpecies ? `(${topSpecies[1]})` : ""}
+    </div>
+  </div>
+
+  <div class="mini-card">
+    <div class="mini-k">Biggest Fish</div>
+    <div class="mini-v">
+      ${biggest 
+        ? `<span class="accent">${esc(biggest.length)}</span> in`
+        : "—"}
+    </div>
+    <div style="font-size:11px; opacity:.6; margin-top:4px;">
+      ${biggest ? esc(biggest.species || "Unknown species") : ""}
+    </div>
+  </div>
+
+  <div class="mini-card">
+    <div class="mini-k">% Kept of All Catches</div>
+    <div class="mini-v">
+      ${keptPct == null ? "—" : `<span class="accent">${keptPct}%</span>`}
+    </div>
+    <div style="font-size:11px; opacity:.6; margin-top:4px;">
+      Kept: ${keptCt} • Released: ${relCt}
+    </div>
+  </div>
+`;
+
       return;
     }
 
