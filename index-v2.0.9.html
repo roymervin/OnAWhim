@@ -301,6 +301,7 @@
   <div class="tab" onclick="switchTab('reports', this)">Trip Reports</div>
   <div class="tab" onclick="switchTab('albums', this)">Albums</div>
   <div class="tab" onclick="switchTab('videos', this)">Videos</div>
+  <div class="tab" onclick="switchTab('leaderboards', this)">Leaderboards</div>
 </div>
 
 <div id="dashboard" class="page active">
@@ -315,6 +316,24 @@
       </div>
     </div>
     <div class="hint">Numbers glow when conditions score ≥ 6/8.</div>
+  </div>
+</div>
+
+<div id="leaderboards" class="page">
+  <div class="panel">
+    <h2>📊 Leaderboards</h2>
+
+    <div style="margin-bottom:12px;">
+      <label style="font-size:12px;">Trip Filter</label>
+      <select id="lbTrip"></select>
+    </div>
+
+    <div id="cards" style=
+      "display:grid;
+       grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+       gap:12px;">
+    </div>
+
   </div>
 </div>
 
