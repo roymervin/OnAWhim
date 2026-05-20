@@ -5,7 +5,6 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>OnAWhim Offshore</title>
-
 <style>
   :root{
     --teal:#00d4c6;
@@ -20,6 +19,11 @@
     /* filter card override */
     --filterBg: rgba(0,0,0,0.28);
     --filterStroke: rgba(0,212,198,0.18);
+
+    /* leaderboard accents */
+    --qty:#eafffb;
+    --qtyShadow: rgba(0,0,0,.35);
+    --panelMax: 1020px;
   }
 
   body{
@@ -59,7 +63,11 @@
     text-align:center;
   }
   .cond-label{ font-size:11px; opacity:0.72; }
-  .cond-value{ font-size:28px; color:var(--teal); font-weight:650; }
+  .cond-value{
+    font-size:28px;
+    color:var(--teal);
+    font-weight:650;
+  }
   .glow{ text-shadow: 0 0 6px rgba(0,212,198,0.75), 0 0 14px rgba(0,212,198,0.45); }
 
   /* TABS */
@@ -92,7 +100,7 @@
 
   /* PANELS */
   .panel{
-    max-width:1020px;
+    max-width:var(--panelMax);
     background:var(--glass);
     border:1px solid var(--stroke);
     border-radius:14px;
@@ -136,13 +144,11 @@
     flex:1;
     min-width:260px;
   }
-
   .form-grid{
     display:grid;
     grid-template-columns:repeat(3,1fr);
     gap:10px;
   }
-
   /* Filters near bottom */
   .filters{
     display:grid;
@@ -164,7 +170,6 @@
     margin-bottom:6px;
     color: rgba(205,231,240,0.95);
   }
-
   .field{
     background:rgba(255,255,255,0.04);
     border:1px solid rgba(255,255,255,0.08);
@@ -185,7 +190,6 @@
   textarea{ min-height:90px; resize:vertical; grid-column:1/-1; }
   input::placeholder{ color:rgba(255,255,255,0.55); }
   select option{ color:#0b1f2a; }
-
   .actions{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
   .btn{
     background:rgba(0,212,198,0.18);
@@ -208,7 +212,6 @@
     border:1px solid rgba(255,77,77,0.25);
     color:#ffd0d0;
   }
-
   .table-wrap{ margin-top:10px; overflow:auto; border-radius:12px; border:1px solid rgba(255,255,255,0.10); }
   table{ width:100%; border-collapse:collapse; min-width:1250px; background:rgba(0,0,0,0.18); }
   th, td{ padding:10px; border-bottom:1px solid rgba(255,255,255,0.08); text-align:left; font-size:12px; }
@@ -270,23 +273,140 @@
   /* Hidden file input */
   #csvFileInput{ display:none; }
 
+  /* ===== Leaderboards Pro Layout ===== */
+  .lb-toolbar{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap:10px;
+    margin:10px 0 14px;
+  }
+  .lb-tool{
+    background: rgba(0,0,0,0.22);
+    border: 1px solid rgba(0,212,198,0.18);
+    border-radius: 12px;
+    padding:10px;
+    backdrop-filter: blur(12px);
+  }
+  .lb-tool label{ display:block; font-size:11px; opacity:0.85; margin-bottom:6px; color: rgba(205,231,240,0.95); }
+
+  .lb-group{ margin-top:14px; }
+  .lb-group h3{
+    margin:0 0 10px;
+    font-size:13px;
+    letter-spacing:.4px;
+    text-transform:uppercase;
+    color:rgba(205,231,240,0.95);
+    opacity:.9;
+  }
+  .lb-cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:12px;
+  }
+  .lb-card{
+    background:var(--glass);
+    border:1px solid var(--stroke);
+    border-radius:16px;
+    padding:16px;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.18);
+    animation: lbRise .45s ease both;
+  }
+  @keyframes lbRise{
+    from{ opacity:0; transform: translateY(10px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+  .lb-k{
+    font-size:12px;
+    opacity:.75;
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    align-items:center;
+  }
+  .lb-live{
+    display:inline-block;
+    padding:4px 10px;
+    border-radius:999px;
+    border:1px solid rgba(0,212,198,0.22);
+    background:rgba(0,212,198,0.08);
+    color:rgba(210,255,251,0.95);
+    font-size:11px;
+    white-space:nowrap;
+  }
+  .lb-v{
+    font-size:22px;
+    font-weight:950;
+    color:var(--qty);
+    margin-top:10px;
+    line-height:1.2;
+    text-shadow: 0 2px 16px var(--qtyShadow);
+  }
+  .lb-v .accent{ color:var(--teal); text-shadow: 0 0 10px rgba(0,212,198,0.35); }
+  .lb-sub{
+    margin-top:10px;
+    font-size:12px;
+    opacity:.86;
+    line-height:1.35;
+  }
+
+  .lb-medals{ margin-top:10px; display:flex; flex-direction:column; gap:6px; }
+  .lb-row{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    align-items:center;
+    padding:8px 10px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.10);
+    background: rgba(0,0,0,0.18);
+  }
+  .lb-left{ display:flex; align-items:center; gap:10px; min-width:0; }
+  .lb-badge{
+    width:26px; height:26px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(0,212,198,0.18);
+    border:1px solid rgba(0,212,198,0.30);
+  }
+  .lb-name{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .lb-count{ font-weight:950; color:var(--qty); text-shadow: 0 2px 12px var(--qtyShadow); }
+
+  .lb-mini{
+    margin-top:10px;
+    border:1px solid rgba(255,255,255,0.10);
+    border-radius:12px;
+    overflow:hidden;
+    background: rgba(0,0,0,0.18);
+  }
+  .lb-mini .r{
+    display:grid;
+    grid-template-columns: 1.2fr .9fr .7fr;
+    gap:10px;
+    padding:10px 12px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    font-size:12px;
+    align-items:center;
+  }
+  .lb-mini .r:last-child{ border-bottom:none; }
+  .lb-mini .h{ background: rgba(0,0,0,0.28); font-weight:900; opacity:.9; }
+  .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
   @media(max-width:768px){
     .cond-grid{ grid-template-columns:repeat(2,1fr); }
     .decision-row{ grid-template-columns:1fr; }
     .form-grid{ grid-template-columns:1fr; }
     .filters{ grid-template-columns:1fr; }
+    .lb-toolbar{ grid-template-columns:1fr; }
     .hero{ padding:16px 16px; height:28vh; }
     .condition-wrap, .decision-row{ max-width:100%; }
   }
 </style>
 </head>
-
 <body>
 
 <div class="hero">
   <h1>Everything... On A Whim!</h1>
   <p>Offshore Planning Dashboard</p>
-
   <div class="condition-wrap">
     <div class="cond-grid" id="conditions">Loading...</div>
   </div>
@@ -296,14 +416,14 @@
   <div class="tab active" onclick="switchTab('dashboard', this)">Dashboard</div>
   <div class="tab" onclick="switchTab('log', this)">Catch Log</div>
   <div class="tab" onclick="switchTab('leaderboards', this)">Leaderboards</div>
-    <!-- ***hide for now******************************************************  
-    <div class="tab" onclick="switchTab('guide', this)">Captain's Guide</div>
-    <div class="tab" onclick="switchTab('calc', this)">Trip Calculator</div>
-    <div class="tab" onclick="switchTab('charter', this)">Charter Options</div>
-    <div class="tab" onclick="switchTab('reports', this)">Trip Reports</div>
-    <div class="tab" onclick="switchTab('albums', this)">Albums</div>
-    <div class="tab" onclick="switchTab('videos', this)">Videos</div>
-    -->
+  <!-- hidden for now
+  <div class="tab" onclick="switchTab('guide', this)">Captain's Guide</div>
+  <div class="tab" onclick="switchTab('calc', this)">Trip Calculator</div>
+  <div class="tab" onclick="switchTab('charter', this)">Charter Options</div>
+  <div class="tab" onclick="switchTab('reports', this)">Trip Reports</div>
+  <div class="tab" onclick="switchTab('albums', this)">Albums</div>
+  <div class="tab" onclick="switchTab('videos', this)">Videos</div>
+  -->
 </div>
 
 <div id="dashboard" class="page active">
@@ -321,30 +441,53 @@
   </div>
 </div>
 
+<!-- PRO LEADERBOARDS TAB -->
 <div id="leaderboards" class="page">
   <div class="panel">
     <h2>📊 Leaderboards</h2>
 
-    <div style="margin-bottom:12px;">
-      <label style="font-size:12px;">Trip Filter</label>
-      <select id="lbTrip"></select>
+    <div class="lb-toolbar">
+      <div class="lb-tool">
+        <label>Trip Filter</label>
+        <select id="lbTrip"></select>
+      </div>
+      <div class="lb-tool">
+        <label>Status Filter</label>
+        <select id="lbStatus">
+          <option value="ALL">All</option>
+          <option value="Kept">Kept</option>
+          <option value="Released">Released</option>
+        </select>
+      </div>
+      <div class="lb-tool">
+        <label>Scope</label>
+        <select id="lbScope">
+          <option value="FILTERED">Use Trip/Status filters</option>
+          <option value="ALLDATA">Ignore filters (Global)</option>
+        </select>
+      </div>
     </div>
 
-    <div id="cards" style=
-      "display:grid;
-       grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-       gap:12px;">
+    <div class="lb-group">
+      <h3>People</h3>
+      <div class="lb-cards" id="lbPeople"></div>
     </div>
 
+    <div class="lb-group">
+      <h3>Fish Species</h3>
+      <div class="lb-cards" id="lbSpecies"></div>
+    </div>
+
+    <div class="lb-group">
+      <h3>Time & Trips</h3>
+      <div class="lb-cards" id="lbTimeTrips"></div>
+    </div>
+
+    <div class="hint" id="lbHint">Leaderboards update live as your catches update.</div>
   </div>
 </div>
 
-<div id="guide" class="page">
-  <div class="panel">
-    <h2>Captain's Guide</h2>
-    <div class="hint">Placeholder — content coming soon.</div>
-  </div>
-</div>
+<div id="guide" class="page"><div class="panel"><h2>Captain's Guide</h2><div class="hint">Placeholder — content coming soon.</div></div></div>
 
 <div id="log" class="page">
   <div class="panel">
@@ -499,7 +642,6 @@
         <tbody id="entries"></tbody>
       </table>
     </div>
-
   </div>
 </div>
 
@@ -585,7 +727,7 @@
   const db = getFirestore(app);
   const catchesCol = collection(db, "catches"); // Option A
 
-  // Trips updated with Alaska options
+  // Trips include April + Alaska
   const TRIPS = [
     "April.Trip.01","April.Trip.02",
     "May ARS Opener","May ARS 02",
@@ -618,7 +760,13 @@
   ];
 
   const $ = (id)=>document.getElementById(id);
-  const esc = (v)=> (v??"").toString().replaceAll("<","&lt;").replaceAll(">","&gt;");
+
+  // Proper escape (fixes previous un-escaping)
+  const esc = (v)=> String(v ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"','&quot;');
 
   function fillSelect(selectEl, items, placeholder){
     selectEl.innerHTML = "";
@@ -633,6 +781,7 @@
       selectEl.appendChild(o);
     });
   }
+
   function fillFilterSelect(selectEl, items){
     selectEl.innerHTML = "";
     const all = document.createElement("option");
@@ -650,8 +799,6 @@
   let isCaptain = false;
   let allDocs = [];
   let unsub = null;
-
-  // Editing state
   let editingId = null;
 
   function setWriteEnabled(enabled){
@@ -673,16 +820,12 @@
     const total = list.length;
     const kept = list.filter(x => (x.keptReleased || x.status) === "Kept").length;
     const released = list.filter(x => (x.keptReleased || x.status) === "Released").length;
-
-    // Optional averages (only if numeric values exist)
-    const nums = (arr)=>arr.filter(v => v !== "" && v != null && !Number.isNaN(Number(v))).map(Number);
+    const nums = (arr)=>arr.filter(v => v !== "" && v != null && Number.isFinite(Number(v))).map(Number);
     const lenVals = nums(list.map(x => x.length));
     const wtVals  = nums(list.map(x => x.weight));
     const avg = (a)=> a.length ? (a.reduce((p,c)=>p+c,0)/a.length) : null;
-
     const avgLen = avg(lenVals);
     const avgWt  = avg(wtVals);
-
     return { total, kept, released, avgLen, avgWt };
   }
 
@@ -692,7 +835,7 @@
     parts.push(`<span class="pill">Kept: <b>${t.kept}</b></span>`);
     parts.push(`<span class="pill">Released: <b>${t.released}</b></span>`);
     if(t.avgLen != null) parts.push(`<span class="pill">Avg Len: <b>${t.avgLen.toFixed(1)}</b> in</span>`);
-    if(t.avgWt != null) parts.push(`<span class="pill">Avg Wt: <b>${t.avgWt.toFixed(1)}</b> lb</span>`);
+    if(t.avgWt != null)  parts.push(`<span class="pill">Avg Wt: <b>${t.avgWt.toFixed(1)}</b> lb</span>`);
     $("totalsBar").innerHTML = parts.join("");
   }
 
@@ -703,9 +846,10 @@
     if(f.angler !== "ALL") filtered = filtered.filter(d => d.angler === f.angler);
     if(f.species !== "ALL") filtered = filtered.filter(d => d.species === f.species);
     if(f.status !== "ALL") filtered = filtered.filter(d => (d.keptReleased || d.status) === f.status);
-
     renderTotalsBar(computeTotals(filtered));
     renderTable(filtered);
+    // keep leaderboards in sync with latest dataset
+    renderLeaderboards();
   }
 
   function renderTable(list){
@@ -719,10 +863,8 @@
       const status = (d.keptReleased || d.status || "");
       const statusClass = (status === "Kept") ? "kept" : "released";
       const statusChip = `<span class="status-chip ${statusClass}">${esc(status)}</span>`;
-
       const editBtn = isCaptain ? `<button class="btn secondary" style="padding:6px 10px;" data-edit="${d._id}">Edit</button>` : "";
       const delBtn  = isCaptain ? `<button class="btn secondary" style="padding:6px 10px;" data-del="${d._id}">Delete</button>` : "";
-
       return `
         <tr>
           <td>${esc(d.date)}</td>
@@ -745,11 +887,8 @@
       btn.addEventListener("click", async ()=>{
         const id = btn.getAttribute("data-del");
         if(!confirm("Delete this entry?")) return;
-        try{
-          await deleteDoc(doc(db, "catches", id));
-        }catch(e){
-          alert("Delete failed: " + (e?.message || e));
-        }
+        try{ await deleteDoc(doc(db, "catches", id)); }
+        catch(e){ alert("Delete failed: " + (e?.message || e)); }
       });
     });
 
@@ -759,10 +898,7 @@
         const id = btn.getAttribute("data-edit");
         const entry = allDocs.find(x => x._id === id);
         if(!entry) return;
-
         editingId = id;
-
-        // Populate form
         $("trip").value = entry.trip || "";
         $("date").value = entry.date || new Date().toISOString().slice(0,10);
         $("location").value = entry.location || "";
@@ -774,7 +910,6 @@
         $("weight").value = entry.weight || "";
         $("notes").value = entry.notes || "";
 
-        // Update UI
         $("btnSave").textContent = "Update Entry";
         $("btnCancelEdit").style.display = "inline-block";
         $("editHint").textContent = "Editing an existing entry — click Update Entry to save changes, or Cancel Edit.";
@@ -811,11 +946,9 @@
 
     try{
       if(editingId){
-        // Update existing
         await updateDoc(doc(db, "catches", editingId), entry);
         cancelEdit();
       } else {
-        // Create new
         await addDoc(catchesCol, {
           ...entry,
           createdAt: serverTimestamp(),
@@ -888,13 +1021,11 @@
     let row = [];
     let cur = "";
     let inQuotes = false;
-
     for(let i=0;i<text.length;i++){
       const ch = text[i];
       const next = text[i+1];
-
-      if(ch === '"' ){
-        if(inQuotes && next === '"'){ // escaped quote
+      if(ch === '"'){
+        if(inQuotes && next === '"'){
           cur += '"';
           i++;
         } else {
@@ -907,44 +1038,35 @@
         if(ch === '\r' && next === '\n') i++;
         row.push(cur);
         cur = "";
-        if(row.some(c=>c.trim()!== "")) rows.push(row);
+        if(row.some(c=>c.trim()!=="")) rows.push(row);
         row = [];
       } else {
         cur += ch;
       }
     }
-
-    // final
     row.push(cur);
-    if(row.some(c=>c.trim()!== "")) rows.push(row);
+    if(row.some(c=>c.trim()!=="")) rows.push(row);
     return rows;
   }
 
-  function normalizeHeader(h){
-    return h.trim().toLowerCase();
-  }
+  function normalizeHeader(h){ return h.trim().toLowerCase(); }
 
   function mapRow(headers, cols){
     const get = (name)=>{
       const idx = headers.indexOf(name);
       return idx >= 0 ? (cols[idx] ?? "").trim() : "";
     };
-
     const date = get("date");
     const trip = get("trip");
     const angler = get("angler");
     const species = get("species");
-
     const status = get("status") || get("keptreleased") || get("kept_released") || get("kept/released");
     const bait = get("bait");
     const location = get("location");
     const notes = get("notes");
-
     const length = get("length_in") || get("length") || get("len") || get("len(in)");
     const weight = get("weight_lb") || get("weight") || get("wt") || get("wt(lb)");
-
     const keptReleased = (status.toLowerCase() === "released") ? "Released" : "Kept";
-
     return { date, trip, angler, species, keptReleased, length, weight, bait, location, notes };
   }
 
@@ -953,26 +1075,18 @@
       alert("You must be signed in as the captain to import.");
       return;
     }
-
     const text = await file.text();
     const rows = parseCSV(text);
     if(rows.length < 2){
       alert("CSV file looks empty or missing rows.");
       return;
     }
-
     const headers = rows[0].map(normalizeHeader);
     const dataRows = rows.slice(1);
-
     const entries = [];
     for(const cols of dataRows){
       const e = mapRow(headers, cols);
-
-      // minimal validation
-      if(!e.date || !e.trip || !e.angler || !e.species){
-        continue; // skip bad rows silently
-      }
-
+      if(!e.date || !e.trip || !e.angler || !e.species) continue;
       entries.push({
         ...e,
         createdAt: serverTimestamp(),
@@ -981,13 +1095,10 @@
         updatedBy: auth.currentUser?.uid || null
       });
     }
-
     if(!entries.length){
       alert("No valid rows found. Required columns: date, trip, angler, species.");
       return;
     }
-
-    // Batch write in chunks of 400 (safe under 500 limit)
     const chunkSize = 400;
     try{
       for(let i=0;i<entries.length;i+=chunkSize){
@@ -1000,7 +1111,7 @@
         await batch.commit();
       }
       alert(`Imported ${entries.length} entries.`);
-    } catch(e){
+    }catch(e){
       alert("Import failed: " + (e?.message || e));
     }
   }
@@ -1028,20 +1139,14 @@
   $("btnSignOut").addEventListener("click", doSignOut);
   $("btnSave").addEventListener("click", saveCatch);
   $("btnCancelEdit").addEventListener("click", cancelEdit);
-  $("btnClear").addEventListener("click", ()=>{
-    cancelEdit();
-    clearForm();
-  });
+  $("btnClear").addEventListener("click", ()=>{ cancelEdit(); clearForm(); });
   $("btnExport").addEventListener("click", exportCSV);
-
-  $("btnImport").addEventListener("click", ()=>{
-    $("csvFileInput").click();
-  });
+  $("btnImport").addEventListener("click", ()=>{ $("csvFileInput").click(); });
   $("csvFileInput").addEventListener("change", async (ev)=>{
     const file = ev.target.files?.[0];
     if(!file) return;
     await importCSV(file);
-    ev.target.value = ""; // reset
+    ev.target.value = "";
   });
 
   // Auth state
@@ -1066,8 +1171,8 @@
     applyFilters();
   });
 
+  // Init
   async function init(){
-    // Dashboard
     const c = await getBuoy();
     const s = score(c);
     const stat = labelScore(s);
@@ -1107,6 +1212,9 @@
     attachFilterListeners();
     startCatchListener();
     applyFilters();
+
+    // Leaderboards controls
+    initLeaderboardsUI();
   }
 
   init();
@@ -1114,16 +1222,13 @@
   // Sign-in/out functions
   async function doSignIn(){
     const email = $("authEmail").value.trim();
-    const pass  = $("authPassword").value;
+    const pass = $("authPassword").value;
     if(!email || !pass){
       alert("Enter email and password to sign in.");
       return;
     }
-    try{
-      await signInWithEmailAndPassword(auth, email, pass);
-    }catch(e){
-      alert("Sign-in failed: " + (e?.message || e));
-    }
+    try{ await signInWithEmailAndPassword(auth, email, pass); }
+    catch(e){ alert("Sign-in failed: " + (e?.message || e)); }
   }
 
   async function doSignOut(){
@@ -1131,173 +1236,290 @@
     catch(e){ alert("Sign-out failed: " + (e?.message || e)); }
   }
 
-// ✅ ===== LEADERBOARDS MODULE (SAFE MERGE) =====
+  // =====================
+  // Leaderboards (Pro)
+  // =====================
+  const lbTrip   = document.getElementById("lbTrip");
+  const lbStatus = document.getElementById("lbStatus");
+  const lbScope  = document.getElementById("lbScope");
 
-const lbTrip = document.getElementById("lbTrip");
-
-const LB_TRIPS = [
-  "All",
-  "April.Trip.01","April.Trip.02",
-  "May ARS Opener","May ARS 02",
-  "June.Trip.01","June.Trip.02","June.Trip.03","June.Trip.04",
-  "July.Trip.01","July.Trip.02","July.Trip.03","July.Trip.04",
-  "August.Trip.01","August.Trip.02","August.Trip.03","August.Trip.04",
-  "Alaska (Homer)","Alaska (Seward)","Alaska (Whittier)"
-];
-
-LB_TRIPS.forEach(t=>{
-  const o=document.createElement("option");
-  o.value=t;
-  o.textContent=t;
-  if(lbTrip) lbTrip.appendChild(o);
-});
-
-function lbCountBy(arr, key){
-  const map = {};
-  arr.forEach(d=>{
-    if(!d[key]) return;
-    map[d[key]] = (map[d[key]] || 0) + 1;
-  });
-  return Object.entries(map).sort((a,b)=>b[1]-a[1]);
-}
-
-function lbBiggest(data){
-  return data.reduce((a,b)=>{
-    return (+b.length > +a.length ? b : a);
-  }, data[0]);
-}
-
-function lbBestDay(data){
-  const d = lbCountBy(data,"date")[0];
-  return d ? `${d[0]} (${d[1]})` : "-";
-}
-
-
-function lbStats(data){
-  if(!data.length) return [];
-
-  // Helpers
-  const count = key => {
-    const m = {};
-    data.forEach(d=>{
-      if(!d[key]) return;
-      m[d[key]] = (m.get?.(d[key])||m[d[key]]||0)+1;
+  function initLeaderboardsUI(){
+    if(!lbTrip) return;
+    lbTrip.innerHTML = "";
+    const trips = ["All", ...TRIPS];
+    const uniq = Array.from(new Set(trips));
+    uniq.forEach(t=>{
+      const o = document.createElement("option");
+      o.value = t;
+      o.textContent = t;
+      lbTrip.appendChild(o);
     });
-    return Object.entries(m).sort((a,b)=>b[1]-a[1]);
-  };
 
-  const biggest = data.reduce((a,b)=> +b.length > +a.length ? b : a, data[0]);
+    lbTrip.addEventListener("change", renderLeaderboards);
+    lbStatus.addEventListener("change", renderLeaderboards);
+    lbScope.addEventListener("change", renderLeaderboards);
 
-  const heaviest = data.reduce((a,b)=> +b.weight > +a.weight ? b : a, data[0]);
-
-  const tripCounts = count("trip");
-  const anglerCounts = count("angler");
-  const speciesCounts = count("species");
-
-  const bestTrip = tripCounts[0];
-  const topAngler = anglerCounts[0];
-  const topSpecies = speciesCounts[0];
-
-  const bestDay = count("date")[0];
-
-  const monthCounts = {};
-  data.forEach(d=>{
-    if(!d.date) return;
-    const m = d.date.slice(0,7);
-    monthCounts[m] = (monthCounts[m]||0)+1;
-  });
-  const bestMonth = Object.entries(monthCounts).sort((a,b)=>b[1]-a[1])[0];
-
-  // kept %
-  const kept = data.filter(x=>x.keptReleased==="Kept").length;
-  const rel = data.filter(x=>x.keptReleased==="Released").length;
-  const total = kept+rel;
-
-  // unique species
-  const uniqueSpecies = new Set(data.map(d=>d.species)).size;
-
-  // Top 3 medals list renderer
-  const medals = arr => `
-    ${arr.slice(0,3).map((e,i)=>`
-      <div style="display:flex;justify-content:space-between;margin-top:6px;">
-        <span>${["🥇","🥈","🥉"][i]} ${e[0]}</span>
-        <b>${e[1]}</b>
-      </div>
-    `).join("")}
-  `;
-
-  // Most diverse trip
-  const tripSpecies = {};
-  data.forEach(d=>{
-    if(!tripSpecies[d.trip]) tripSpecies[d.trip] = new Set();
-    tripSpecies[d.trip].add(d.species);
-  });
-  let diverseTrip="", max=0;
-  Object.entries(tripSpecies).forEach(([k,v])=>{
-    if(v.size>max){ max=v.size; diverseTrip=k; }
-  });
-
-  return [
-    ["Biggest Fish", `${biggest.species} (${biggest.length} in)`],
-    ["Heaviest Fish", `${heaviest.species} (${heaviest.weight} lb)`],
-    ["Most Caught Species", `${topSpecies?.[0]} (${topSpecies?.[1]})`],
-    ["Top Angler", `${topAngler?.[0]} (${topAngler?.[1]})`],
-    ["Best Trip", `${bestTrip?.[0]} (${bestTrip?.[1]})`],
-    ["Best Day", `${bestDay?.[0]} (${bestDay?.[1]})`],
-    ["Best Month", `${bestMonth?.[0]} (${bestMonth?.[1]})`],
-    ["Kept %", total ? Math.round(kept/total*100)+"%" : "-"],
-    ["Unique Species", uniqueSpecies],
-    ["Most Diverse Trip", `${diverseTrip} (${max})`],
-
-    // Medal-style cards
-    ["Top 3 Anglers", medals(anglerCounts)],
-    ["Top 3 Species", medals(speciesCounts)]
-  ];
-}
-
-
-// Render
-function renderLeaderboards(){
-  const el = document.getElementById("cards");
-  if(!el) return;
-
-  let data = allDocs || [];
-
-  const trip = lbTrip.value;
-  if(trip && trip !== "All"){
-    data = data.filter(d=>d.trip===trip);
+    renderLeaderboards();
   }
 
-  el.innerHTML = lbStats(data).map(x=>`
-    <div style="
-      background:rgba(255,255,255,0.07);
-      border:1px solid rgba(255,255,255,0.12);
-      padding:14px;
-      border-radius:12px;">
-      <div style="font-size:12px; opacity:.7;">${x[0]}</div>
-      <div style="
-        font-size:20px;
-        font-weight:900;
-        color:#00d4c6;">
-        ${x[1]}
+  // ✅ FIXED count function (no .get on plain object)
+  function countBy(arr, key){
+    const m = {};
+    for(const d of arr){
+      const k = d?.[key];
+      if(!k) continue;
+      m[k] = (m[k] || 0) + 1;
+    }
+    return Object.entries(m).sort((a,b)=>b[1]-a[1]);
+  }
+
+  function safeNum(v){
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function medalList(entries){
+    const medals = ["🥇","🥈","🥉"];
+    if(!entries.length) return `<div class="lb-sub">No data yet.</div>`;
+    return `
+      <div class="lb-medals">
+        ${entries.slice(0,3).map((e,i)=>`
+          <div class="lb-row">
+            <div class="lb-left">
+              <div class="lb-badge">${medals[i] || "🏅"}</div>
+              <div class="lb-name">${esc(e[0])}</div>
+            </div>
+            <div class="lb-count">${esc(e[1])}</div>
+          </div>
+        `).join("")}
       </div>
-    </div>
-  `).join("");
-}
+    `;
+  }
 
-// Hook to existing Firestore updates
-const originalApplyFilters = applyFilters;
-applyFilters = function(){
-  originalApplyFilters();
-  renderLeaderboards();
-};
+  function statCard(title, valueHtml, subHtml){
+    return `
+      <div class="lb-card">
+        <div class="lb-k"><span>${esc(title)}</span><span class="lb-live">Live</span></div>
+        <div class="lb-v">${valueHtml}</div>
+        <div class="lb-sub">${subHtml}</div>
+      </div>
+    `;
+  }
 
-if(lbTrip){
-  lbTrip.addEventListener("change", renderLeaderboards);
-}
+  function personalBestsTable(rows){
+    if(!rows.length) return "No length data yet.";
+    return `
+      <div class="lb-mini">
+        <div class="r h"><div>Angler</div><div>Best Fish</div><div class="mono">Len</div></div>
+        ${rows.map(r=>`
+          <div class="r">
+            <div>${esc(r.angler)}</div>
+            <div>${esc(r.species)} <span class="pill">${esc(r.trip)}</span></div>
+            <div class="mono"><span style="font-weight:950; color:var(--qty);">${esc(r.len)}</span> in</div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
 
+  // ✅ Pro dashboard render + missing cards included
+  function renderLeaderboards(){
+    const peopleEl = document.getElementById("lbPeople");
+    const speciesEl = document.getElementById("lbSpecies");
+    const timeEl = document.getElementById("lbTimeTrips");
+    if(!peopleEl || !speciesEl || !timeEl) return;
 
-  
+    const tripSel = lbTrip?.value || "All";
+    const statusSel = lbStatus?.value || "ALL";
+    const scopeSel = lbScope?.value || "FILTERED";
+
+    let base = allDocs.slice();
+
+    if(scopeSel !== "ALLDATA"){
+      if(tripSel !== "All") base = base.filter(d => d.trip === tripSel);
+      if(statusSel !== "ALL") base = base.filter(d => (d.keptReleased || d.status) === statusSel);
+    }
+
+    // ===== People stats =====
+    const anglerCounts = countBy(base, "angler");
+    const topAngler = anglerCounts[0];
+
+    // ✅ Kept leaderboard
+    const keptOnly = base.filter(d => (d.keptReleased || d.status) === "Kept");
+    const keptAnglerCounts = countBy(keptOnly, "angler");
+
+    // Angler most unique species
+    const speciesByAngler = new Map();
+    for(const d of base){
+      if(!d.angler || !d.species) continue;
+      if(!speciesByAngler.has(d.angler)) speciesByAngler.set(d.angler, new Set());
+      speciesByAngler.get(d.angler).add(d.species);
+    }
+    let bestDiversity = null;
+    for(const [a,set] of speciesByAngler.entries()){
+      if(!bestDiversity || set.size > bestDiversity.count) bestDiversity = { a, count:set.size };
+    }
+
+    // ✅ Personal bests
+    const bestByAngler = new Map();
+    for(const d of base){
+      const len = safeNum(d.length);
+      if(!d.angler || len==null) continue;
+      const cur = bestByAngler.get(d.angler);
+      if(!cur || len > cur.len){
+        bestByAngler.set(d.angler, { angler:d.angler, len, species:d.species||"Unknown", trip:d.trip||"—" });
+      }
+    }
+    const pbRows = Array.from(bestByAngler.values()).sort((a,b)=>b.len-a.len).slice(0,8);
+
+    const peopleCards = [];
+    peopleCards.push(statCard(
+      "Top Angler (Most Fish)",
+      topAngler ? `<span class="accent">${esc(topAngler[0])}</span> <span class="mono">— ${esc(topAngler[1])}</span>` : "—",
+      "Based on total catch entries in the selected scope."
+    ));
+    peopleCards.push(statCard(
+      "Kept Leaderboard (Top 3 Anglers)",
+      `<span class="accent">${esc(scopeSel === "ALLDATA" ? "Global" : tripSel)}</span>`,
+      medalList(keptAnglerCounts)
+    ));
+    peopleCards.push(statCard(
+      "Angler — Most Unique Species",
+      bestDiversity ? `<span class="accent">${esc(bestDiversity.a)}</span> <span class="mono">— ${esc(bestDiversity.count)}</span>` : "—",
+      "Species variety by angler in the selected scope."
+    ));
+    peopleCards.push(statCard(
+      "Personal Bests (Top by Length)",
+      `<span class="accent">Top ${pbRows.length}</span>`,
+      personalBestsTable(pbRows)
+    ));
+
+    // ===== Species stats =====
+    const speciesCounts = countBy(base, "species");
+    const topSpecies = speciesCounts[0];
+
+    // Biggest fish (length) + biggest kept + heaviest
+    let biggest = null;
+    let biggestKept = null;
+    let heaviest = null;
+
+    for(const d of base){
+      const len = safeNum(d.length);
+      const wt = safeNum(d.weight);
+
+      if(len!=null){
+        if(!biggest || len > biggest.len) biggest = { len, species:d.species||"Unknown", angler:d.angler||"—", trip:d.trip||"—", date:d.date||"—" };
+        if((d.keptReleased||d.status)==="Kept" && (!biggestKept || len > biggestKept.len)){
+          biggestKept = { len, species:d.species||"Unknown", angler:d.angler||"—", trip:d.trip||"—", date:d.date||"—", weight: wt };
+        }
+      }
+      if(wt!=null){
+        if(!heaviest || wt > heaviest.wt) heaviest = { wt, species:d.species||"Unknown", angler:d.angler||"—", trip:d.trip||"—", date:d.date||"—" };
+      }
+    }
+
+    const uniqueSpecies = new Set(base.map(d=>d.species).filter(Boolean)).size;
+
+    const speciesCards = [];
+    speciesCards.push(statCard(
+      "Most Caught Species",
+      topSpecies ? `<span class="accent">${esc(topSpecies[0])}</span> <span class="mono">— ${esc(topSpecies[1])}</span>` : "—",
+      "Counts entries by species."
+    ));
+    speciesCards.push(statCard(
+      "Top 3 Species (Medals)",
+      `<span class="accent">${esc(scopeSel === "ALLDATA" ? "Global" : tripSel)}</span>`,
+      medalList(speciesCounts)
+    ));
+    speciesCards.push(statCard(
+      "Biggest Fish (Length)",
+      biggest ? `<span class="accent">${esc(biggest.species)}</span> <span class="mono">— ${esc(biggest.len)} in</span>` : "—",
+      biggest ? `${esc(biggest.angler)} · ${esc(biggest.trip)} · ${esc(biggest.date)}` : "No length data yet."
+    ));
+    speciesCards.push(statCard(
+      "Biggest Kept Fish (Length)",
+      biggestKept ? `<span class="accent">${esc(biggestKept.species)}</span> <span class="mono">— ${esc(biggestKept.len)} in</span> ${biggestKept.weight!=null ? `<span class="pill">${esc(biggestKept.weight)} lb</span>` : ""}` : "—",
+      biggestKept ? `${esc(biggestKept.angler)} · ${esc(biggestKept.trip)} · ${esc(biggestKept.date)} <span class="status-chip kept">Kept</span>` : "No kept length data yet."
+    ));
+    speciesCards.push(statCard(
+      "Heaviest Fish (Weight)",
+      heaviest ? `<span class="accent">${esc(heaviest.species)}</span> <span class="mono">— ${esc(heaviest.wt)} lb</span>` : "—",
+      heaviest ? `${esc(heaviest.angler)} · ${esc(heaviest.trip)} · ${esc(heaviest.date)}` : "No weight data yet."
+    ));
+    speciesCards.push(statCard(
+      "Unique Species Count",
+      `<span class="accent">${esc(uniqueSpecies)}</span>`,
+      "Total different species logged (selected scope)."
+    ));
+
+    // ===== Time & Trips stats =====
+    const tripCounts = countBy(base, "trip");
+    const bestTrip = tripCounts[0];
+
+    const dateCounts = countBy(base, "date");
+    const bestDay = dateCounts[0];
+
+    // ✅ Best month
+    const monthCountsObj = {};
+    for(const d of base){
+      if(!d.date || d.date.length < 7) continue;
+      const m = d.date.slice(0,7);
+      monthCountsObj[m] = (monthCountsObj[m] || 0) + 1;
+    }
+    const bestMonth = Object.entries(monthCountsObj).sort((a,b)=>b[1]-a[1])[0];
+
+    // % kept vs released
+    const keptCt = keptOnly.length;
+    const relCt = base.filter(d => (d.keptReleased||d.status) === "Released").length;
+    const totalCt = keptCt + relCt;
+    const keptPct = totalCt ? Math.round((keptCt/totalCt)*100) : null;
+    const relPct = totalCt ? (100-keptPct) : null;
+
+    // ✅ Most diverse trip (global if All selected)
+    const sourceForDiversity = (scopeSel === "ALLDATA" || tripSel === "All") ? allDocs : base;
+    const tripSpeciesMap = new Map();
+    for(const d of sourceForDiversity){
+      if(!d.trip || !d.species) continue;
+      if(!tripSpeciesMap.has(d.trip)) tripSpeciesMap.set(d.trip, new Set());
+      tripSpeciesMap.get(d.trip).add(d.species);
+    }
+    let diverse = null;
+    for(const [t,set] of tripSpeciesMap.entries()){
+      if(!diverse || set.size > diverse.count) diverse = { trip:t, count:set.size };
+    }
+
+    const timeCards = [];
+    timeCards.push(statCard(
+      "Best Trip (Most Catches)",
+      bestTrip ? `<span class="accent">${esc(bestTrip[0])}</span> <span class="mono">— ${esc(bestTrip[1])}</span>` : "—",
+      "Within the selected scope."
+    ));
+    timeCards.push(statCard(
+      "Best Day",
+      bestDay ? `<span class="accent">${esc(bestDay[0])}</span> <span class="mono">— ${esc(bestDay[1])}</span>` : "—",
+      "Most catches logged on a single date (selected scope)."
+    ));
+    timeCards.push(statCard(
+      "Best Month",
+      bestMonth ? `<span class="accent">${esc(bestMonth[0])}</span> <span class="mono">— ${esc(bestMonth[1])}</span>` : "—",
+      "Most catches in a YYYY-MM month (selected scope)."
+    ));
+    timeCards.push(statCard(
+      "% Kept vs Released",
+      totalCt ? `<span class="mono"><span style="color:var(--good); font-weight:950;">${keptPct}%</span> Kept · <span style="color:var(--bad); font-weight:950;">${relPct}%</span> Released</span>` : "—",
+      totalCt ? `<span class="status-chip kept">Kept ${keptCt}</span> <span class="status-chip released">Released ${relCt}</span> <span class="pill">Total ${totalCt}</span>` : "No kept/released status yet."
+    ));
+    timeCards.push(statCard(
+      (scopeSel === "ALLDATA" || tripSel === "All") ? "Most Diverse Trip" : "Trip Diversity (Unique Species)",
+      diverse ? `<span class="accent">${esc(diverse.trip)}</span> <span class="mono">— ${esc(diverse.count)}</span>` : "—",
+      "Unique species count by trip."
+    ));
+
+    // Write to DOM
+    peopleEl.innerHTML = peopleCards.join("");
+    speciesEl.innerHTML = speciesCards.join("");
+    timeEl.innerHTML = timeCards.join("");
+  }
 </script>
 
 </body>
