@@ -1,0 +1,1526 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OnAWhim Offshore</title>
+<style>
+  :root{
+    --teal:#00d4c6;
+    --glass:rgba(255,255,255,0.07);
+    --glass2:rgba(255,255,255,0.05);
+    --stroke:rgba(255,255,255,0.10);
+    --stroke2:rgba(255,255,255,0.08);
+    --good:#00d084;
+    --ok:#fcb900;
+    --bad:#ff4d4d;
+
+    /* filter card override */
+    --filterBg: rgba(0,0,0,0.28);
+    --filterStroke: rgba(0,212,198,0.18);
+
+    /* leaderboard accents */
+    --qty:#eafffb;
+    --qtyShadow: rgba(0,0,0,.35);
+    --panelMax: 1020px;
+  }
+
+  body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    color:white;
+    background:
+      linear-gradient(rgba(11,31,42,0.86), rgba(11,31,42,0.96)),
+      url("https://images.unsplash.com/photo-1484387436194-cf7cb70800ce?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080");
+    background-size:cover;
+    background-position:center;
+    background-attachment:fixed;
+  }
+
+  /* HERO */
+  .hero{
+    height:22vh;
+    background:
+      linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.82)),
+      url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e");
+    background-size:cover;
+    background-position:center;
+    padding:18px 40px;
+  }
+  .hero h1{ margin:0; font-size:32px; }
+  .hero p{ margin:6px 0 0; opacity:0.85; }
+
+  /* CONDITIONS */
+  .condition-wrap{ margin-top:10px; max-width:520px; }
+  .cond-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .cond-card{
+    background:var(--glass2);
+    backdrop-filter: blur(12px);
+    border:1px solid var(--stroke2);
+    padding:10px;
+    border-radius:10px;
+    text-align:center;
+  }
+  .cond-label{ font-size:11px; opacity:0.72; }
+  .cond-value{
+    font-size:28px;
+    color:var(--teal);
+    font-weight:650;
+  }
+  .glow{ text-shadow: 0 0 6px rgba(0,212,198,0.75), 0 0 14px rgba(0,212,198,0.45); }
+
+  /* TABS */
+  .nav-tabs{
+    display:flex;
+    gap:10px;
+    padding:10px 20px;
+    overflow-x:auto;
+    background:rgba(0,0,0,0.45);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .tab{
+    padding:8px 14px;
+    border-radius:8px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.10);
+    cursor:pointer;
+    white-space:nowrap;
+    user-select:none;
+    transition:0.2s;
+    font-size:13px;
+  }
+  .tab:hover{ background:rgba(255,255,255,0.10); }
+  .tab.active{ background:rgba(0,212,198,0.18); border-color:rgba(0,212,198,0.45); color:var(--teal); }
+
+  /* PAGES */
+  .page{ display:none; padding:20px; }
+  .page.active{ display:block; }
+
+  /* PANELS */
+  .panel{
+    max-width:var(--panelMax);
+    background:var(--glass);
+    border:1px solid var(--stroke);
+    border-radius:14px;
+    padding:16px;
+    backdrop-filter: blur(14px);
+  }
+  .panel h2{ margin:0 0 10px; }
+  .hint{ font-size:12px; opacity:0.78; margin-top:8px; }
+
+  /* DASHBOARD */
+  .decision-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:520px; }
+  .decision-card{
+    background:var(--glass);
+    border:1px solid var(--stroke);
+    border-radius:12px;
+    padding:14px;
+    text-align:center;
+    backdrop-filter: blur(14px);
+    min-height:110px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  .good{ color:var(--good); }
+  .ok{ color:var(--ok); }
+  .bad{ color:var(--bad); }
+
+  /* CATCH LOG */
+  .authbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:flex-end;
+    margin:10px 0 14px;
+  }
+  .authbar .mini{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.10);
+    border-radius:12px;
+    padding:10px;
+    flex:1;
+    min-width:260px;
+  }
+  .form-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+  }
+  /* Filters near bottom */
+  .filters{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin:12px 0 10px;
+  }
+  .filter-card{
+    background: var(--filterBg);
+    border: 1px solid var(--filterStroke);
+    border-radius: 12px;
+    padding: 10px;
+    backdrop-filter: blur(12px);
+  }
+  .filter-card label{
+    display:block;
+    font-size:11px;
+    opacity:0.8;
+    margin-bottom:6px;
+    color: rgba(205,231,240,0.95);
+  }
+  .field{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:10px;
+    padding:10px;
+  }
+  .field label{ display:block; font-size:11px; opacity:0.75; margin-bottom:6px; }
+  input, select, textarea{
+    width:100%;
+    box-sizing:border-box;
+    background:rgba(0,0,0,0.25);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:8px;
+    padding:10px;
+    color:white;
+    outline:none;
+  }
+  textarea{ min-height:90px; resize:vertical; grid-column:1/-1; }
+  input::placeholder{ color:rgba(255,255,255,0.55); }
+  select option{ color:#0b1f2a; }
+  .actions{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
+  .btn{
+    background:rgba(0,212,198,0.18);
+    border:1px solid rgba(0,212,198,0.45);
+    color:var(--teal);
+    padding:10px 12px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:800;
+    letter-spacing:0.2px;
+  }
+  .btn.secondary{
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.12);
+    color:white;
+    font-weight:650;
+  }
+  .btn.danger{
+    background:rgba(255,77,77,0.10);
+    border:1px solid rgba(255,77,77,0.25);
+    color:#ffd0d0;
+  }
+  .table-wrap{ margin-top:10px; overflow:auto; border-radius:12px; border:1px solid rgba(255,255,255,0.10); }
+  table{ width:100%; border-collapse:collapse; min-width:1250px; background:rgba(0,0,0,0.18); }
+  th, td{ padding:10px; border-bottom:1px solid rgba(255,255,255,0.08); text-align:left; font-size:12px; }
+  th{ position:sticky; top:0; background:rgba(0,0,0,0.35); backdrop-filter: blur(10px); z-index:1; }
+  .pill{
+    display:inline-block;
+    padding:4px 8px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,0.12);
+    background:rgba(255,255,255,0.05);
+    font-size:11px;
+    white-space:nowrap;
+  }
+
+  /* Kept/Released chips */
+  .status-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:800;
+    border:1px solid rgba(255,255,255,0.12);
+    background:rgba(255,255,255,0.06);
+    white-space:nowrap;
+  }
+  .status-chip::before{
+    content:'';
+    width:8px;
+    height:8px;
+    border-radius:999px;
+    display:inline-block;
+    background:rgba(255,255,255,0.5);
+  }
+  .kept{
+    border-color: rgba(0,208,132,0.35);
+    background: rgba(0,208,132,0.10);
+    color: rgba(192,255,226,0.95);
+  }
+  .kept::before{ background: var(--good); }
+  .released{
+    border-color: rgba(255,77,77,0.30);
+    background: rgba(255,77,77,0.10);
+    color: rgba(255,210,210,0.95);
+  }
+  .released::before{ background: var(--bad); }
+
+  /* Totals bar */
+  .totals{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+    margin:6px 0 6px;
+  }
+  .totals .pill{ border-color: rgba(0,212,198,0.18); }
+
+  /* Hidden file input */
+  #csvFileInput{ display:none; }
+
+  /* ===== Leaderboards Pro Layout ===== */
+  .lb-toolbar{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap:10px;
+    margin:10px 0 14px;
+  }
+  .lb-tool{
+    background: rgba(0,0,0,0.22);
+    border: 1px solid rgba(0,212,198,0.18);
+    border-radius: 12px;
+    padding:10px;
+    backdrop-filter: blur(12px);
+  }
+  .lb-tool label{ display:block; font-size:11px; opacity:0.85; margin-bottom:6px; color: rgba(205,231,240,0.95); }
+
+  .lb-group{ margin-top:14px; }
+  .lb-group h3{
+    margin:0 0 10px;
+    font-size:13px;
+    letter-spacing:.4px;
+    text-transform:uppercase;
+    color:rgba(205,231,240,0.95);
+    opacity:.9;
+  }
+  .lb-cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:12px;
+  }
+  .lb-card{
+    background:var(--glass);
+    border:1px solid var(--stroke);
+    border-radius:16px;
+    padding:16px;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.18);
+    animation: lbRise .45s ease both;
+  }
+  @keyframes lbRise{
+    from{ opacity:0; transform: translateY(10px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+  .lb-k{
+    font-size:12px;
+    opacity:.75;
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    align-items:center;
+  }
+  .lb-live{
+    display:inline-block;
+    padding:4px 10px;
+    border-radius:999px;
+    border:1px solid rgba(0,212,198,0.22);
+    background:rgba(0,212,198,0.08);
+    color:rgba(210,255,251,0.95);
+    font-size:11px;
+    white-space:nowrap;
+  }
+  .lb-v{
+    font-size:22px;
+    font-weight:950;
+    color:var(--qty);
+    margin-top:10px;
+    line-height:1.2;
+    text-shadow: 0 2px 16px var(--qtyShadow);
+  }
+  .lb-v .accent{ color:var(--teal); text-shadow: 0 0 10px rgba(0,212,198,0.35); }
+  .lb-sub{
+    margin-top:10px;
+    font-size:12px;
+    opacity:.86;
+    line-height:1.35;
+  }
+
+  .lb-medals{ margin-top:10px; display:flex; flex-direction:column; gap:6px; }
+  .lb-row{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    align-items:center;
+    padding:8px 10px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.10);
+    background: rgba(0,0,0,0.18);
+  }
+  .lb-left{ display:flex; align-items:center; gap:10px; min-width:0; }
+  .lb-badge{
+    width:26px; height:26px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(0,212,198,0.18);
+    border:1px solid rgba(0,212,198,0.30);
+  }
+  .lb-name{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .lb-count{ font-weight:950; color:var(--qty); text-shadow: 0 2px 12px var(--qtyShadow); }
+
+  .lb-mini{
+    margin-top:10px;
+    border:1px solid rgba(255,255,255,0.10);
+    border-radius:12px;
+    overflow:hidden;
+    background: rgba(0,0,0,0.18);
+  }
+  .lb-mini .r{
+    display:grid;
+    grid-template-columns: 1.2fr .9fr .7fr;
+    gap:10px;
+    padding:10px 12px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    font-size:12px;
+    align-items:center;
+  }
+  .lb-mini .r:last-child{ border-bottom:none; }
+  .lb-mini .h{ background: rgba(0,0,0,0.28); font-weight:900; opacity:.9; }
+  .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+  @media(max-width:768px){
+    .cond-grid{ grid-template-columns:repeat(2,1fr); }
+    .decision-row{ grid-template-columns:1fr; }
+    .form-grid{ grid-template-columns:1fr; }
+    .filters{ grid-template-columns:1fr; }
+    .lb-toolbar{ grid-template-columns:1fr; }
+    .hero{ padding:16px 16px; height:28vh; }
+    .condition-wrap, .decision-row{ max-width:100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Everything... On A Whim!</h1>
+  <p>Offshore Planning Dashboard</p>
+  <div class="condition-wrap">
+    <div class="cond-grid" id="conditions">Loading...</div>
+  </div>
+</div>
+
+<div class="nav-tabs">
+  <div class="tab active" onclick="switchTab('dashboard', this)">Dashboard</div>
+  <div class="tab" onclick="switchTab('log', this)">Catch Log</div>
+  <div class="tab" onclick="switchTab('leaderboards', this)">Leaderboards</div>
+  <!-- hidden for now
+  <div class="tab" onclick="switchTab('guide', this)">Captain's Guide</div>
+  <div class="tab" onclick="switchTab('calc', this)">Trip Calculator</div>
+  <div class="tab" onclick="switchTab('charter', this)">Charter Options</div>
+  <div class="tab" onclick="switchTab('reports', this)">Trip Reports</div>
+  <div class="tab" onclick="switchTab('albums', this)">Albums</div>
+  <div class="tab" onclick="switchTab('videos', this)">Videos</div>
+  -->
+</div>
+
+<div id="dashboard" class="page active">
+  <div class="panel">
+    <h2>Go / No-Go Decision Guide</h2>
+    <div class="decision-row">
+      <div class="decision-card" id="status">Loading...</div>
+      <div class="decision-card" id="bite">Loading...</div>
+      <div class="decision-card">
+        <div style="color:var(--teal); font-weight:800;">Fishable Days</div>
+        <div style="font-size:24px; color:var(--teal); margin-top:6px;" id="fishable">Loading...</div>
+      </div>
+    </div>
+    <div class="hint">Numbers glow when conditions score ≥ 6/8.</div>
+  </div>
+</div>
+
+<!-- PRO LEADERBOARDS TAB -->
+<div id="leaderboards" class="page">
+  <div class="panel">
+    <h2>📊 Leaderboards</h2>
+
+    <div class="lb-toolbar">
+      <div class="lb-tool">
+        <label>Trip Filter</label>
+        <select id="lbTrip"></select>
+      </div>
+      <div class="lb-tool">
+        <label>Status Filter</label>
+        <select id="lbStatus">
+          <option value="ALL">All</option>
+          <option value="Kept">Kept</option>
+          <option value="Released">Released</option>
+        </select>
+      </div>
+      <div class="lb-tool">
+        <label>Scope</label>
+        <select id="lbScope">
+          <option value="FILTERED">Use Trip/Status filters</option>
+          <option value="ALLDATA">Ignore filters (Global)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="lb-group">
+      <h3>People</h3>
+      <div class="lb-cards" id="lbPeople"></div>
+    </div>
+
+    <div class="lb-group">
+      <h3>Fish Species</h3>
+      <div class="lb-cards" id="lbSpecies"></div>
+    </div>
+
+    <div class="lb-group">
+      <h3>Time & Trips</h3>
+      <div class="lb-cards" id="lbTimeTrips"></div>
+    </div>
+
+    <div class="hint" id="lbHint">Leaderboards update live as your catches update.</div>
+  </div>
+</div>
+
+<div id="guide" class="page"><div class="panel"><h2>Captain's Guide</h2><div class="hint">Placeholder — content coming soon.</div></div></div>
+
+<div id="log" class="page">
+  <div class="panel">
+    <h2>Catch Log</h2>
+
+    <!-- AUTH BAR -->
+    <div class="authbar">
+      <!-- Sign-in card (hides after login) -->
+      <div class="mini" id="signInCard">
+        <div style="font-weight:800; color:var(--teal);">Captain Sign-In</div>
+        <div class="hint">Your Firestore rules require sign-in for writes. Public can still read catches.</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+          <div>
+            <label style="font-size:11px; opacity:.75;">Email</label>
+            <input id="authEmail" type="email" placeholder="captain@email.com" />
+          </div>
+          <div>
+            <label style="font-size:11px; opacity:.75;">Password</label>
+            <input id="authPassword" type="password" placeholder="••••••••" />
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="btnSignIn">Sign In</button>
+        </div>
+      </div>
+
+      <!-- Session card (no UID displayed) -->
+      <div class="mini">
+        <div style="font-weight:800; color:var(--teal);">Session</div>
+        <div class="hint">Write access is allowed only when signed in as the captain.</div>
+        <div style="margin-top:10px; line-height:1.6;">
+          <div>Auth Status: <span id="authStatus" class="pill">Checking…</span></div>
+          <div>Write Enabled: <span id="writeEnabled" class="pill">No</span></div>
+        </div>
+        <div class="actions">
+          <button class="btn secondary" id="btnSignOut" disabled>Sign Out</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <div class="form-grid">
+      <div class="field">
+        <label>Trip Name</label>
+        <select id="trip" required></select>
+      </div>
+
+      <div class="field">
+        <label>Date</label>
+        <input id="date" type="date" required>
+      </div>
+
+      <div class="field">
+        <label>Location</label>
+        <input id="location" placeholder="Freeport / 40–80 ft / Coordinates" />
+      </div>
+
+      <div class="field">
+        <label>Angler</label>
+        <select id="angler" required></select>
+      </div>
+
+      <div class="field">
+        <label>Species</label>
+        <select id="species" required></select>
+      </div>
+
+      <div class="field">
+        <label>Bait</label>
+        <select id="bait"></select>
+      </div>
+
+      <div class="field">
+        <label>Kept / Released</label>
+        <select id="keptReleased" required>
+          <option value="Kept">Kept</option>
+          <option value="Released">Released</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Length (inches)</label>
+        <input id="length" type="number" min="0" step="0.1" placeholder="e.g., 18.5" />
+      </div>
+
+      <div class="field">
+        <label>Weight (lbs)</label>
+        <input id="weight" type="number" min="0" step="0.1" placeholder="e.g., 6.2" />
+      </div>
+
+      <div class="field" style="grid-column:1/-1;">
+        <label>Notes</label>
+        <textarea id="notes" placeholder="Conditions, depth, structure, rig, hooks, etc…"></textarea>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="btnSave" disabled>Save Entry</button>
+      <button class="btn secondary" id="btnCancelEdit" style="display:none;">Cancel Edit</button>
+      <button class="btn secondary" id="btnClear">Clear Form</button>
+      <button class="btn secondary" id="btnExport">Export CSV</button>
+      <button class="btn secondary" id="btnImport">Import CSV</button>
+      <input id="csvFileInput" type="file" accept=".csv,text/csv" />
+    </div>
+
+    <div class="hint" id="editHint">Reads are public. Writes require signing in as captain (per your rules).</div>
+
+    <!-- FILTERS (near table) -->
+    <div class="filters">
+      <div class="filter-card">
+        <label>Filter by Trip</label>
+        <select id="filterTrip"></select>
+      </div>
+      <div class="filter-card">
+        <label>Filter by Angler</label>
+        <select id="filterAngler"></select>
+      </div>
+      <div class="filter-card">
+        <label>Filter by Species</label>
+        <select id="filterSpecies"></select>
+      </div>
+      <div class="filter-card">
+        <label>Filter by Status</label>
+        <select id="filterStatus">
+          <option value="ALL">All</option>
+          <option value="Kept">Kept</option>
+          <option value="Released">Released</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Totals -->
+    <div class="totals" id="totalsBar"></div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Trip</th>
+            <th>Angler</th>
+            <th>Species</th>
+            <th>Status</th>
+            <th>Len (in)</th>
+            <th>Wt (lb)</th>
+            <th>Bait</th>
+            <th>Location</th>
+            <th>Notes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="entries"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="calc" class="page"><div class="panel"><h2>Trip Calculator</h2><div class="hint">Placeholder — content coming soon.</div></div></div>
+<div id="charter" class="page"><div class="panel"><h2>Charter Options</h2><div class="hint">Placeholder — content coming soon.</div></div></div>
+<div id="reports" class="page"><div class="panel"><h2>Trip Reports</h2><div class="hint">Placeholder — content coming soon.</div></div></div>
+<div id="albums" class="page"><div class="panel"><h2>Albums</h2><div class="hint">Placeholder — content coming soon.</div></div></div>
+<div id="videos" class="page"><div class="panel"><h2>Videos</h2><div class="hint">Placeholder — content coming soon.</div></div></div>
+
+<script type="module">
+  // Tabs
+  window.switchTab = function(id, el){
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    el.classList.add('active');
+  };
+
+  // NOAA (Dashboard)
+  async function getBuoy(){
+    try{
+      const res = await fetch('https://www.ndbc.noaa.gov/data/realtime2/42019.txt');
+      const text = await res.text();
+      const row = text.split('\n')[2].trim().split(/\s+/);
+      return {
+        wind: parseFloat(row[6]) || 10,
+        seas: parseFloat(row[8]) || 2,
+        period: parseFloat(row[9]) || 6,
+        temp: parseFloat(row[10]) || 78
+      };
+    }catch{
+      return {wind:10,seas:2,period:6,temp:78};
+    }
+  }
+
+  function score(c){
+    let s=0;
+    if(c.wind<=10) s+=3; else if(c.wind<=15) s+=2; else s+=1;
+    if(c.seas<=2) s+=3; else if(c.seas<=4) s+=2; else s+=1;
+    if(c.period>=9) s+=2; else if(c.period>=7) s+=1; else s-=1;
+    return Math.max(0,s);
+  }
+  function labelScore(s){
+    if(s>=6) return {text:'✅ Offshore Excellent', cls:'good'};
+    if(s>=4) return {text:'🟡 Fishable Window', cls:'ok'};
+    return {text:'❌ Stay Nearshore', cls:'bad'};
+  }
+  function biteText(c,s){
+    if(s>=6 && c.period>=8) return '🔥 Strong Bite';
+    if(s>=4) return '🟡 Moderate Bite';
+    return '❌ Tough Conditions';
+  }
+  function monthly(){
+    let total=0;
+    for(let i=0;i<30;i++){
+      const s = score({ wind:Math.random()*20, seas:Math.random()*6, period:Math.random()*10 });
+      if(s>=4) total++;
+    }
+    return total;
+  }
+
+  // Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getFirestore, collection, addDoc, deleteDoc, doc, updateDoc,
+    query, orderBy, limit, onSnapshot, serverTimestamp, writeBatch
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBKLfhyxZTn4t7RlRCRTfb8DgzLlPY2sFc",
+    authDomain: "onawhim-85c14.firebaseapp.com",
+    projectId: "onawhim-85c14",
+    storageBucket: "onawhim-85c14.firebasestorage.app",
+    messagingSenderId: "582396606776",
+    appId: "1:582396606776:web:2c17b5ef75a96fde7f29cd"
+  };
+
+  const CAPTAIN_UID = "X4dxUNgOmyPYFjFKUzF7boE5OTd2";
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const catchesCol = collection(db, "catches"); // Option A
+
+  // Trips include April + Alaska
+  const TRIPS = [
+    "April.Trip.01","April.Trip.02",
+    "May ARS Opener","May ARS 02",
+    "June.Trip.01","June.Trip.02","June.Trip.03","June.Trip.04",
+    "July.Trip.01","July.Trip.02","July.Trip.03","July.Trip.04",
+    "August.Trip.01","August.Trip.02","August.Trip.03","August.Trip.04",
+    "Alaska (Homer)","Alaska (Seward)","Alaska (Whittier)"
+  ];
+
+  const ANGLERS = [
+    "Roy de Ocampo","Brandon de Ocampo","Levi de Ocampo","Joie de Ocampo","Bench de Ocampo",
+    "William Ling","Elizabeth Ling","Christopher Ling",
+    "Majd Basharat","Boyd Nabas","Gerard Reyes",
+    "Luther Salvan","Daniel Salvan","Khenny Bocala","Val Garcia"
+  ];
+
+  const SPECIES = [
+    "Red Snapper","Vermillion Snapper (Beeliner)","Lane Snapper","Mangrove Snapper","Mutton Snapper",
+    "Grouper (Gag)","Grouper (Scamp)","Grouper (Rockhind)","Grouper (Strawberry)","Grouper (Other)",
+    "Tuna (Blackfin)","Tuna (Yellowfin)","Tuna (Other)","Wahoo","Mahi Mahi","Sheepshead",
+    "Mackerel (Spanish)","Mackerel (King)","Barracuda","Shark",
+    "Triggerfish (Gray)","Triggerfish (Oceanic)",
+    "Halibut","Salmon (King)","Salmon (Silver)","Salmon (Sockeye)",
+    "Rockfish (Black)","Rockfish (China)","Ling Cod","Pacific Cod","Black Cod"
+  ];
+
+  const BAITS = [
+    "Cut Squid","Shrimp","Pinfish (Live)","Pinfish (Dead)","Croacker (Live)","Croacker (Dead)",
+    "Mullet (Live)","Other Fish","Jig (Diamond)","Jig (Imposter)","Jig (Other)"
+  ];
+
+  const $ = (id)=>document.getElementById(id);
+
+  // Proper escape (fixes previous un-escaping)
+  const esc = (v)=> String(v ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"','&quot;');
+
+  function fillSelect(selectEl, items, placeholder){
+    selectEl.innerHTML = "";
+    const opt0 = document.createElement("option");
+    opt0.value = "";
+    opt0.textContent = placeholder;
+    selectEl.appendChild(opt0);
+    items.forEach(x=>{
+      const o = document.createElement("option");
+      o.value = x;
+      o.textContent = x;
+      selectEl.appendChild(o);
+    });
+  }
+
+  function fillFilterSelect(selectEl, items){
+    selectEl.innerHTML = "";
+    const all = document.createElement("option");
+    all.value = "ALL";
+    all.textContent = "All";
+    selectEl.appendChild(all);
+    items.forEach(x=>{
+      const o = document.createElement("option");
+      o.value = x;
+      o.textContent = x;
+      selectEl.appendChild(o);
+    });
+  }
+
+  let isCaptain = false;
+  let allDocs = [];
+  let unsub = null;
+  let editingId = null;
+
+  function setWriteEnabled(enabled){
+    $("btnSave").disabled = !enabled;
+    $("btnSignOut").disabled = !enabled;
+    $("writeEnabled").textContent = enabled ? "Yes" : "No";
+  }
+
+  function getFilters(){
+    return {
+      trip: $("filterTrip").value,
+      angler: $("filterAngler").value,
+      species: $("filterSpecies").value,
+      status: $("filterStatus").value
+    };
+  }
+
+  function computeTotals(list){
+    const total = list.length;
+    const kept = list.filter(x => (x.keptReleased || x.status) === "Kept").length;
+    const released = list.filter(x => (x.keptReleased || x.status) === "Released").length;
+    const nums = (arr)=>arr.filter(v => v !== "" && v != null && Number.isFinite(Number(v))).map(Number);
+    const lenVals = nums(list.map(x => x.length));
+    const wtVals  = nums(list.map(x => x.weight));
+    const avg = (a)=> a.length ? (a.reduce((p,c)=>p+c,0)/a.length) : null;
+    const avgLen = avg(lenVals);
+    const avgWt  = avg(wtVals);
+    return { total, kept, released, avgLen, avgWt };
+  }
+
+  function renderTotalsBar(t){
+    const parts = [];
+    parts.push(`<span class="pill">Showing: <b>${t.total}</b></span>`);
+    parts.push(`<span class="pill">Kept: <b>${t.kept}</b></span>`);
+    parts.push(`<span class="pill">Released: <b>${t.released}</b></span>`);
+    if(t.avgLen != null) parts.push(`<span class="pill">Avg Len: <b>${t.avgLen.toFixed(1)}</b> in</span>`);
+    if(t.avgWt != null)  parts.push(`<span class="pill">Avg Wt: <b>${t.avgWt.toFixed(1)}</b> lb</span>`);
+    $("totalsBar").innerHTML = parts.join("");
+  }
+
+  function applyFilters(){
+    const f = getFilters();
+    let filtered = allDocs.slice();
+    if(f.trip !== "ALL") filtered = filtered.filter(d => d.trip === f.trip);
+    if(f.angler !== "ALL") filtered = filtered.filter(d => d.angler === f.angler);
+    if(f.species !== "ALL") filtered = filtered.filter(d => d.species === f.species);
+    if(f.status !== "ALL") filtered = filtered.filter(d => (d.keptReleased || d.status) === f.status);
+    renderTotalsBar(computeTotals(filtered));
+    renderTable(filtered);
+    // keep leaderboards in sync with latest dataset
+    renderLeaderboards();
+  }
+
+  function renderTable(list){
+    const tbody = $("entries");
+    if(!list.length){
+      tbody.innerHTML = `<tr><td colspan="11" style="opacity:.7;">No entries match your filters yet.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = list.map(d=>{
+      const status = (d.keptReleased || d.status || "");
+      const statusClass = (status === "Kept") ? "kept" : "released";
+      const statusChip = `<span class="status-chip ${statusClass}">${esc(status)}</span>`;
+      const editBtn = isCaptain ? `<button class="btn secondary" style="padding:6px 10px;" data-edit="${d._id}">Edit</button>` : "";
+      const delBtn  = isCaptain ? `<button class="btn secondary" style="padding:6px 10px;" data-del="${d._id}">Delete</button>` : "";
+      return `
+        <tr>
+          <td>${esc(d.date)}</td>
+          <td><span class="pill">${esc(d.trip)}</span></td>
+          <td>${esc(d.angler)}</td>
+          <td>${esc(d.species)}</td>
+          <td>${statusChip}</td>
+          <td>${esc(d.length)}</td>
+          <td>${esc(d.weight)}</td>
+          <td>${esc(d.bait)}</td>
+          <td>${esc(d.location)}</td>
+          <td>${esc(d.notes)}</td>
+          <td style="display:flex; gap:8px; flex-wrap:wrap;">${editBtn}${delBtn}</td>
+        </tr>
+      `;
+    }).join("");
+
+    // Delete handlers
+    tbody.querySelectorAll("button[data-del]").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const id = btn.getAttribute("data-del");
+        if(!confirm("Delete this entry?")) return;
+        try{ await deleteDoc(doc(db, "catches", id)); }
+        catch(e){ alert("Delete failed: " + (e?.message || e)); }
+      });
+    });
+
+    // Edit handlers
+    tbody.querySelectorAll("button[data-edit]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const id = btn.getAttribute("data-edit");
+        const entry = allDocs.find(x => x._id === id);
+        if(!entry) return;
+        editingId = id;
+        $("trip").value = entry.trip || "";
+        $("date").value = entry.date || new Date().toISOString().slice(0,10);
+        $("location").value = entry.location || "";
+        $("angler").value = entry.angler || "";
+        $("species").value = entry.species || "";
+        $("bait").value = entry.bait || "";
+        $("keptReleased").value = (entry.keptReleased || entry.status || "Kept");
+        $("length").value = entry.length || "";
+        $("weight").value = entry.weight || "";
+        $("notes").value = entry.notes || "";
+
+        $("btnSave").textContent = "Update Entry";
+        $("btnCancelEdit").style.display = "inline-block";
+        $("editHint").textContent = "Editing an existing entry — click Update Entry to save changes, or Cancel Edit.";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    });
+  }
+
+  async function saveCatch(){
+    if(!isCaptain){
+      alert("You must be signed in as the captain to save.");
+      return;
+    }
+
+    const entry = {
+      trip: $("trip").value,
+      date: $("date").value,
+      location: $("location").value.trim(),
+      angler: $("angler").value,
+      species: $("species").value,
+      bait: $("bait").value,
+      keptReleased: $("keptReleased").value,
+      length: $("length").value,
+      weight: $("weight").value,
+      notes: $("notes").value.trim(),
+      updatedAt: serverTimestamp(),
+      updatedBy: auth.currentUser?.uid || null
+    };
+
+    if(!entry.trip || !entry.date || !entry.angler || !entry.species || !entry.keptReleased){
+      alert("Please select Trip, Date, Angler, Species, and Kept/Released.");
+      return;
+    }
+
+    try{
+      if(editingId){
+        await updateDoc(doc(db, "catches", editingId), entry);
+        cancelEdit();
+      } else {
+        await addDoc(catchesCol, {
+          ...entry,
+          createdAt: serverTimestamp(),
+          createdBy: auth.currentUser?.uid || null
+        });
+        clearForm();
+      }
+    }catch(e){
+      alert("Save failed: " + (e?.message || e));
+    }
+  }
+
+  function clearForm(){
+    $("trip").value = "";
+    $("date").value = new Date().toISOString().slice(0,10);
+    $("location").value="";
+    $("angler").value="";
+    $("species").value="";
+    $("bait").value="";
+    $("keptReleased").value="Kept";
+    $("length").value="";
+    $("weight").value="";
+    $("notes").value="";
+  }
+
+  function cancelEdit(){
+    editingId = null;
+    $("btnSave").textContent = "Save Entry";
+    $("btnCancelEdit").style.display = "none";
+    $("editHint").textContent = "Reads are public. Writes require signing in as captain (per your rules).";
+    clearForm();
+  }
+
+  function exportCSV(){
+    const f = getFilters();
+    let list = allDocs.slice();
+    if(f.trip !== "ALL") list = list.filter(d => d.trip === f.trip);
+    if(f.angler !== "ALL") list = list.filter(d => d.angler === f.angler);
+    if(f.species !== "ALL") list = list.filter(d => d.species === f.species);
+    if(f.status !== "ALL") list = list.filter(d => (d.keptReleased || d.status) === f.status);
+
+    if(!list.length){
+      alert("No entries to export for current filters.");
+      return;
+    }
+
+    const headers = ["date","trip","angler","species","status","length_in","weight_lb","bait","location","notes"];
+    const escCSV = (v)=> `"${(v??"").toString().replaceAll('"','""')}"`;
+    const rows = [headers.join(",")].concat(
+      list.map(d => [
+        d.date, d.trip, d.angler, d.species, (d.keptReleased || d.status),
+        d.length, d.weight, d.bait, d.location, d.notes
+      ].map(escCSV).join(","))
+    );
+
+    const blob = new Blob([rows.join("\n")], {type:"text/csv;charset=utf-8;"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `onawhim_catch_log_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  // Simple CSV parser (handles quotes)
+  function parseCSV(text){
+    const rows = [];
+    let row = [];
+    let cur = "";
+    let inQuotes = false;
+    for(let i=0;i<text.length;i++){
+      const ch = text[i];
+      const next = text[i+1];
+      if(ch === '"'){
+        if(inQuotes && next === '"'){
+          cur += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if(ch === ',' && !inQuotes){
+        row.push(cur);
+        cur = "";
+      } else if((ch === '\n' || ch === '\r') && !inQuotes){
+        if(ch === '\r' && next === '\n') i++;
+        row.push(cur);
+        cur = "";
+        if(row.some(c=>c.trim()!=="")) rows.push(row);
+        row = [];
+      } else {
+        cur += ch;
+      }
+    }
+    row.push(cur);
+    if(row.some(c=>c.trim()!=="")) rows.push(row);
+    return rows;
+  }
+
+  function normalizeHeader(h){ return h.trim().toLowerCase(); }
+
+  function mapRow(headers, cols){
+    const get = (name)=>{
+      const idx = headers.indexOf(name);
+      return idx >= 0 ? (cols[idx] ?? "").trim() : "";
+    };
+    const date = get("date");
+    const trip = get("trip");
+    const angler = get("angler");
+    const species = get("species");
+    const status = get("status") || get("keptreleased") || get("kept_released") || get("kept/released");
+    const bait = get("bait");
+    const location = get("location");
+    const notes = get("notes");
+    const length = get("length_in") || get("length") || get("len") || get("len(in)");
+    const weight = get("weight_lb") || get("weight") || get("wt") || get("wt(lb)");
+    const keptReleased = (status.toLowerCase() === "released") ? "Released" : "Kept";
+    return { date, trip, angler, species, keptReleased, length, weight, bait, location, notes };
+  }
+
+  async function importCSV(file){
+    if(!isCaptain){
+      alert("You must be signed in as the captain to import.");
+      return;
+    }
+    const text = await file.text();
+    const rows = parseCSV(text);
+    if(rows.length < 2){
+      alert("CSV file looks empty or missing rows.");
+      return;
+    }
+    const headers = rows[0].map(normalizeHeader);
+    const dataRows = rows.slice(1);
+    const entries = [];
+    for(const cols of dataRows){
+      const e = mapRow(headers, cols);
+      if(!e.date || !e.trip || !e.angler || !e.species) continue;
+      entries.push({
+        ...e,
+        createdAt: serverTimestamp(),
+        createdBy: auth.currentUser?.uid || null,
+        updatedAt: serverTimestamp(),
+        updatedBy: auth.currentUser?.uid || null
+      });
+    }
+    if(!entries.length){
+      alert("No valid rows found. Required columns: date, trip, angler, species.");
+      return;
+    }
+    const chunkSize = 400;
+    try{
+      for(let i=0;i<entries.length;i+=chunkSize){
+        const batch = writeBatch(db);
+        const chunk = entries.slice(i, i+chunkSize);
+        chunk.forEach(e=>{
+          const ref = doc(collection(db, "catches"));
+          batch.set(ref, e);
+        });
+        await batch.commit();
+      }
+      alert(`Imported ${entries.length} entries.`);
+    }catch(e){
+      alert("Import failed: " + (e?.message || e));
+    }
+  }
+
+  function attachFilterListeners(){
+    ["filterTrip","filterAngler","filterSpecies","filterStatus"].forEach(id=>{
+      $(id).addEventListener("change", applyFilters);
+    });
+  }
+
+  function startCatchListener(){
+    const q = query(catchesCol, orderBy("date","desc"), limit(500));
+    if(unsub) unsub();
+    unsub = onSnapshot(q, (snap)=>{
+      allDocs = snap.docs.map(s=>({ _id: s.id, ...s.data() }));
+      applyFilters();
+    }, (err)=>{
+      console.error(err);
+      $("entries").innerHTML = `<tr><td colspan="11" style="opacity:.7;">Could not load from Firestore. Check rules and run via http://localhost.</td></tr>`;
+    });
+  }
+
+  // Wiring
+  $("btnSignIn").addEventListener("click", doSignIn);
+  $("btnSignOut").addEventListener("click", doSignOut);
+  $("btnSave").addEventListener("click", saveCatch);
+  $("btnCancelEdit").addEventListener("click", cancelEdit);
+  $("btnClear").addEventListener("click", ()=>{ cancelEdit(); clearForm(); });
+  $("btnExport").addEventListener("click", exportCSV);
+  $("btnImport").addEventListener("click", ()=>{ $("csvFileInput").click(); });
+  $("csvFileInput").addEventListener("change", async (ev)=>{
+    const file = ev.target.files?.[0];
+    if(!file) return;
+    await importCSV(file);
+    ev.target.value = "";
+  });
+
+  // Auth state
+  onAuthStateChanged(auth, (user)=>{
+    if(user){
+      $("signInCard").style.display = "none";
+      isCaptain = (user.uid === CAPTAIN_UID);
+      $("authStatus").textContent = isCaptain ? "Signed in (Captain)" : "Signed in (Read-only)";
+      $("writeEnabled").textContent = isCaptain ? "Yes" : "No";
+      $("writeEnabled").style.borderColor = isCaptain ? "rgba(0,208,132,.45)" : "rgba(255,255,255,.12)";
+      $("writeEnabled").style.color = isCaptain ? "var(--good)" : "white";
+      setWriteEnabled(isCaptain);
+      $("btnSignOut").disabled = false;
+    } else {
+      $("signInCard").style.display = "block";
+      $("authStatus").textContent = "Signed out";
+      isCaptain = false;
+      setWriteEnabled(false);
+      $("btnSignOut").disabled = true;
+      cancelEdit();
+    }
+    applyFilters();
+  });
+
+  // Init
+  async function init(){
+    const c = await getBuoy();
+    const s = score(c);
+    const stat = labelScore(s);
+    const glow = (s>=6) ? "glow" : "";
+
+    document.getElementById("conditions").innerHTML = `
+      <div class="cond-card"><div class="cond-label">Wind</div><div class="cond-value ${glow}">${c.wind}</div></div>
+      <div class="cond-card"><div class="cond-label">Seas</div><div class="cond-value ${glow}">${c.seas}</div></div>
+      <div class="cond-card"><div class="cond-label">Period</div><div class="cond-value ${glow}">${c.period}</div></div>
+      <div class="cond-card"><div class="cond-label">Temp</div><div class="cond-value ${glow}">${c.temp}</div></div>
+    `;
+
+    document.getElementById("status").innerHTML = `
+      <div class="${stat.cls}" style="font-weight:900;">${stat.text}</div>
+      <div style="opacity:.9; margin-top:6px;">Score: ${s}/8</div>
+    `;
+
+    document.getElementById("bite").innerHTML = `
+      <div style="color:var(--teal); font-weight:900;">Fishing Outlook</div>
+      <div style="margin-top:6px;">${biteText(c,s)}</div>
+    `;
+
+    document.getElementById("fishable").textContent = `${monthly()} days`;
+
+    // Dropdowns
+    fillSelect($("trip"), TRIPS, "Select a trip…");
+    fillSelect($("angler"), ANGLERS, "Select angler…");
+    fillSelect($("species"), SPECIES, "Select species…");
+    fillSelect($("bait"), BAITS, "Select bait…");
+
+    fillFilterSelect($("filterTrip"), TRIPS);
+    fillFilterSelect($("filterAngler"), ANGLERS);
+    fillFilterSelect($("filterSpecies"), SPECIES);
+
+    $("date").value = new Date().toISOString().slice(0,10);
+
+    attachFilterListeners();
+    startCatchListener();
+    applyFilters();
+
+    // Leaderboards controls
+    initLeaderboardsUI();
+  }
+
+  init();
+
+  // Sign-in/out functions
+  async function doSignIn(){
+    const email = $("authEmail").value.trim();
+    const pass = $("authPassword").value;
+    if(!email || !pass){
+      alert("Enter email and password to sign in.");
+      return;
+    }
+    try{ await signInWithEmailAndPassword(auth, email, pass); }
+    catch(e){ alert("Sign-in failed: " + (e?.message || e)); }
+  }
+
+  async function doSignOut(){
+    try{ await signOut(auth); }
+    catch(e){ alert("Sign-out failed: " + (e?.message || e)); }
+  }
+
+  // =====================
+  // Leaderboards (Pro)
+  // =====================
+  const lbTrip   = document.getElementById("lbTrip");
+  const lbStatus = document.getElementById("lbStatus");
+  const lbScope  = document.getElementById("lbScope");
+
+  function initLeaderboardsUI(){
+    if(!lbTrip) return;
+    lbTrip.innerHTML = "";
+    const trips = ["All", ...TRIPS];
+    const uniq = Array.from(new Set(trips));
+    uniq.forEach(t=>{
+      const o = document.createElement("option");
+      o.value = t;
+      o.textContent = t;
+      lbTrip.appendChild(o);
+    });
+
+    lbTrip.addEventListener("change", renderLeaderboards);
+    lbStatus.addEventListener("change", renderLeaderboards);
+    lbScope.addEventListener("change", renderLeaderboards);
+
+    renderLeaderboards();
+  }
+
+  // ✅ FIXED count function (no .get on plain object)
+  function countBy(arr, key){
+    const m = {};
+    for(const d of arr){
+      const k = d?.[key];
+      if(!k) continue;
+      m[k] = (m[k] || 0) + 1;
+    }
+    return Object.entries(m).sort((a,b)=>b[1]-a[1]);
+  }
+
+  function safeNum(v){
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function medalList(entries){
+    const medals = ["🥇","🥈","🥉"];
+    if(!entries.length) return `<div class="lb-sub">No data yet.</div>`;
+    return `
+      <div class="lb-medals">
+        ${entries.slice(0,3).map((e,i)=>`
+          <div class="lb-row">
+            <div class="lb-left">
+              <div class="lb-badge">${medals[i] || "🏅"}</div>
+              <div class="lb-name">${esc(e[0])}</div>
+            </div>
+            <div class="lb-count">${esc(e[1])}</div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function statCard(title, valueHtml, subHtml){
+    return `
+      <div class="lb-card">
+        <div class="lb-k"><span>${esc(title)}</span><span class="lb-live">Live</span></div>
+        <div class="lb-v">${valueHtml}</div>
+        <div class="lb-sub">${subHtml}</div>
+      </div>
+    `;
+  }
+
+  function personalBestsTable(rows){
+    if(!rows.length) return "No length data yet.";
+    return `
+      <div class="lb-mini">
+        <div class="r h"><div>Angler</div><div>Best Fish</div><div class="mono">Len</div></div>
+        ${rows.map(r=>`
+          <div class="r">
+            <div>${esc(r.angler)}</div>
+            <div>${esc(r.species)} <span class="pill">${esc(r.trip)}</span></div>
+            <div class="mono"><span style="font-weight:950; color:var(--qty);">${esc(r.len)}</span> in</div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  // ✅ Pro dashboard render + missing cards included
+  function renderLeaderboards(){
+    const peopleEl = document.getElementById("lbPeople");
+    const speciesEl = document.getElementById("lbSpecies");
+    const timeEl = document.getElementById("lbTimeTrips");
+    if(!peopleEl || !speciesEl || !timeEl) return;
+
+    const tripSel = lbTrip?.value || "All";
+    const statusSel = lbStatus?.value || "ALL";
+    const scopeSel = lbScope?.value || "FILTERED";
+
+    let base = allDocs.slice();
+
+    if(scopeSel !== "ALLDATA"){
+      if(tripSel !== "All") base = base.filter(d => d.trip === tripSel);
+      if(statusSel !== "ALL") base = base.filter(d => (d.keptReleased || d.status) === statusSel);
+    }
+
+    // ===== People stats =====
+    const anglerCounts = countBy(base, "angler");
+    const topAngler = anglerCounts[0];
+
+    // ✅ Kept leaderboard
+    const keptOnly = base.filter(d => (d.keptReleased || d.status) === "Kept");
+    const keptAnglerCounts = countBy(keptOnly, "angler");
+
+    // Angler most unique species
+    const speciesByAngler = new Map();
+    for(const d of base){
+      if(!d.angler || !d.species) continue;
+      if(!speciesByAngler.has(d.angler)) speciesByAngler.set(d.angler, new Set());
+      speciesByAngler.get(d.angler).add(d.species);
+    }
+    let bestDiversity = null;
+    for(const [a,set] of speciesByAngler.entries()){
+      if(!bestDiversity || set.size > bestDiversity.count) bestDiversity = { a, count:set.size };
+    }
+
+    // ✅ Personal bests
+    const bestByAngler = new Map();
+    for(const d of base){
+      const len = safeNum(d.length);
+      if(!d.angler || len==null) continue;
+      const cur = bestByAngler.get(d.angler);
+      if(!cur || len > cur.len){
+        bestByAngler.set(d.angler, { angler:d.angler, len, species:d.species||"Unknown", trip:d.trip||"—" });
+      }
+    }
+    const pbRows = Array.from(bestByAngler.values()).sort((a,b)=>b.len-a.len).slice(0,8);
+
+    const peopleCards = [];
+    peopleCards.push(statCard(
+      "Top Angler (Most Fish)",
+      topAngler ? `<span class="accent">${esc(topAngler[0])}</span> <span class="mono">— ${esc(topAngler[1])}</span>` : "—",
+      "Based on total catch entries in the selected scope."
+    ));
+    peopleCards.push(statCard(
+      "Kept Leaderboard (Top 3 Anglers)",
+      `<span class="accent">${esc(scopeSel === "ALLDATA" ? "Global" : tripSel)}</span>`,
+      medalList(keptAnglerCounts)
+    ));
+    peopleCards.push(statCard(
+      "Angler — Most Unique Species",
+      bestDiversity ? `<span class="accent">${esc(bestDiversity.a)}</span> <span class="mono">— ${esc(bestDiversity.count)}</span>` : "—",
+      "Species variety by angler in the selected scope."
+    ));
+    peopleCards.push(statCard(
+      "Personal Bests (Top by Length)",
+      `<span class="accent">Top ${pbRows.length}</span>`,
+      personalBestsTable(pbRows)
+    ));
+
+    // ===== Species stats =====
+    const speciesCounts = countBy(base, "species");
+    const topSpecies = speciesCounts[0];
+
+    // Biggest fish (length) + biggest kept + heaviest
+    let biggest = null;
+    let biggestKept = null;
+    let heaviest = null;
+
+    for(const d of base){
+      const len = safeNum(d.length);
+      const wt = safeNum(d.weight);
+
+      if(len!=null){
+        if(!biggest || len > biggest.len) biggest = { len, species:d.species||"Unknown", angler:d.angler||"—", trip:d.trip||"—", date:d.date||"—" };
+        if((d.keptReleased||d.status)==="Kept" && (!biggestKept || len > biggestKept.len)){
+          biggestKept = { len, species:d.species||"Unknown", angler:d.angler||"—", trip:d.trip||"—", date:d.date||"—", weight: wt };
+        }
+      }
+      if(wt!=null){
+        if(!heaviest || wt > heaviest.wt) heaviest = { wt, species:d.species||"Unknown", angler:d.angler||"—", trip:d.trip||"—", date:d.date||"—" };
+      }
+    }
+
+    const uniqueSpecies = new Set(base.map(d=>d.species).filter(Boolean)).size;
+
+    const speciesCards = [];
+    speciesCards.push(statCard(
+      "Most Caught Species",
+      topSpecies ? `<span class="accent">${esc(topSpecies[0])}</span> <span class="mono">— ${esc(topSpecies[1])}</span>` : "—",
+      "Counts entries by species."
+    ));
+    speciesCards.push(statCard(
+      "Top 3 Species (Medals)",
+      `<span class="accent">${esc(scopeSel === "ALLDATA" ? "Global" : tripSel)}</span>`,
+      medalList(speciesCounts)
+    ));
+    speciesCards.push(statCard(
+      "Biggest Fish (Length)",
+      biggest ? `<span class="accent">${esc(biggest.species)}</span> <span class="mono">— ${esc(biggest.len)} in</span>` : "—",
+      biggest ? `${esc(biggest.angler)} · ${esc(biggest.trip)} · ${esc(biggest.date)}` : "No length data yet."
+    ));
+    speciesCards.push(statCard(
+      "Biggest Kept Fish (Length)",
+      biggestKept ? `<span class="accent">${esc(biggestKept.species)}</span> <span class="mono">— ${esc(biggestKept.len)} in</span> ${biggestKept.weight!=null ? `<span class="pill">${esc(biggestKept.weight)} lb</span>` : ""}` : "—",
+      biggestKept ? `${esc(biggestKept.angler)} · ${esc(biggestKept.trip)} · ${esc(biggestKept.date)} <span class="status-chip kept">Kept</span>` : "No kept length data yet."
+    ));
+    speciesCards.push(statCard(
+      "Heaviest Fish (Weight)",
+      heaviest ? `<span class="accent">${esc(heaviest.species)}</span> <span class="mono">— ${esc(heaviest.wt)} lb</span>` : "—",
+      heaviest ? `${esc(heaviest.angler)} · ${esc(heaviest.trip)} · ${esc(heaviest.date)}` : "No weight data yet."
+    ));
+    speciesCards.push(statCard(
+      "Unique Species Count",
+      `<span class="accent">${esc(uniqueSpecies)}</span>`,
+      "Total different species logged (selected scope)."
+    ));
+
+    // ===== Time & Trips stats =====
+    const tripCounts = countBy(base, "trip");
+    const bestTrip = tripCounts[0];
+
+    const dateCounts = countBy(base, "date");
+    const bestDay = dateCounts[0];
+
+    // ✅ Best month
+    const monthCountsObj = {};
+    for(const d of base){
+      if(!d.date || d.date.length < 7) continue;
+      const m = d.date.slice(0,7);
+      monthCountsObj[m] = (monthCountsObj[m] || 0) + 1;
+    }
+    const bestMonth = Object.entries(monthCountsObj).sort((a,b)=>b[1]-a[1])[0];
+
+    // % kept vs released
+    const keptCt = keptOnly.length;
+    const relCt = base.filter(d => (d.keptReleased||d.status) === "Released").length;
+    const totalCt = keptCt + relCt;
+    const keptPct = totalCt ? Math.round((keptCt/totalCt)*100) : null;
+    const relPct = totalCt ? (100-keptPct) : null;
+
+    // ✅ Most diverse trip (global if All selected)
+    const sourceForDiversity = (scopeSel === "ALLDATA" || tripSel === "All") ? allDocs : base;
+    const tripSpeciesMap = new Map();
+    for(const d of sourceForDiversity){
+      if(!d.trip || !d.species) continue;
+      if(!tripSpeciesMap.has(d.trip)) tripSpeciesMap.set(d.trip, new Set());
+      tripSpeciesMap.get(d.trip).add(d.species);
+    }
+    let diverse = null;
+    for(const [t,set] of tripSpeciesMap.entries()){
+      if(!diverse || set.size > diverse.count) diverse = { trip:t, count:set.size };
+    }
+
+    const timeCards = [];
+    timeCards.push(statCard(
+      "Best Trip (Most Catches)",
+      bestTrip ? `<span class="accent">${esc(bestTrip[0])}</span> <span class="mono">— ${esc(bestTrip[1])}</span>` : "—",
+      "Within the selected scope."
+    ));
+    timeCards.push(statCard(
+      "Best Day",
+      bestDay ? `<span class="accent">${esc(bestDay[0])}</span> <span class="mono">— ${esc(bestDay[1])}</span>` : "—",
+      "Most catches logged on a single date (selected scope)."
+    ));
+    timeCards.push(statCard(
+      "Best Month",
+      bestMonth ? `<span class="accent">${esc(bestMonth[0])}</span> <span class="mono">— ${esc(bestMonth[1])}</span>` : "—",
+      "Most catches in a YYYY-MM month (selected scope)."
+    ));
+    timeCards.push(statCard(
+      "% Kept vs Released",
+      totalCt ? `<span class="mono"><span style="color:var(--good); font-weight:950;">${keptPct}%</span> Kept · <span style="color:var(--bad); font-weight:950;">${relPct}%</span> Released</span>` : "—",
+      totalCt ? `<span class="status-chip kept">Kept ${keptCt}</span> <span class="status-chip released">Released ${relCt}</span> <span class="pill">Total ${totalCt}</span>` : "No kept/released status yet."
+    ));
+    timeCards.push(statCard(
+      (scopeSel === "ALLDATA" || tripSel === "All") ? "Most Diverse Trip" : "Trip Diversity (Unique Species)",
+      diverse ? `<span class="accent">${esc(diverse.trip)}</span> <span class="mono">— ${esc(diverse.count)}</span>` : "—",
+      "Unique species count by trip."
+    ));
+
+    // Write to DOM
+    peopleEl.innerHTML = peopleCards.join("");
+    speciesEl.innerHTML = speciesCards.join("");
+    timeEl.innerHTML = timeCards.join("");
+  }
+</script>
+
+</body>
+</html>
