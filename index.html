@@ -15,17 +15,14 @@
       --good:#00d084;
       --ok:#fcb900;
       --bad:#ff4d4d;
-
       /* filter card override */
       --filterBg: rgba(0,0,0,0.28);
       --filterStroke: rgba(0,212,198,0.18);
-
       /* leaderboard accents */
       --qty:#eafffb;
       --qtyShadow: rgba(0,0,0,.35);
       --panelMax: 1020px;
     }
-
     body{
       margin:0;
       font-family: Arial, sans-serif;
@@ -37,7 +34,6 @@
       background-position:center;
       background-attachment:fixed;
     }
-
     /* HERO */
     .hero{
       height:22vh;
@@ -439,23 +435,74 @@
       .hero{ padding:16px 16px; height:28vh; }
       .condition-wrap, .decision-row{ max-width:100%; }
     }
+
+    /* === Requested UI updates === */
+    /* 1) Trip Summary tab: glowing yellow */
+    .tab.trip-summary-tab{
+      background: rgba(252,185,0,0.20);
+      border-color: rgba(252,185,0,0.60);
+      color: rgba(255,242,200,0.98);
+      box-shadow: 0 0 10px rgba(252,185,0,0.55), 0 0 26px rgba(252,185,0,0.28);
+    }
+    .tab.trip-summary-tab:hover{
+      background: rgba(252,185,0,0.28);
+      box-shadow: 0 0 12px rgba(252,185,0,0.65), 0 0 30px rgba(252,185,0,0.30);
+    }
+    .tab.trip-summary-tab.active{
+      background: rgba(252,185,0,0.30);
+      border-color: rgba(252,185,0,0.75);
+      color: rgba(255,255,220,0.98);
+    }
+
+    /* 2) Catch Log entries: increase height of rows below filters */
+    #log .table-wrap table th,
+    #log .table-wrap table td{
+      padding-top: 14px;
+      padding-bottom: 14px;
+    }
+    #log .table-wrap tbody tr{
+      min-height: 58px;
+    }
+
+    /* 4) Trip Summary: evenly spaced columns + centered values */
+    #tsTable{
+      table-layout: fixed;
+    }
+    #tsTable th, #tsTable td{
+      text-align: center;
+      vertical-align: middle;
+    }
+    #tsTable th{
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    /* 3) Trip Summary Species Summary table: centered + evenly spaced */
+    #tsSpeciesTable{
+      min-width: 520px;
+      table-layout: fixed;
+    }
+    #tsSpeciesTable th, #tsSpeciesTable td{
+      text-align: center;
+      vertical-align: middle;
+    }
   </style>
 </head>
-
 <body>
   <div class="hero">
     <h1>Everything... On A Whim!</h1>
     <p>Offshore Planning Dashboard</p>
+
     <div class="condition-wrap">
       <div class="cond-grid" id="conditions">Loading...</div>
     </div>
   </div>
 
   <div class="nav-tabs">
+    <div class="tab trip-summary-tab" onclick="switchTab('tripSummary', this)">Trip Summary</div>
     <div class="tab active" onclick="switchTab('dashboard', this)">Dashboard</div>
     <div class="tab" onclick="switchTab('log', this)">Catch Log</div>
     <div class="tab" onclick="switchTab('leaderboards', this)">Leaderboards</div>
-    <div class="tab" onclick="switchTab('tripSummary', this)">Trip Summary</div>
   </div>
 
   <div id="dashboard" class="page active">
@@ -480,7 +527,6 @@
   <div id="leaderboards" class="page">
     <div class="panel">
       <h2>📊 Leaderboards</h2>
-
       <div class="lb-toolbar">
         <div class="lb-tool">
           <label>Trip Filter</label>
@@ -559,6 +605,24 @@
 
       <div class="ts-section">
         <div style="font-size:13px; letter-spacing:.4px; text-transform:uppercase; color:rgba(205,231,240,0.95); opacity:.9;">
+          Species Summary (Selected Date)
+        </div>
+        <div class="hint">Counts are based on the selected date above. Values are totals, kept, and released per species.</div>
+
+        <div class="table-wrap">
+          <table id="tsSpeciesTable">
+            <thead>
+              <tr>
+                <th>Species</th><th>Total</th><th>Kept</th><th>Released</th>
+              </tr>
+            </thead>
+            <tbody id="tsSpeciesBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="ts-section">
+        <div style="font-size:13px; letter-spacing:.4px; text-transform:uppercase; color:rgba(205,231,240,0.95); opacity:.9;">
           Angler Breakdown (by Species)
         </div>
         <div class="hint">
@@ -588,6 +652,7 @@
         <div class="mini" id="signInCard">
           <div style="font-weight:800; color:var(--teal);">Captain Sign-In</div>
           <div class="hint">Your Firestore rules require sign-in for writes. Public can still read catches.</div>
+
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
             <div>
               <label style="font-size:11px; opacity:.75;">Email</label>
@@ -598,6 +663,7 @@
               <input id="authPassword" type="password" placeholder="••••••••" />
             </div>
           </div>
+
           <div class="actions">
             <button class="btn" id="btnSignIn">Sign In</button>
           </div>
@@ -606,10 +672,12 @@
         <div class="mini">
           <div style="font-weight:800; color:var(--teal);">Session</div>
           <div class="hint">Write access is allowed only when signed in as the captain.</div>
+
           <div style="margin-top:10px; line-height:1.6;">
             <div>Auth Status: <span id="authStatus" class="pill">Checking…</span></div>
             <div>Write Enabled: <span id="writeEnabled" class="pill">No</span></div>
           </div>
+
           <div class="actions">
             <button class="btn secondary" id="btnSignOut" disabled>Sign Out</button>
           </div>
@@ -630,7 +698,6 @@
           <label>Location</label>
           <input id="location" placeholder="Freeport / 40–80 ft / Coordinates" />
         </div>
-
         <div class="field">
           <label>Angler</label>
           <select id="angler" required></select>
@@ -643,7 +710,6 @@
           <label>Bait</label>
           <select id="bait"></select>
         </div>
-
         <div class="field">
           <label>Kept / Released</label>
           <select id="keptReleased" required>
@@ -659,7 +725,6 @@
           <label>Weight (lbs)</label>
           <input id="weight" type="number" min="0" step="0.1" placeholder="e.g., 6.2" />
         </div>
-
         <div class="field" style="grid-column:1/-1;">
           <label>Notes</label>
           <textarea id="notes" placeholder="Conditions, depth, structure, rig, hooks, etc…"></textarea>
@@ -742,7 +807,6 @@
         return {wind:10,seas:2,period:6,temp:78};
       }
     }
-
     function score(c){
       let s=0;
       if(c.wind<=10) s+=3; else if(c.wind<=15) s+=2; else s+=1;
@@ -750,19 +814,16 @@
       if(c.period>=9) s+=2; else if(c.period>=7) s+=1; else s-=1;
       return Math.max(0,s);
     }
-
     function labelScore(s){
       if(s>=6) return {text:'✅ Offshore Excellent', cls:'good'};
       if(s>=4) return {text:'🟡 Fishable Window', cls:'ok'};
       return {text:'❌ Stay Nearshore', cls:'bad'};
     }
-
     function biteText(c,s){
       if(s>=6 && c.period>=8) return '🔥 Strong Bite';
       if(s>=4) return '🟡 Moderate Bite';
       return '❌ Tough Conditions';
     }
-
     function monthly(){
       let total=0;
       for(let i=0;i<30;i++){
@@ -803,14 +864,12 @@
       "August.Trip.01","August.Trip.02","August.Trip.03","August.Trip.04",
       "Alaska (Homer)","Alaska (Seward)","Alaska (Whittier)"
     ];
-
     const ANGLERS = [
-      "Roy de Ocampo","Brandon de Ocampo","Levi de Ocampo","Joie de Ocampo","Bench de Ocampo",
-      "Paul Pierson","William Ling","Elizabeth Ling","Christopher Ling",
-      "Majd Basharat","Boyd Nabas","Gerard Reyes",
-      "Luther Salvan","Daniel Salvan","Khenny Bocala","Val Garcia"
+      "Roy D.","Brandon D.","Levi D.","Joie D.","Bench D.",
+      "Paul P.","William L.","Elizabeth L.","Christopher L.",
+      "Majd B.","Boyd N.","Gerard R.",
+      "Luther S.","Daniel S.","Khenny B.","Val G."
     ];
-
     const SPECIES = [
       "Red Snapper","Vermillion Snapper (Beeliner)","Lane Snapper","Mangrove Snapper","Mutton Snapper",
       "Grouper (Gag)","Grouper (Scamp)","Grouper (Rockhind)","Grouper (Strawberry)","Grouper (Other)",
@@ -820,10 +879,9 @@
       "Halibut","Salmon (King)","Salmon (Silver)","Salmon (Sockeye)",
       "Rockfish (Black)","Rockfish (China)","Ling Cod","Pacific Cod","Black Cod"
     ];
-
     const BAITS = [
       "Cut Squid","Shrimp","Pinfish (Live)","Pinfish (Dead)","Croacker (Live)","Croacker (Dead)",
-      "Mullet (Live)","Other Fish","Jig (Diamond)","Jig (Imposter)","Jig (Other)"
+      "Mullet (Live)","Sardines (Dead)","Sardines (Live)","Other Fish","Jig (Diamond)","Jig (Imposter)","Jig (Other)"
     ];
 
     const $ = (id)=>document.getElementById(id);
@@ -853,7 +911,6 @@
         selectEl.appendChild(o);
       });
     }
-
     function fillFilterSelect(selectEl, items){
       selectEl.innerHTML = "";
       const all = document.createElement("option");
@@ -982,7 +1039,6 @@
           const entry = allDocs.find(x => x._id === id);
           if(!entry) return;
           editingId = id;
-
           $("trip").value = entry.trip || "";
           $("date").value = entry.date || new Date().toISOString().slice(0,10);
           $("location").value = entry.location || "";
@@ -993,7 +1049,6 @@
           $("length").value = entry.length || "";
           $("weight").value = entry.weight || "";
           $("notes").value = entry.notes || "";
-
           $("btnSave").textContent = "Update Entry";
           $("btnCancelEdit").style.display = "inline-block";
           $("editHint").textContent = "Editing an existing entry — click Update Entry to save changes, or Cancel Edit.";
@@ -1021,12 +1076,10 @@
         updatedAt: serverTimestamp(),
         updatedBy: auth.currentUser?.uid || null
       };
-
       if(!entry.trip || !entry.date || !entry.angler || !entry.species || !entry.keptReleased){
         alert("Please select Trip, Date, Angler, Species, and Kept/Released.");
         return;
       }
-
       try{
         if(editingId){
           await updateDoc(doc(db, "catches", editingId), entry);
@@ -1056,7 +1109,6 @@
       $("weight").value="";
       $("notes").value="";
     }
-
     function cancelEdit(){
       editingId = null;
       $("btnSave").textContent = "Save Entry";
@@ -1077,7 +1129,6 @@
         alert("No entries to export for current filters.");
         return;
       }
-
       const headers = ["date","trip","angler","species","status","length_in","weight_lb","bait","location","notes"];
       const escCSV = (v)=> `"${(v??"").toString().replaceAll('"','""')}"`;
       const rows = [headers.join(",")].concat(
@@ -1086,7 +1137,6 @@
           d.length, d.weight, d.bait, d.location, d.notes
         ].map(escCSV).join(","))
       );
-
       const blob = new Blob([rows.join("\n")], {type:"text/csv;charset=utf-8;"});
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -1103,11 +1153,9 @@
       let row = [];
       let cur = "";
       let inQuotes = false;
-
       for(let i=0;i<text.length;i++){
         const ch = text[i];
         const next = text[i+1];
-
         if(ch === '"'){
           if(inQuotes && next === '"'){ cur += '"'; i++; }
           else inQuotes = !inQuotes;
@@ -1126,7 +1174,6 @@
     }
 
     function normalizeHeader(h){ return h.trim().toLowerCase(); }
-
     function mapRow(headers, cols){
       const get = (name)=>{
         const idx = headers.indexOf(name);
@@ -1160,7 +1207,6 @@
       const headers = rows[0].map(normalizeHeader);
       const dataRows = rows.slice(1);
       const entries = [];
-
       for(const cols of dataRows){
         const e = mapRow(headers, cols);
         if(!e.date || !e.trip || !e.angler || !e.species) continue;
@@ -1172,12 +1218,10 @@
           updatedBy: auth.currentUser?.uid || null
         });
       }
-
       if(!entries.length){
         alert("No valid rows found. Required columns: date, trip, angler, species.");
         return;
       }
-
       const chunkSize = 400;
       try{
         for(let i=0;i<entries.length;i+=chunkSize){
@@ -1268,7 +1312,6 @@
       const dates = getTripSummaryAvailableDates();
       const today = new Date().toISOString().slice(0,10);
       const current = tsDate.value;
-
       tsDate.innerHTML = "";
 
       if(!dates.length){
@@ -1279,14 +1322,12 @@
         tsDate.value = today;
         return;
       }
-
       for(const d of dates){
         const o = document.createElement("option");
         o.value = d;
         o.textContent = d;
         tsDate.appendChild(o);
       }
-
       if(current && dates.includes(current)) tsDate.value = current;
       else if(dates.includes(today)) tsDate.value = today;
       else tsDate.value = dates[0];
@@ -1310,6 +1351,7 @@
       const highlightsEl = document.getElementById("tsHighlights");
       const headEl = document.getElementById("tsHeader");
       const bodyEl = document.getElementById("tsBody");
+      const speciesBodyEl = document.getElementById("tsSpeciesBody");
       if(!highlightsEl || !headEl || !bodyEl) return;
 
       const date = tripSummaryDate();
@@ -1348,6 +1390,7 @@
 
         headEl.innerHTML = `<th>Angler</th><th>Total</th><th>Kept</th><th>Released</th><th>Unique Species</th>`;
         bodyEl.innerHTML = `<tr><td colspan="5" style="opacity:.7;">No catch log entries for ${esc(date)}.</td></tr>`;
+        if(speciesBodyEl){ speciesBodyEl.innerHTML = `<tr><td colspan="4" style="opacity:.7; text-align:center;">No catch log entries for ${esc(date)}.</td></tr>`; }
         return;
       }
 
@@ -1373,6 +1416,33 @@
           `Unique species caught on <span class="mono">${esc(date)}</span>.`
         )
       ].join("");
+
+      // --- Species Summary table (selected date) ---
+      if(speciesBodyEl){
+        const smap = new Map();
+        for(const d of dayDocs){
+          const sp = d?.species;
+          if(!sp) continue;
+          if(!smap.has(sp)) smap.set(sp, { total:0, kept:0, released:0 });
+          const st = smap.get(sp);
+          const status = (d.keptReleased || d.status || "");
+          if(status === "Kept") st.kept += 1;
+          else if(status === "Released") st.released += 1;
+          st.total += 1;
+        }
+        const rows = Array.from(smap.entries())
+          .map(([species,st]) => ({ species, ...st }))
+          .sort((a,b) => (b.total - a.total) || a.species.localeCompare(b.species));
+        speciesBodyEl.innerHTML = rows.length
+          ? rows.map(r => `
+            <tr>
+              <td>${esc(r.species)}</td>
+              <td><span class="pill"><b>${esc(r.total)}</b></span></td>
+              <td><span class="pill"><b>${esc(r.kept)}</b></span></td>
+              <td><span class="pill"><b>${esc(r.released)}</b></span></td>
+            </tr>`).join("")
+          : `<tr><td colspan="4" style="opacity:.7; text-align:center;">No species found for ${esc(date)}.</td></tr>`;
+      }
 
       const speciesList = Array.from(new Set(dayDocs.map(d=>d?.species).filter(Boolean))).sort();
       const anglers = Array.from(new Set(dayDocs.map(d=>d?.angler).filter(Boolean))).sort();
@@ -1408,7 +1478,6 @@
         const released = st.released;
         const uniq = m.size;
         const cells = speciesList.map(s => (m.get(s) || 0));
-
         return `
           <tr>
             <td>${esc(a)}</td>
@@ -1434,7 +1503,6 @@
       const el = document.getElementById("miniLeaderboards");
       if(!el) return;
       const data = allDocs.slice();
-
       if(!data.length){
         el.innerHTML = `
           <div class="mini-card">
@@ -1458,7 +1526,6 @@
         `;
         return;
       }
-
       const topAngler = countBy(data,"angler")[0];
       const topSpecies = countBy(data,"species")[0];
       const numericLen = data.filter(d=>safeNum(d.length)!=null);
@@ -1500,7 +1567,6 @@
 
     function initLeaderboardsUI(){
       if(!lbTrip) return;
-
       lbTrip.innerHTML = "";
       ["All", ...TRIPS].forEach(t=>{
         const o = document.createElement("option");
@@ -1508,16 +1574,13 @@
         o.textContent = t;
         lbTrip.appendChild(o);
       });
-
       refreshLeaderboardsAnglerOptions();
-
       lbTrip.addEventListener("change", renderLeaderboards);
       lbAngler.addEventListener("change", renderLeaderboards);
       lbStatus.addEventListener("change", renderLeaderboards);
       lbFrom.addEventListener("change", renderLeaderboards);
       lbTo.addEventListener("change", renderLeaderboards);
       lbScope.addEventListener("change", renderLeaderboards);
-
       renderLeaderboards();
     }
 
@@ -1526,20 +1589,17 @@
       const current = lbAngler.value || "ALL";
       const fromData = allDocs.map(d=>d.angler).filter(Boolean);
       const uniq = Array.from(new Set(["ALL", ...ANGLERS, ...fromData]));
-
       lbAngler.innerHTML = "";
       const allOpt = document.createElement("option");
       allOpt.value = "ALL";
       allOpt.textContent = "All";
       lbAngler.appendChild(allOpt);
-
       uniq.filter(a=>a && a!=="ALL").forEach(a=>{
         const o = document.createElement("option");
         o.value = a;
         o.textContent = a;
         lbAngler.appendChild(o);
       });
-
       if(Array.from(lbAngler.options).some(o=>o.value===current)){
         lbAngler.value = current;
       }
@@ -1613,7 +1673,6 @@
 
       const anglerCounts = countBy(base, "angler");
       const topAngler = anglerCounts[0];
-
       const keptOnly = base.filter(d => (d.keptReleased || d.status) === "Kept");
       const keptAnglerCounts = countBy(keptOnly, "angler");
 
@@ -1784,7 +1843,6 @@
       const s = score(c);
       const stat = labelScore(s);
       const glow = (s>=6) ? "glow" : "";
-
       const conditionsHtml = `
         <div class="cond-card"><div class="cond-label">Wind (mph)</div><div class="cond-value ${glow}">${c.wind}</div></div>
         <div class="cond-card"><div class="cond-label">Seas (ft)</div><div class="cond-value ${glow}">${c.seas}</div></div>
@@ -1797,12 +1855,10 @@
         <div class="${stat.cls}" style="font-weight:900;">${stat.text}</div>
         <div style="opacity:.9; margin-top:6px;">Score: ${s}/8</div>
       `;
-
       document.getElementById("bite").innerHTML = `
         <div style="color:var(--teal); font-weight:900;">Fishing Outlook</div>
         <div style="margin-top:6px;">${biteText(c,s)}</div>
       `;
-
       document.getElementById("fishable").textContent = `${monthly()} days`;
 
       fillSelect($("trip"), TRIPS, "Select a trip…");
@@ -1820,13 +1876,11 @@
       initLeaderboardsUI();
       initTripSummaryUI();
       startCatchListener();
-
       renderMiniLeaderboards();
       renderLeaderboards();
       refreshTripSummaryDateOptions();
       renderTripSummary();
     }
-
     init();
 
     async function doSignIn(){
@@ -1839,12 +1893,11 @@
       try{ await signInWithEmailAndPassword(auth, email, pass); }
       catch(e){ alert("Sign-in failed: " + (e?.message || e)); }
     }
-
     async function doSignOut(){
       try{ await signOut(auth); }
       catch(e){ alert("Sign-out failed: " + (e?.message || e)); }
     }
   </script>
 </body>
-  v2.0.13
+v2.0.14
 </html>
