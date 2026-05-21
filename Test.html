@@ -44,7 +44,8 @@
 
     /* HERO */
     .hero{
-      height:22vh;
+      min-height:22vh;
+      height:auto;
       background:
         linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.82)),
         url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e");
@@ -186,6 +187,9 @@
     select option{ color:#0b1f2a; }
     .actions{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
     .btn{
+      -webkit-appearance:none;
+      appearance:none;
+      touch-action:manipulation;
       background:rgba(0,212,198,0.18);
       border:1px solid rgba(0,212,198,0.45);
       color:var(--teal);
@@ -763,7 +767,7 @@
       .decision-row{ grid-template-columns:1fr; }
       .form-grid{ grid-template-columns:1fr; }
       .filters{ grid-template-columns:1fr; }
-      .hero{ padding:16px 16px; height:28vh; }
+      .hero{ padding:16px 16px 24px; min-height:unset; height:auto; }
       .condition-wrap, .decision-row{ max-width:100%; }
 
       /* hide columns that cause horizontal scroll */
@@ -1036,7 +1040,7 @@
       </div>
 
       <div class="actions">
-        <button class="btn" id="btnSave" disabled>Save Entry</button>
+        <button class="btn" id="btnSave" type="button" disabled>Save Entry</button>
         <button class="btn secondary" id="btnCancelEdit" style="display:none;">Cancel Edit</button>
         <button class="btn secondary" id="btnClear">Clear Form</button>
         <button class="btn secondary" id="btnExport">Export CSV</button>
@@ -1297,11 +1301,11 @@
       "Alaska (Homer)","Alaska (Seward)","Alaska (Whittier)"
     ];
     const ANGLERS = [
-      "Roy D.","Brandon D.","Levi D.","Joie D.","Bench D.",
+      "Roy D.","Brandon D.","Levi D.","Joie D.","Kim D.",
+      "Bench D.","Chloe D.",
       "Paul P.","William L.","Elizabeth L.","Christopher L.",
       "Majd B.","Boyd N.","Gerard R.",
       "Luther S.","Daniel S.","Khenny B.","Val G."
-      "Kim D.","Chloe D."
     ];
     const SPECIES = [
       "Red Snapper","Vermillion Snapper (Beeliner)","Lane Snapper","Mangrove Snapper","Mutton Snapper",
@@ -1330,6 +1334,32 @@
     function safeNum(v){
       const n = Number(v);
       return Number.isFinite(n) ? n : null;
+    }
+
+    function formatDisplayDate(value){
+      if(!value) return "";
+      if(/^\d{2}\/\d{2}\/\d{4}$/.test(value)) return value;
+      if(/^\d{4}-\d{2}-\d{2}$/.test(value)){
+        const [y,m,d] = value.split("-");
+        return `${m}/${d}/${y}`;
+      }
+      const dt = new Date(value);
+      if(!isNaN(dt.getTime())){
+        const m = String(dt.getMonth()+1).padStart(2,'0');
+        const d = String(dt.getDate()).padStart(2,'0');
+        const y = dt.getFullYear();
+        return `${m}/${d}/${y}`;
+      }
+      return value;
+    }
+
+    function normalizeDateForStorage(value){
+      if(!value) return value;
+      if(/^\d{2}\/\d{2}\/\d{4}$/.test(value)){
+        const [m,d,y] = value.split('/');
+        return `${y}-${m}-${d}`;
+      }
+      return value;
     }
     function fillSelect(selectEl, items, placeholder){
       selectEl.innerHTML = "";
@@ -1660,7 +1690,7 @@
 
         return `
           <tr>
-            <td>${esc(d.date || "")}</td>
+            <td>${esc(formatDisplayDate(d.date || ""))}</td>
             <td><span class="pill">${esc(d.trip || "")}</span></td>
             <td>${esc(d.angler || "")}</td>
             <td>${esc(d.species || "")}</td>
@@ -1768,7 +1798,7 @@
           <div class="entry-card">
             <div class="entry-top">
               <div class="entry-title">
-                <span class="pill">${esc(d.date || "—")}</span>
+                <span class="pill">${esc(formatDisplayDate(d.date || "—"))}</span>
                 <span class="pill">${esc(d.trip || "—")}</span>
               </div>
               <div class="entry-meta">${statusChip}</div>
@@ -1886,7 +1916,7 @@
 
       const entry = {
         trip: $("trip").value,
-        date: $("date").value,
+        date: normalizeDateForStorage($("date").value),
         location: $("location").value.trim(),
         angler: $("angler").value,
         species: $("species").value,
@@ -2037,7 +2067,7 @@
         return idx >= 0 ? (cols[idx] ?? "").trim() : "";
       };
 
-      const date = get("date");
+      const date = normalizeDateForStorage(get("date"));
       const trip = get("trip");
       const angler = get("angler");
       const species = get("species");
@@ -2132,6 +2162,7 @@
     $("btnSignIn").addEventListener("click", doSignIn);
     $("btnSignOut").addEventListener("click", doSignOut);
     $("btnSave").addEventListener("click", saveCatch);
+    $("btnSave").addEventListener("touchend", (e)=>{ e.preventDefault(); saveCatch(); }, {passive:false});
     $("btnCancelEdit").addEventListener("click", cancelEdit);
     $("btnClear").addEventListener("click", ()=>{ cancelEdit(); clearForm(); });
     $("btnExport").addEventListener("click", exportCSV);
@@ -2842,7 +2873,7 @@
         const cls = st==="Kept" ? "kept" : "released";
         return `
           <tr>
-            <td>${esc(d.date || "—")}</td>
+            <td>${esc(formatDisplayDate(d.date || "—"))}</td>
             <td><span class="pill">${esc(d.trip || "—")}</span></td>
             <td>${esc(d.species || "Unknown")}</td>
             <td style="text-align:center;"><span class="status-chip ${cls}">${esc(st || "—")}</span></td>
@@ -2943,5 +2974,5 @@
     }
   </script>
 </body>
-  v.2.1.0
+  v.2.1.1
 </html>
