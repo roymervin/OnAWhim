@@ -44,8 +44,7 @@
 
     /* HERO */
     .hero{
-      min-height:22vh;
-      height:auto;
+      height:22vh;
       background:
         linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.82)),
         url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e");
@@ -187,9 +186,6 @@
     select option{ color:#0b1f2a; }
     .actions{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
     .btn{
-      -webkit-appearance:none;
-      appearance:none;
-      touch-action:manipulation;
       background:rgba(0,212,198,0.18);
       border:1px solid rgba(0,212,198,0.45);
       color:var(--teal);
@@ -767,7 +763,7 @@
       .decision-row{ grid-template-columns:1fr; }
       .form-grid{ grid-template-columns:1fr; }
       .filters{ grid-template-columns:1fr; }
-      .hero{ padding:16px 16px 24px; min-height:unset; height:auto; }
+      .hero{ padding:16px 16px; height:28vh; }
       .condition-wrap, .decision-row{ max-width:100%; }
 
       /* hide columns that cause horizontal scroll */
@@ -1040,7 +1036,7 @@
       </div>
 
       <div class="actions">
-        <button class="btn" id="btnSave" type="button" disabled>Save Entry</button>
+        <button class="btn" id="btnSave" disabled>Save Entry</button>
         <button class="btn secondary" id="btnCancelEdit" style="display:none;">Cancel Edit</button>
         <button class="btn secondary" id="btnClear">Clear Form</button>
         <button class="btn secondary" id="btnExport">Export CSV</button>
@@ -1071,6 +1067,10 @@
             <option value="Kept">Kept</option>
             <option value="Released">Released</option>
           </select>
+        
+        <div class="filter-card">
+          <label>Filter by Date</label>
+          <input type="date" id="filterDate">
         </div>
       </div>
 
@@ -1210,7 +1210,12 @@
     </div>
   </div>
 
-  <script type="module">
+  <div id="imageModal" style="display:none;position:fixed;z-index:9999;inset:0;background:rgba(0,0,0,.88);align-items:center;justify-content:center;padding:20px;">
+<div style="position:relative;max-width:90vw;max-height:90vh;">
+<button id="closeImageModal" style="position:absolute;top:-50px;right:0;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:white;padding:10px 14px;border-radius:10px;cursor:pointer;">Close</button>
+<img id="modalImage" src="" style="max-width:90vw;max-height:90vh;border-radius:16px;" />
+</div></div>
+<script type="module">
     // Tabs
     window.switchTab = function(id, el){
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1331,35 +1336,16 @@
       .replaceAll('"',"&quot;")
       .replaceAll("'","&#39;");
 
+    function formatDateDisplay(dateStr){
+      if(!dateStr) return "";
+      const parts = dateStr.split("-");
+      if(parts.length !== 3) return dateStr;
+      return `${parts[1]}/${parts[2]}/${parts[0]}`;
+    }
+
     function safeNum(v){
       const n = Number(v);
       return Number.isFinite(n) ? n : null;
-    }
-
-    function formatDisplayDate(value){
-      if(!value) return "";
-      if(/^\d{2}\/\d{2}\/\d{4}$/.test(value)) return value;
-      if(/^\d{4}-\d{2}-\d{2}$/.test(value)){
-        const [y,m,d] = value.split("-");
-        return `${m}/${d}/${y}`;
-      }
-      const dt = new Date(value);
-      if(!isNaN(dt.getTime())){
-        const m = String(dt.getMonth()+1).padStart(2,'0');
-        const d = String(dt.getDate()).padStart(2,'0');
-        const y = dt.getFullYear();
-        return `${m}/${d}/${y}`;
-      }
-      return value;
-    }
-
-    function normalizeDateForStorage(value){
-      if(!value) return value;
-      if(/^\d{2}\/\d{2}\/\d{4}$/.test(value)){
-        const [m,d,y] = value.split('/');
-        return `${y}-${m}-${d}`;
-      }
-      return value;
     }
     function fillSelect(selectEl, items, placeholder){
       selectEl.innerHTML = "";
@@ -1651,6 +1637,8 @@
       if(f.angler !== "ALL") filtered = filtered.filter(d => d.angler === f.angler);
       if(f.species !== "ALL") filtered = filtered.filter(d => d.species === f.species);
       if(f.status !== "ALL") filtered = filtered.filter(d => (d.keptReleased || d.status) === f.status);
+      const filterDate = $("filterDate")?.value;
+      if(filterDate) filtered = filtered.filter(d => d.date === filterDate);
 
       renderTotalsBar(computeTotals(filtered));
       renderTable(filtered);
@@ -1685,12 +1673,12 @@
         const delBtn  = isCaptain ? `<button class="btn secondary" style="padding:6px 10px;" data-del="${d._id}">Delete</button>` : "";
 
         const photoCell = d.photoUrl
-          ? `<a class="photo-icon" href="${esc(d.photoUrl)}" target="_blank" rel="noopener">📷</a>`
+          ? `<button class="photo-icon view-photo-btn" data-photo="${esc(d.photoUrl)}">📷</button>`
           : `<span style="opacity:.35;">—</span>`;
 
         return `
           <tr>
-            <td>${esc(formatDisplayDate(d.date || ""))}</td>
+            <td>${esc(formatDateDisplay(d.date || ""))}</td>
             <td><span class="pill">${esc(d.trip || "")}</span></td>
             <td>${esc(d.angler || "")}</td>
             <td>${esc(d.species || "")}</td>
@@ -1705,6 +1693,20 @@
           </tr>
         `;
       }).join("");
+
+      wrap.querySelectorAll(".clickable-photo").forEach(img=>{
+        img.addEventListener("click", ()=>{
+          $("modalImage").src = img.dataset.photo;
+          $("imageModal").style.display = "flex";
+        });
+      });
+
+      tbody.querySelectorAll(".view-photo-btn").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          $("modalImage").src = btn.dataset.photo;
+          $("imageModal").style.display = "flex";
+        });
+      });
 
       // Delete handlers (also delete photo from storage if present)
       tbody.querySelectorAll("button[data-del]").forEach(btn=>{
@@ -1792,13 +1794,13 @@
         const loc  = d.location ? esc(d.location) : "—";
         const notes = d.notes ? esc(d.notes) : "";
 
-        const photo = d.photoUrl ? `<img class="photo-thumb" src="${esc(d.photoUrl)}" alt="Catch photo"/>` : "";
+        const photo = d.photoUrl ? `<img class="photo-thumb clickable-photo" data-photo="${esc(d.photoUrl)}" src="${esc(d.photoUrl)}" alt="Catch photo"/>` : "";
 
         return `
           <div class="entry-card">
             <div class="entry-top">
               <div class="entry-title">
-                <span class="pill">${esc(formatDisplayDate(d.date || "—"))}</span>
+                <span class="pill">${esc(d.date || "—")}</span>
                 <span class="pill">${esc(d.trip || "—")}</span>
               </div>
               <div class="entry-meta">${statusChip}</div>
@@ -1916,7 +1918,7 @@
 
       const entry = {
         trip: $("trip").value,
-        date: normalizeDateForStorage($("date").value),
+        date: $("date").value,
         location: $("location").value.trim(),
         angler: $("angler").value,
         species: $("species").value,
@@ -2067,7 +2069,7 @@
         return idx >= 0 ? (cols[idx] ?? "").trim() : "";
       };
 
-      const date = normalizeDateForStorage(get("date"));
+      const date = get("date");
       const trip = get("trip");
       const angler = get("angler");
       const species = get("species");
@@ -2133,7 +2135,7 @@
     }
 
     function attachFilterListeners(){
-      ["filterTrip","filterAngler","filterSpecies","filterStatus"].forEach(id=>{
+      ["filterTrip","filterAngler","filterSpecies","filterStatus","filterDate"].forEach(id=>{
         $(id).addEventListener("change", applyFilters);
       });
     }
@@ -2162,7 +2164,6 @@
     $("btnSignIn").addEventListener("click", doSignIn);
     $("btnSignOut").addEventListener("click", doSignOut);
     $("btnSave").addEventListener("click", saveCatch);
-    $("btnSave").addEventListener("touchend", (e)=>{ e.preventDefault(); saveCatch(); }, {passive:false});
     $("btnCancelEdit").addEventListener("click", cancelEdit);
     $("btnClear").addEventListener("click", ()=>{ cancelEdit(); clearForm(); });
     $("btnExport").addEventListener("click", exportCSV);
@@ -2873,7 +2874,7 @@
         const cls = st==="Kept" ? "kept" : "released";
         return `
           <tr>
-            <td>${esc(formatDisplayDate(d.date || "—"))}</td>
+            <td>${esc(d.date || "—")}</td>
             <td><span class="pill">${esc(d.trip || "—")}</span></td>
             <td>${esc(d.species || "Unknown")}</td>
             <td style="text-align:center;"><span class="status-chip ${cls}">${esc(st || "—")}</span></td>
@@ -2974,5 +2975,5 @@
     }
   </script>
 </body>
-  v.2.1.1
+  v.2.1.0
 </html>
