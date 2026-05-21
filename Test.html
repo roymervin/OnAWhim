@@ -16,14 +16,17 @@
       --ok:#fcb900;
       --bad:#ff4d4d;
 
-      /* filter card override */
       --filterBg: rgba(0,0,0,0.28);
       --filterStroke: rgba(0,212,198,0.18);
 
-      /* leaderboard accents */
       --qty:#eafffb;
       --qtyShadow: rgba(0,0,0,.35);
+
       --panelMax: 1020px;
+
+      /* bright inventory total */
+      --invTotal: rgba(210,255,251,0.98);
+      --invTotalGlow: rgba(0,212,198,0.35);
     }
 
     body{
@@ -159,49 +162,7 @@
     }
     .mini-v .accent{ color:var(--teal); text-shadow:0 0 10px rgba(0,212,198,0.35); }
 
-    /* CATCH LOG */
-    .authbar{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:flex-end;
-      margin:10px 0 14px;
-    }
-    .authbar .mini{
-      background:rgba(255,255,255,0.04);
-      border:1px solid rgba(255,255,255,0.10);
-      border-radius:12px;
-      padding:10px;
-      flex:1;
-      min-width:260px;
-    }
-    .form-grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:10px;
-    }
-
-    /* Filters near bottom */
-    .filters{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:10px;
-      margin:12px 0 10px;
-    }
-    .filter-card{
-      background: var(--filterBg);
-      border: 1px solid var(--filterStroke);
-      border-radius: 12px;
-      padding: 10px;
-      backdrop-filter: blur(12px);
-    }
-    .filter-card label{
-      display:block;
-      font-size:11px;
-      opacity:0.8;
-      margin-bottom:6px;
-      color: rgba(205,231,240,0.95);
-    }
+    /* Controls + inputs */
     .field{
       background:rgba(255,255,255,0.04);
       border:1px solid rgba(255,255,255,0.08);
@@ -222,6 +183,7 @@
     textarea{ min-height:90px; resize:vertical; grid-column:1/-1; }
     input::placeholder{ color:rgba(255,255,255,0.55); }
     select option{ color:#0b1f2a; }
+
     .actions{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
     .btn{
       background:rgba(0,212,198,0.18);
@@ -239,15 +201,7 @@
       color:white;
       font-weight:650;
     }
-    .btn.danger{
-      background:rgba(255,77,77,0.10);
-      border:1px solid rgba(255,77,77,0.25);
-      color:#ffd0d0;
-    }
-    .table-wrap{ margin-top:10px; overflow:auto; border-radius:12px; border:1px solid rgba(255,255,255,0.10); }
-    table{ width:100%; border-collapse:collapse; min-width:1250px; background:rgba(0,0,0,0.18); }
-    th, td{ padding:10px; border-bottom:1px solid rgba(255,255,255,0.08); text-align:left; font-size:12px; }
-    th{ position:sticky; top:0; background:rgba(0,0,0,0.35); backdrop-filter: blur(10px); z-index:1; }
+
     .pill{
       display:inline-block;
       padding:4px 8px;
@@ -305,7 +259,70 @@
     /* Hidden file input */
     #csvFileInput{ display:none; }
 
-    /* ===== Leaderboards Pro Layout ===== */
+    /* Filters */
+    .filters{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+      margin:12px 0 10px;
+    }
+    .filter-card{
+      background: var(--filterBg);
+      border: 1px solid var(--filterStroke);
+      border-radius: 12px;
+      padding: 10px;
+      backdrop-filter: blur(12px);
+    }
+    .filter-card label{
+      display:block;
+      font-size:11px;
+      opacity:0.8;
+      margin-bottom:6px;
+      color: rgba(205,231,240,0.95);
+    }
+
+    /* ========= Trip Summary ========= */
+    #tripSummary{
+      background:
+        linear-gradient(rgba(11,31,42,0.80), rgba(11,31,42,0.94)),
+        url("https://images.unsplash.com/photo-1500375592092-40eb2168fd21?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1400");
+      background-size:cover;
+      background-position:center;
+      background-attachment:fixed;
+    }
+    .ts-section{ margin-top:14px; }
+
+    /* Trip Summary tab: glowing yellow */
+    .tab.trip-summary-tab{
+      background: rgba(252,185,0,0.20);
+      border-color: rgba(252,185,0,0.60);
+      color: rgba(255,242,200,0.98);
+      box-shadow: 0 0 10px rgba(252,185,0,0.55), 0 0 26px rgba(252,185,0,0.28);
+    }
+    .tab.trip-summary-tab:hover{
+      background: rgba(252,185,0,0.28);
+      box-shadow: 0 0 12px rgba(252,185,0,0.65), 0 0 30px rgba(252,185,0,0.30);
+    }
+    .tab.trip-summary-tab.active{
+      background: rgba(252,185,0,0.30);
+      border-color: rgba(252,185,0,0.75);
+      color: rgba(255,255,220,0.98);
+    }
+
+    /* Trip Summary: evenly spaced columns + centered values */
+    #tsTable{ table-layout: fixed; }
+    #tsTable th, #tsTable td{ text-align:center; vertical-align:middle; }
+    #tsTable th{ white-space:normal; overflow-wrap:anywhere; }
+
+    #tsSpeciesTable{ min-width:520px; table-layout:fixed; }
+    #tsSpeciesTable th, #tsSpeciesTable td{ text-align:center; vertical-align:middle; }
+
+    .table-wrap{ margin-top:10px; overflow:auto; border-radius:12px; border:1px solid rgba(255,255,255,0.10); }
+    table{ width:100%; border-collapse:collapse; min-width:1250px; background:rgba(0,0,0,0.18); }
+    th, td{ padding:10px; border-bottom:1px solid rgba(255,255,255,0.08); text-align:left; font-size:12px; }
+    th{ position:sticky; top:0; background:rgba(0,0,0,0.35); backdrop-filter: blur(10px); z-index:1; }
+
+    /* ========= Leaderboards ========= */
     .lb-toolbar{
       display:grid;
       grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
@@ -320,7 +337,27 @@
       backdrop-filter: blur(12px);
     }
     .lb-tool label{ display:block; font-size:11px; opacity:0.85; margin-bottom:6px; color: rgba(205,231,240,0.95); }
-    .lb-group{ margin-top:14px; }
+
+    .lb-group{
+      margin-top:14px;
+      position:relative;
+      padding-right:16px;
+      border-radius:14px;
+    }
+    .lb-group::after{
+      content:"";
+      position:absolute;
+      top:10px;
+      right:6px;
+      width:5px;
+      height:calc(100% - 20px);
+      border-radius:999px;
+      background: var(--lbAccent, rgba(0,212,198,0.22));
+      box-shadow: 0 0 12px rgba(0,0,0,0.25);
+      opacity:.95;
+      pointer-events:none;
+    }
+
     .lb-group h3{
       margin:0 0 10px;
       font-size:13px;
@@ -329,6 +366,16 @@
       color:rgba(205,231,240,0.95);
       opacity:.9;
     }
+    /* brighter category colors */
+    .lb-group.lb-people{ --lbAccent: rgba(0,231,255,0.90); }
+    .lb-group.lb-people h3{ color: rgba(120,248,255,0.98); text-shadow: 0 0 14px rgba(0,231,255,0.35); }
+
+    .lb-group.lb-species{ --lbAccent: rgba(252,185,0,0.95); }
+    .lb-group.lb-species h3{ color: rgba(255,232,160,0.98); text-shadow: 0 0 16px rgba(252,185,0,0.35); }
+
+    .lb-group.lb-time{ --lbAccent: rgba(179,95,255,0.92); }
+    .lb-group.lb-time h3{ color: rgba(215,175,255,0.98); text-shadow: 0 0 16px rgba(179,95,255,0.35); }
+
     .lb-cards{
       display:grid;
       grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
@@ -400,6 +447,7 @@
     }
     .lb-name{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .lb-count{ font-weight:950; color:var(--qty); text-shadow: 0 2px 12px var(--qtyShadow); }
+
     .lb-mini{
       margin-top:10px;
       border:1px solid rgba(255,255,255,0.10);
@@ -418,18 +466,204 @@
     }
     .lb-mini .r:last-child{ border-bottom:none; }
     .lb-mini .h{ background: rgba(0,0,0,0.28); font-weight:900; opacity:.9; }
-    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-
-    /* TRIP SUMMARY */
-    #tripSummary{
-      background:
-        linear-gradient(rgba(11,31,42,0.80), rgba(11,31,42,0.94)),
-        url("https://images.unsplash.com/photo-1500375592092-40eb2168fd21?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1400");
-      background-size:cover;
-      background-position:center;
-      background-attachment:fixed;
+    .mono{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     }
-    .ts-section{ margin-top:14px; }
+
+    /* ========= Catch Log Cards + Toggle ========= */
+    .view-toggle{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin:10px 0 4px;
+      flex-wrap:wrap;
+    }
+    .toggle-btn{
+      padding:9px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.18);
+      color:white;
+      cursor:pointer;
+      font-weight:850;
+      letter-spacing:.2px;
+      transition:.18s ease;
+    }
+    .toggle-btn:hover{ background: rgba(255,255,255,0.08); }
+    .toggle-btn.active{
+      border-color: rgba(0,212,198,0.55);
+      background: rgba(0,212,198,0.14);
+      color: rgba(210,255,251,0.98);
+      box-shadow: 0 0 18px rgba(0,212,198,0.18);
+    }
+
+    .entry-grid{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+      gap:12px;
+    }
+    .entry-card{
+      background: rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.10);
+      border-radius:16px;
+      padding:14px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.18);
+      position:relative;
+      overflow:hidden;
+      min-height: 220px;
+    }
+    .entry-card::after{
+      content:"";
+      position:absolute;
+      top:10px;
+      right:10px;
+      width:4px;
+      height:calc(100% - 20px);
+      border-radius:999px;
+      background: rgba(0,212,198,0.35);
+      opacity:.75;
+      pointer-events:none;
+    }
+    .entry-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .entry-title{
+      font-weight:900;
+      letter-spacing:.2px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+    }
+    .entry-meta{
+      font-size:12px;
+      opacity:.85;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
+    .entry-line{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:8px;
+      font-size:12px;
+      margin-top:10px;
+    }
+    .entry-line .k{ opacity:.72; font-size:11px; margin-bottom:3px; }
+    .entry-line .v{ font-weight:800; }
+    .entry-notes{
+      margin-top:10px;
+      font-size:12px;
+      line-height:1.35;
+      opacity:.9;
+      background: rgba(0,0,0,0.18);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:12px;
+      padding:10px;
+      min-height:44px;
+    }
+    .entry-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .entry-empty{
+      padding:14px;
+      border-radius:14px;
+      border:1px dashed rgba(255,255,255,0.18);
+      background: rgba(0,0,0,0.16);
+      opacity:.85;
+    }
+
+    /* ========= Angler Profile ========= */
+    .wire-pre{
+      margin:0 0 12px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.20);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:12px;
+      line-height:1.25;
+      white-space:pre;
+      overflow:auto;
+      opacity:.9;
+    }
+    .ap-toolbar{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:10px;
+      margin:10px 0 14px;
+    }
+    .ap-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+      gap:12px;
+      margin-top:10px;
+    }
+    .ap-split{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-top:14px;
+    }
+    .ap-panel{
+      background: rgba(0,0,0,0.18);
+      border:1px solid rgba(255,255,255,0.10);
+      border-radius:16px;
+      padding:12px;
+      overflow:auto;
+    }
+    .ap-panel h3{
+      margin:0 0 10px;
+      font-size:13px;
+      letter-spacing:.4px;
+      text-transform:uppercase;
+      color:rgba(205,231,240,0.95);
+      opacity:.95;
+    }
+    .ap-table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:520px;
+    }
+    .ap-table th, .ap-table td{
+      padding:10px;
+      border-bottom:1px solid rgba(255,255,255,0.08);
+      font-size:12px;
+      vertical-align:middle;
+    }
+    .ap-table th{
+      position:sticky;
+      top:0;
+      background:rgba(0,0,0,0.28);
+      backdrop-filter: blur(10px);
+      z-index:1;
+      text-align:left;
+    }
+
+    /* Catch Inventory specific table formatting */
+    .inv-species{ text-align:left; }
+    .inv-center{ text-align:center; }
+    .inv-total{
+      text-align:center;
+      font-weight:950;
+      color: var(--invTotal);
+      text-shadow: 0 0 14px var(--invTotalGlow);
+    }
+
+    @media(max-width:900px){
+      .ap-split{ grid-template-columns:1fr; }
+    }
 
     @media(max-width:768px){
       .cond-grid{ grid-template-columns:repeat(2,1fr); }
@@ -438,6 +672,28 @@
       .filters{ grid-template-columns:1fr; }
       .hero{ padding:16px 16px; height:28vh; }
       .condition-wrap, .decision-row{ max-width:100%; }
+    }
+
+    /* CATCH LOG */
+    .authbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:flex-end;
+      margin:10px 0 14px;
+    }
+    .authbar .mini{
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.10);
+      border-radius:12px;
+      padding:10px;
+      flex:1;
+      min-width:260px;
+    }
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
     }
   </style>
 </head>
@@ -452,12 +708,14 @@
   </div>
 
   <div class="nav-tabs">
+    <div class="tab trip-summary-tab" onclick="switchTab('tripSummary', this)">Trip Summary</div>
     <div class="tab active" onclick="switchTab('dashboard', this)">Dashboard</div>
     <div class="tab" onclick="switchTab('log', this)">Catch Log</div>
     <div class="tab" onclick="switchTab('leaderboards', this)">Leaderboards</div>
-    <div class="tab" onclick="switchTab('tripSummary', this)">Trip Summary</div>
+    <div class="tab" onclick="switchTab('anglerProfile', this)">Angler Profile</div>
   </div>
 
+  <!-- DASHBOARD -->
   <div id="dashboard" class="page active">
     <div class="panel">
       <h2>Go / No-Go Decision Guide</h2>
@@ -470,13 +728,11 @@
         </div>
       </div>
       <div class="hint">Numbers glow when conditions score ≥ 6/8.</div>
-
-      <!-- ✅ Dashboard mini leaderboards -->
       <div id="miniLeaderboards" class="mini-grid"></div>
     </div>
   </div>
 
-  <!-- PRO LEADERBOARDS TAB -->
+  <!-- LEADERBOARDS -->
   <div id="leaderboards" class="page">
     <div class="panel">
       <h2>📊 Leaderboards</h2>
@@ -517,17 +773,17 @@
         </div>
       </div>
 
-      <div class="lb-group">
+      <div class="lb-group lb-people">
         <h3>People</h3>
         <div class="lb-cards" id="lbPeople"></div>
       </div>
 
-      <div class="lb-group">
+      <div class="lb-group lb-species">
         <h3>Fish Species</h3>
         <div class="lb-cards" id="lbSpecies"></div>
       </div>
 
-      <div class="lb-group">
+      <div class="lb-group lb-time">
         <h3>Time & Trips</h3>
         <div class="lb-cards" id="lbTimeTrips"></div>
       </div>
@@ -536,7 +792,7 @@
     </div>
   </div>
 
-  <!-- ✅ TRIP SUMMARY TAB -->
+  <!-- TRIP SUMMARY -->
   <div id="tripSummary" class="page">
     <div class="panel">
       <h2>🧾 Trip Summary</h2>
@@ -559,11 +815,29 @@
 
       <div class="ts-section">
         <div style="font-size:13px; letter-spacing:.4px; text-transform:uppercase; color:rgba(205,231,240,0.95); opacity:.9;">
+          Species Summary (Selected Date)
+        </div>
+        <div class="hint">Counts are based on the selected date above. Values are totals, kept, and released per species.</div>
+        <div class="table-wrap">
+          <table id="tsSpeciesTable" style="min-width:520px;">
+            <thead>
+              <tr>
+                <th style="text-align:center;">Species</th>
+                <th style="text-align:center;">Total</th>
+                <th style="text-align:center;">Kept</th>
+                <th style="text-align:center;">Released</th>
+              </tr>
+            </thead>
+            <tbody id="tsSpeciesBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="ts-section">
+        <div style="font-size:13px; letter-spacing:.4px; text-transform:uppercase; color:rgba(205,231,240,0.95); opacity:.9;">
           Angler Breakdown (by Species)
         </div>
-        <div class="hint">
-          Table columns are generated from the species caught on the selected date. Values are quantities per angler.
-        </div>
+        <div class="hint">Table columns are generated from the species caught on the selected date. Values are quantities per angler.</div>
 
         <div class="table-wrap">
           <table id="tsTable">
@@ -578,7 +852,7 @@
     </div>
   </div>
 
-  <!-- CATCH LOG TAB -->
+  <!-- CATCH LOG -->
   <div id="log" class="page">
     <div class="panel">
       <h2>Catch Log</h2>
@@ -630,7 +904,6 @@
           <label>Location</label>
           <input id="location" placeholder="Freeport / 40–80 ft / Coordinates" />
         </div>
-
         <div class="field">
           <label>Angler</label>
           <select id="angler" required></select>
@@ -643,7 +916,6 @@
           <label>Bait</label>
           <select id="bait"></select>
         </div>
-
         <div class="field">
           <label>Kept / Released</label>
           <select id="keptReleased" required>
@@ -659,7 +931,6 @@
           <label>Weight (lbs)</label>
           <input id="weight" type="number" min="0" step="0.1" placeholder="e.g., 6.2" />
         </div>
-
         <div class="field" style="grid-column:1/-1;">
           <label>Notes</label>
           <textarea id="notes" placeholder="Conditions, depth, structure, rig, hooks, etc…"></textarea>
@@ -703,7 +974,15 @@
 
       <div class="totals" id="totalsBar"></div>
 
-      <div class="table-wrap">
+      <!-- VIEW TOGGLE -->
+      <div class="view-toggle">
+        <button class="toggle-btn" id="btnViewCards" type="button">Card View</button>
+        <button class="toggle-btn" id="btnViewTable" type="button">Table View</button>
+        <span class="hint" style="margin:0;">Switch how entries display (stays saved).</span>
+      </div>
+
+      <!-- TABLE VIEW -->
+      <div class="table-wrap" id="entriesTableWrap">
         <table>
           <thead>
             <tr>
@@ -714,6 +993,93 @@
           <tbody id="entries"></tbody>
         </table>
       </div>
+
+      <!-- CARD VIEW -->
+      <div id="entriesCards" class="entry-grid"></div>
+    </div>
+  </div>
+
+  <!-- ANGLER PROFILE -->
+  <div id="anglerProfile" class="page">
+    <div class="panel">
+      <h2>🎣 Angler Profile</h2>
+
+      <pre class="wire-pre">|--------------------------------------------------------------|
+|                                                               Angler Profile      |
+|                                                                                   |
+| Angler Name                                                                       |
+|                                                                                   |
+|  Card 1  |   Card 2   |   Card 3   |   Card 4   |   Card 5                         |
+|                                                                                   |
+|                                                                                   |
+|----------------------------------------------------------------</pre>
+
+      <div class="ap-toolbar">
+        <div class="lb-tool">
+          <label>Angler Name</label>
+          <select id="apAngler"></select>
+        </div>
+        <div class="lb-tool">
+          <label>Info</label>
+          <div style="font-size:12px; opacity:.85; line-height:1.35;">
+            Stats are computed from the Catch Log for the selected angler.
+          </div>
+        </div>
+      </div>
+
+      <div id="apCards" class="ap-grid"></div>
+
+      <div class="ap-split">
+        <div class="ap-panel">
+          <h3>Top Species (for this Angler)</h3>
+          <table class="ap-table">
+            <thead>
+              <tr>
+                <th>Species</th>
+                <th>Total</th>
+                <th>Kept</th>
+                <th>Released</th>
+              </tr>
+            </thead>
+            <tbody id="apTopSpeciesBody"></tbody>
+          </table>
+        </div>
+
+        <div class="ap-panel">
+          <h3>Recent Catches (for this Angler)</h3>
+          <table class="ap-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Trip</th>
+                <th>Species</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="apRecentBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CATCH INVENTORY SECTION -->
+      <div class="ap-panel" style="margin-top:14px;">
+        <h3>Catch Inventory</h3>
+        <div class="hint" style="margin-top:-6px;">
+          Species totals for the selected angler. Total is bold + brighter; Released/Kept are normal.
+        </div>
+        <table class="ap-table" style="min-width:640px;">
+          <thead>
+            <tr>
+              <th class="inv-species">Species</th>
+              <th class="inv-center">Total</th>
+              <th class="inv-center">Released</th>
+              <th class="inv-center">Kept</th>
+            </tr>
+          </thead>
+          <tbody id="apInventoryBody"></tbody>
+        </table>
+      </div>
+
     </div>
   </div>
 
@@ -750,19 +1116,16 @@
       if(c.period>=9) s+=2; else if(c.period>=7) s+=1; else s-=1;
       return Math.max(0,s);
     }
-
     function labelScore(s){
       if(s>=6) return {text:'✅ Offshore Excellent', cls:'good'};
       if(s>=4) return {text:'🟡 Fishable Window', cls:'ok'};
       return {text:'❌ Stay Nearshore', cls:'bad'};
     }
-
     function biteText(c,s){
       if(s>=6 && c.period>=8) return '🔥 Strong Bite';
       if(s>=4) return '🟡 Moderate Bite';
       return '❌ Tough Conditions';
     }
-
     function monthly(){
       let total=0;
       for(let i=0;i<30;i++){
@@ -803,14 +1166,12 @@
       "August.Trip.01","August.Trip.02","August.Trip.03","August.Trip.04",
       "Alaska (Homer)","Alaska (Seward)","Alaska (Whittier)"
     ];
-
     const ANGLERS = [
-      "Roy de Ocampo","Brandon de Ocampo","Levi de Ocampo","Joie de Ocampo","Bench de Ocampo",
-      "Paul Pierson","William Ling","Elizabeth Ling","Christopher Ling",
-      "Majd Basharat","Boyd Nabas","Gerard Reyes",
-      "Luther Salvan","Daniel Salvan","Khenny Bocala","Val Garcia"
+      "Roy D.","Brandon D.","Levi D.","Joie D.","Bench D.",
+      "Paul P.","William L.","Elizabeth L.","Christopher L.",
+      "Majd B.","Boyd N.","Gerard R.",
+      "Luther S.","Daniel S.","Khenny B.","Val G."
     ];
-
     const SPECIES = [
       "Red Snapper","Vermillion Snapper (Beeliner)","Lane Snapper","Mangrove Snapper","Mutton Snapper",
       "Grouper (Gag)","Grouper (Scamp)","Grouper (Rockhind)","Grouper (Strawberry)","Grouper (Other)",
@@ -820,15 +1181,14 @@
       "Halibut","Salmon (King)","Salmon (Silver)","Salmon (Sockeye)",
       "Rockfish (Black)","Rockfish (China)","Ling Cod","Pacific Cod","Black Cod"
     ];
-
     const BAITS = [
       "Cut Squid","Shrimp","Pinfish (Live)","Pinfish (Dead)","Croacker (Live)","Croacker (Dead)",
-      "Mullet (Live)","Other Fish","Jig (Diamond)","Jig (Imposter)","Jig (Other)"
+      "Mullet (Live)","Sardines (Dead)","Sardines (Live)","Other Fish","Jig (Diamond)","Jig (Imposter)","Jig (Other)"
     ];
 
     const $ = (id)=>document.getElementById(id);
 
-    // keep your original esc behavior
+    // keep your original esc behavior (minimal)
     const esc = (v)=> String(v ?? "")
       .replaceAll("&","&")
       .replaceAll("<","<")
@@ -878,10 +1238,49 @@
       return Object.entries(m).sort((a,b)=>b[1]-a[1]);
     }
 
+    function averageOfNumeric(list, field){
+      const nums = list
+        .map(x => Number(x?.[field]))
+        .filter(n => Number.isFinite(n));
+      if(!nums.length) return null;
+      return nums.reduce((p,c)=>p+c,0) / nums.length;
+    }
+
+    function bestDayByCatches(list){
+      const byDate = {};
+      for(const d of list){
+        if(!d?.date) continue;
+        byDate[d.date] = (byDate[d.date] || 0) + 1;
+      }
+      const entries = Object.entries(byDate).sort((a,b)=>b[1]-a[1]);
+      return entries[0] || null; // [date, count]
+    }
+
     let isCaptain = false;
     let allDocs = [];
     let unsub = null;
     let editingId = null;
+
+    // ===== Catch view toggle =====
+    const VIEW_KEY = "catchLogView";
+    let catchView = (localStorage.getItem(VIEW_KEY) || "cards"); // "cards" or "table"
+
+    function setCatchView(view){
+      catchView = (view === "table") ? "table" : "cards";
+      localStorage.setItem(VIEW_KEY, catchView);
+
+      const btnCards = $("btnViewCards");
+      const btnTable = $("btnViewTable");
+      const wrapTable = $("entriesTableWrap");
+      const wrapCards = $("entriesCards");
+
+      if(btnCards && btnTable){
+        btnCards.classList.toggle("active", catchView === "cards");
+        btnTable.classList.toggle("active", catchView === "table");
+      }
+      if(wrapTable) wrapTable.style.display = (catchView === "table") ? "block" : "none";
+      if(wrapCards) wrapCards.style.display = (catchView === "cards") ? "grid" : "none";
+    }
 
     function setWriteEnabled(enabled){
       $("btnSave").disabled = !enabled;
@@ -902,12 +1301,8 @@
       const total = list.length;
       const kept = list.filter(x => (x.keptReleased || x.status) === "Kept").length;
       const released = list.filter(x => (x.keptReleased || x.status) === "Released").length;
-      const nums = (arr)=>arr.filter(v => v !== "" && v != null && Number.isFinite(Number(v))).map(Number);
-      const lenVals = nums(list.map(x => x.length));
-      const wtVals = nums(list.map(x => x.weight));
-      const avg = (a)=> a.length ? (a.reduce((p,c)=>p+c,0)/a.length) : null;
-      const avgLen = avg(lenVals);
-      const avgWt = avg(wtVals);
+      const avgLen = averageOfNumeric(list, "length");
+      const avgWt = averageOfNumeric(list, "weight");
       return { total, kept, released, avgLen, avgWt };
     }
 
@@ -917,13 +1312,14 @@
       parts.push(`<span class="pill">Kept: <b>${t.kept}</b></span>`);
       parts.push(`<span class="pill">Released: <b>${t.released}</b></span>`);
       if(t.avgLen != null) parts.push(`<span class="pill">Avg Len: <b>${t.avgLen.toFixed(1)}</b> in</span>`);
-      if(t.avgWt != null) parts.push(`<span class="pill">Avg Wt: <b>${t.avgWt.toFixed(1)}</b> lb</span>`);
+      if(t.avgWt != null) parts.push(`<span class="pill">Avg Wt: <b>${t.avgWt.toFixed(1)}</b></span> lb</span>`);
       $("totalsBar").innerHTML = parts.join("");
     }
 
     function applyFilters(){
       const f = getFilters();
       let filtered = allDocs.slice();
+
       if(f.trip !== "ALL") filtered = filtered.filter(d => d.trip === f.trip);
       if(f.angler !== "ALL") filtered = filtered.filter(d => d.angler === f.angler);
       if(f.species !== "ALL") filtered = filtered.filter(d => d.species === f.species);
@@ -931,25 +1327,33 @@
 
       renderTotalsBar(computeTotals(filtered));
       renderTable(filtered);
+      renderEntriesCards(filtered);
+      setCatchView(catchView);
 
-      // keep dashboard + leaderboards + trip summary live
       renderMiniLeaderboards();
       renderLeaderboards();
       renderTripSummary();
+      renderAnglerProfile();
     }
 
+    // ===== TABLE VIEW (existing behavior) =====
     function renderTable(list){
       const tbody = $("entries");
+      if(!tbody) return;
+
       if(!list.length){
         tbody.innerHTML = `<tr><td colspan="11" style="opacity:.7;">No entries match your filters yet.</td></tr>`;
         return;
       }
+
       tbody.innerHTML = list.map(d=>{
         const status = (d.keptReleased || d.status || "");
         const statusClass = (status === "Kept") ? "kept" : "released";
         const statusChip = `<span class="status-chip ${statusClass}">${esc(status)}</span>`;
+
         const editBtn = isCaptain ? `<button class="btn secondary" style="padding:6px 10px;" data-edit="${d._id}">Edit</button>` : "";
-        const delBtn = isCaptain ? `<button class="btn secondary" style="padding:6px 10px;" data-del="${d._id}">Delete</button>` : "";
+        const delBtn  = isCaptain ? `<button class="btn secondary" style="padding:6px 10px;" data-del="${d._id}">Delete</button>` : "";
+
         return `
           <tr>
             <td>${esc(d.date)}</td>
@@ -981,8 +1385,97 @@
           const id = btn.getAttribute("data-edit");
           const entry = allDocs.find(x => x._id === id);
           if(!entry) return;
-          editingId = id;
 
+          editingId = id;
+          $("trip").value = entry.trip || "";
+          $("date").value = entry.date || new Date().toISOString().slice(0,10);
+          $("location").value = entry.location || "";
+          $("angler").value = entry.angler || "";
+          $("species").value = entry.species || "";
+          $("bait").value = entry.bait || "";
+          $("keptReleased").value = (entry.keptReleased || entry.status || "Kept");
+          $("length").value = entry.length || "";
+          $("weight").value = entry.weight || "";
+          $("notes").value = entry.notes || "";
+
+          $("btnSave").textContent = "Update Entry";
+          $("btnCancelEdit").style.display = "inline-block";
+          $("editHint").textContent = "Editing an existing entry — click Update Entry to save changes, or Cancel Edit.";
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      });
+    }
+
+    // ===== CARD VIEW =====
+    function renderEntriesCards(list){
+      const wrap = $("entriesCards");
+      if(!wrap) return;
+
+      if(!list.length){
+        wrap.innerHTML = `<div class="entry-empty">No entries match your filters yet.</div>`;
+        return;
+      }
+
+      wrap.innerHTML = list.map(d=>{
+        const status = (d.keptReleased || d.status || "");
+        const statusClass = (status === "Kept") ? "kept" : "released";
+        const statusChip = `<span class="status-chip ${statusClass}">${esc(status)}</span>`;
+
+        const editBtn = isCaptain ? `<button class="btn secondary" style="padding:8px 10px;" data-edit="${d._id}">Edit</button>` : "";
+        const delBtn  = isCaptain ? `<button class="btn secondary" style="padding:8px 10px;" data-del="${d._id}">Delete</button>` : "";
+
+        const len = (d.length ?? "") === "" ? "—" : esc(d.length);
+        const wt  = (d.weight ?? "") === "" ? "—" : esc(d.weight);
+        const bait = d.bait ? esc(d.bait) : "—";
+        const loc  = d.location ? esc(d.location) : "—";
+        const notes = d.notes ? esc(d.notes) : "";
+
+        return `
+          <div class="entry-card">
+            <div class="entry-top">
+              <div class="entry-title">
+                <span class="pill">${esc(d.date || "—")}</span>
+                <span class="pill">${esc(d.trip || "—")}</span>
+              </div>
+              <div class="entry-meta">${statusChip}</div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+              <div style="font-weight:950; font-size:15px;">${esc(d.species || "Unknown")}</div>
+              <div class="pill">${esc(d.angler || "—")}</div>
+            </div>
+
+            <div class="entry-line">
+              <div><div class="k">Length (in)</div><div class="v">${len}</div></div>
+              <div><div class="k">Weight (lb)</div><div class="v">${wt}</div></div>
+              <div><div class="k">Bait</div><div class="v">${bait}</div></div>
+              <div><div class="k">Location</div><div class="v">${loc}</div></div>
+            </div>
+
+            <div class="entry-notes">${notes || "<span style='opacity:.7;'>No notes.</span>"}</div>
+            ${(editBtn || delBtn) ? `<div class="entry-actions">${editBtn}${delBtn}</div>` : ""}
+          </div>
+        `;
+      }).join("");
+
+      // Delete handlers
+      wrap.querySelectorAll("button[data-del]").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const id = btn.getAttribute("data-del");
+          if(!confirm("Delete this entry?")) return;
+          try{ await deleteDoc(doc(db, "catches", id)); }
+          catch(e){ alert("Delete failed: " + (e?.message || e)); }
+        });
+      });
+
+      // Edit handlers
+      wrap.querySelectorAll("button[data-edit]").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const id = btn.getAttribute("data-edit");
+          const entry = allDocs.find(x => x._id === id);
+          if(!entry) return;
+
+          editingId = id;
           $("trip").value = entry.trip || "";
           $("date").value = entry.date || new Date().toISOString().slice(0,10);
           $("location").value = entry.location || "";
@@ -1007,6 +1500,7 @@
         alert("You must be signed in as the captain to save.");
         return;
       }
+
       const entry = {
         trip: $("trip").value,
         date: $("date").value,
@@ -1103,11 +1597,9 @@
       let row = [];
       let cur = "";
       let inQuotes = false;
-
       for(let i=0;i<text.length;i++){
         const ch = text[i];
         const next = text[i+1];
-
         if(ch === '"'){
           if(inQuotes && next === '"'){ cur += '"'; i++; }
           else inQuotes = !inQuotes;
@@ -1151,12 +1643,15 @@
         alert("You must be signed in as the captain to import.");
         return;
       }
+
       const text = await file.text();
       const rows = parseCSV(text);
+
       if(rows.length < 2){
         alert("CSV file looks empty or missing rows.");
         return;
       }
+
       const headers = rows[0].map(normalizeHeader);
       const dataRows = rows.slice(1);
       const entries = [];
@@ -1204,15 +1699,21 @@
     function startCatchListener(){
       const q = query(catchesCol, orderBy("date","desc"), limit(500));
       if(unsub) unsub();
+
       unsub = onSnapshot(q, (snap)=>{
         allDocs = snap.docs.map(s=>({ _id: s.id, ...s.data() }));
         applyFilters();
         refreshLeaderboardsAnglerOptions();
         refreshTripSummaryDateOptions();
+        refreshAnglerProfileOptions();
         renderTripSummary();
+        renderAnglerProfile();
       }, (err)=>{
         console.error(err);
-        $("entries").innerHTML = `<tr><td colspan="11" style="opacity:.7;">Could not load from Firestore. Check rules and run via http://localhost.</td></tr>`;
+        const tbody = $("entries");
+        const cards = $("entriesCards");
+        if(tbody) tbody.innerHTML = `<tr><td colspan="11" style="opacity:.7;">Could not load from Firestore. Check rules and run via http://localhost.</td></tr>`;
+        if(cards) cards.innerHTML = `<div class="entry-empty">Could not load from Firestore. Check rules and run via http://localhost.</div>`;
       });
     }
 
@@ -1230,6 +1731,10 @@
       await importCSV(file);
       ev.target.value = "";
     });
+
+    // Catch view toggle buttons
+    $("btnViewCards").addEventListener("click", ()=> setCatchView("cards"));
+    $("btnViewTable").addEventListener("click", ()=> setCatchView("table"));
 
     // Auth state
     onAuthStateChanged(auth, (user)=>{
@@ -1265,6 +1770,7 @@
 
     function refreshTripSummaryDateOptions(){
       if(!tsDate) return;
+
       const dates = getTripSummaryAvailableDates();
       const today = new Date().toISOString().slice(0,10);
       const current = tsDate.value;
@@ -1310,6 +1816,7 @@
       const highlightsEl = document.getElementById("tsHighlights");
       const headEl = document.getElementById("tsHeader");
       const bodyEl = document.getElementById("tsBody");
+      const speciesBodyEl = document.getElementById("tsSpeciesBody");
       if(!highlightsEl || !headEl || !bodyEl) return;
 
       const date = tripSummaryDate();
@@ -1346,44 +1853,65 @@
           tsCard("Angler with the Most Species", `<span class="accent">—</span>`, "No data for selected date.")
         ].join("");
 
-        headEl.innerHTML = `<th>Angler</th><th>Total</th><th>Kept</th><th>Released</th><th>Unique Species</th>`;
-        bodyEl.innerHTML = `<tr><td colspan="5" style="opacity:.7;">No catch log entries for ${esc(date)}.</td></tr>`;
+        headEl.innerHTML = `<th style="text-align:center;">Angler</th><th style="text-align:center;">Total</th><th style="text-align:center;">Kept</th><th style="text-align:center;">Released</th><th style="text-align:center;">Unique Species</th>`;
+        bodyEl.innerHTML = `<tr><td colspan="5" style="opacity:.7; text-align:center;">No catch log entries for ${esc(date)}.</td></tr>`;
+        if(speciesBodyEl){
+          speciesBodyEl.innerHTML = `<tr><td colspan="4" style="opacity:.7; text-align:center;">No catch log entries for ${esc(date)}.</td></tr>`;
+        }
         return;
       }
 
       highlightsEl.innerHTML = [
-        tsCard(
-          "Total Fish Caught",
-          `<span class="accent">${esc(totalCt)}</span>`,
-          `Kept <span class="pill"><b>${esc(keptCt)}</b></span> · Released <span class="pill"><b>${esc(relCt)}</b></span>`
-        ),
-        tsCard(
-          "Biggest Fish (Length)",
-          biggest ? `<span class="accent">${esc(biggest.length)}</span> in` : `<span class="accent">—</span>`,
-          biggest ? `${esc(biggest.species || "Unknown")}${biggest.angler ? ` · ${esc(biggest.angler)}` : ""}` : `No length recorded on <span class="mono">${esc(date)}</span>.`
-        ),
-        tsCard(
-          "Angler with the Most Catch",
-          topAngler ? `<span class="accent">${esc(topAngler[0])}</span> (${esc(topAngler[1])})` : `<span class="accent">—</span>`,
-          `Total catch entries on <span class="mono">${esc(date)}</span>.`
-        ),
-        tsCard(
-          "Angler with the Most Species",
-          bestDiversity ? `<span class="accent">${esc(bestDiversity.a)}</span> (${esc(bestDiversity.count)})` : `<span class="accent">—</span>`,
-          `Unique species caught on <span class="mono">${esc(date)}</span>.`
-        )
+        tsCard("Total Fish Caught", `<span class="accent">${esc(totalCt)}</span>`,
+          `Kept <span class="pill"><b>${esc(keptCt)}</b></span> · Released <span class="pill"><b>${esc(relCt)}</b></span>`),
+        tsCard("Biggest Fish (Length)", biggest ? `<span class="accent">${esc(biggest.length)}</span> in` : `<span class="accent">—</span>`,
+          biggest ? `${esc(biggest.species || "Unknown")}${biggest.angler ? ` · ${esc(biggest.angler)}` : ""}` : `No length recorded on <span class="mono">${esc(date)}</span>.`),
+        tsCard("Angler with the Most Catch", topAngler ? `<span class="accent">${esc(topAngler[0])}</span> (${esc(topAngler[1])})` : `<span class="accent">—</span>`,
+          `Total catch entries on <span class="mono">${esc(date)}</span>.`),
+        tsCard("Angler with the Most Species", bestDiversity ? `<span class="accent">${esc(bestDiversity.a)}</span> (${esc(bestDiversity.count)})` : `<span class="accent">—</span>`,
+          `Unique species caught on <span class="mono">${esc(date)}</span>.`)
       ].join("");
+
+      // Species Summary table
+      if(speciesBodyEl){
+        const smap = new Map();
+        for(const d of dayDocs){
+          const sp = d?.species;
+          if(!sp) continue;
+          if(!smap.has(sp)) smap.set(sp, { total:0, kept:0, released:0 });
+          const st = smap.get(sp);
+          const status = (d.keptReleased || d.status || "");
+          if(status === "Kept") st.kept += 1;
+          else if(status === "Released") st.released += 1;
+          st.total += 1;
+        }
+
+        const rows = Array.from(smap.entries())
+          .map(([species,st]) => ({ species, ...st }))
+          .sort((a,b)=> (b.total - a.total) || a.species.localeCompare(b.species));
+
+        speciesBodyEl.innerHTML = rows.length
+          ? rows.map(r => `
+              <tr>
+                <td style="text-align:center;">${esc(r.species)}</td>
+                <td style="text-align:center;"><span class="pill"><b>${esc(r.total)}</b></span></td>
+                <td style="text-align:center;"><span class="pill"><b>${esc(r.kept)}</b></span></td>
+                <td style="text-align:center;"><span class="pill"><b>${esc(r.released)}</b></span></td>
+              </tr>
+            `).join("")
+          : `<tr><td colspan="4" style="opacity:.7; text-align:center;">No species found for ${esc(date)}.</td></tr>`;
+      }
 
       const speciesList = Array.from(new Set(dayDocs.map(d=>d?.species).filter(Boolean))).sort();
       const anglers = Array.from(new Set(dayDocs.map(d=>d?.angler).filter(Boolean))).sort();
 
       headEl.innerHTML = [
-        `<th>Angler</th>`,
-        `<th>Total</th>`,
-        `<th>Kept</th>`,
-        `<th>Released</th>`,
-        `<th>Unique Species</th>`,
-        ...speciesList.map(s => `<th>${esc(s)}</th>`)
+        `<th style="text-align:center;">Angler</th>`,
+        `<th style="text-align:center;">Total</th>`,
+        `<th style="text-align:center;">Kept</th>`,
+        `<th style="text-align:center;">Released</th>`,
+        `<th style="text-align:center;">Unique Species</th>`,
+        ...speciesList.map(s => `<th style="text-align:center;">${esc(s)}</th>`)
       ].join("");
 
       const stats = new Map();
@@ -1411,12 +1939,12 @@
 
         return `
           <tr>
-            <td>${esc(a)}</td>
-            <td><span class="pill"><b>${esc(total)}</b></span></td>
-            <td><span class="pill"><b>${esc(kept)}</b></span></td>
-            <td><span class="pill"><b>${esc(released)}</b></span></td>
-            <td><span class="pill"><b>${esc(uniq)}</b></span></td>
-            ${cells.map(v => `<td>${v ? `<span class="pill"><b>${esc(v)}</b></span>` : ""}</td>`).join("")}
+            <td style="text-align:center;">${esc(a)}</td>
+            <td style="text-align:center;"><span class="pill"><b>${esc(total)}</b></span></td>
+            <td style="text-align:center;"><span class="pill"><b>${esc(kept)}</b></span></td>
+            <td style="text-align:center;"><span class="pill"><b>${esc(released)}</b></span></td>
+            <td style="text-align:center;"><span class="pill"><b>${esc(uniq)}</b></span></td>
+            ${cells.map(v => `<td style="text-align:center;">${v ? `<span class="pill"><b>${esc(v)}</b></span>` : ""}</td>`).join("")}
           </tr>
         `;
       }).join("");
@@ -1433,60 +1961,36 @@
     function renderMiniLeaderboards(){
       const el = document.getElementById("miniLeaderboards");
       if(!el) return;
-      const data = allDocs.slice();
 
+      const data = allDocs.slice();
       if(!data.length){
         el.innerHTML = `
-          <div class="mini-card">
-            <div class="mini-k">Top Angler</div>
-            <div class="mini-v"><span class="accent">—</span></div>
-            <div class="mini-sub">total fish caught</div>
-          </div>
-          <div class="mini-card">
-            <div class="mini-k">Top Species</div>
-            <div class="mini-v"><span class="accent">—</span></div>
-          </div>
-          <div class="mini-card">
-            <div class="mini-k">Biggest Fish</div>
-            <div class="mini-v">—</div>
-          </div>
-          <div class="mini-card">
-            <div class="mini-k">% Kept of All Catches</div>
-            <div class="mini-v">—</div>
-            <div class="mini-sub">kept 0 • released 0</div>
-          </div>
+          <div class="mini-card"><div class="mini-k">Top Angler</div><div class="mini-v"><span class="accent">—</span></div><div class="mini-sub">total fish caught</div></div>
+          <div class="mini-card"><div class="mini-k">Top Species</div><div class="mini-v"><span class="accent">—</span></div></div>
+          <div class="mini-card"><div class="mini-k">Biggest Fish</div><div class="mini-v">—</div></div>
+          <div class="mini-card"><div class="mini-k">% Kept of All Catches</div><div class="mini-v">—</div><div class="mini-sub">kept 0 • released 0</div></div>
         `;
         return;
       }
 
       const topAngler = countBy(data,"angler")[0];
       const topSpecies = countBy(data,"species")[0];
+
       const numericLen = data.filter(d=>safeNum(d.length)!=null);
       const biggest = numericLen.length
         ? numericLen.reduce((a,b)=> safeNum(b.length) > safeNum(a.length) ? b : a, numericLen[0])
         : null;
+
       const keptCt = data.filter(d => (d.keptReleased||d.status)==="Kept").length;
       const relCt = data.filter(d => (d.keptReleased||d.status)==="Released").length;
       const totalCt = keptCt+relCt;
       const keptPct = totalCt ? Math.round((keptCt/totalCt)*100) : null;
 
       el.innerHTML = `
-        <div class="mini-card">
-          <div class="mini-k">Top Angler</div>
-          <div class="mini-v"><span class="accent">${esc(topAngler?.[0]||"—")}</span> ${topAngler?`(${topAngler[1]})`:""}</div>
-        </div>
-        <div class="mini-card">
-          <div class="mini-k">Top Species</div>
-          <div class="mini-v"><span class="accent">${esc(topSpecies?.[0]||"—")}</span> ${topSpecies?`(${topSpecies[1]})`:""}</div>
-        </div>
-        <div class="mini-card">
-          <div class="mini-k">Biggest Fish</div>
-          <div class="mini-v">${biggest ? `<span class="accent">${esc(biggest.length)}</span> in` : "—"}</div>
-        </div>
-        <div class="mini-card">
-          <div class="mini-k">% Kept</div>
-          <div class="mini-v">${keptPct==null ? "—" : `<span class="accent">${keptPct}%</span>`}</div>
-        </div>
+        <div class="mini-card"><div class="mini-k">Top Angler</div><div class="mini-v"><span class="accent">${esc(topAngler?.[0]||"—")}</span> ${topAngler?`(${topAngler[1]})`:""}</div></div>
+        <div class="mini-card"><div class="mini-k">Top Species</div><div class="mini-v"><span class="accent">${esc(topSpecies?.[0]||"—")}</span> ${topSpecies?`(${topSpecies[1]})`:""}</div></div>
+        <div class="mini-card"><div class="mini-k">Biggest Fish</div><div class="mini-v">${biggest ? `<span class="accent">${esc(biggest.length)}</span> in` : "—"}</div></div>
+        <div class="mini-card"><div class="mini-k">% Kept</div><div class="mini-v">${keptPct==null ? "—" : `<span class="accent">${keptPct}%</span>`}</div></div>
       `;
     }
 
@@ -1667,9 +2171,11 @@
       let biggest = null;
       let biggestKept = null;
       let heaviest = null;
+
       for(const d of base){
         const len = safeNum(d.length);
         const wt = safeNum(d.weight);
+
         if(len!=null){
           if(!biggest || len > biggest.len) biggest = { len, species:d.species||"Unknown", angler:d.angler||"—", trip:d.trip||"—", date:d.date||"—" };
           if((d.keptReleased||d.status)==="Kept" && (!biggestKept || len > biggestKept.len)){
@@ -1717,6 +2223,7 @@
 
       const tripCounts = countBy(base, "trip");
       const bestTrip = tripCounts[0];
+
       const dateCounts = countBy(base, "date");
       const bestDay = dateCounts[0];
 
@@ -1778,6 +2285,217 @@
       timeEl.innerHTML = timeCards.join("");
     }
 
+    // ===== Angler Profile (with new requested cards + inventory table) =====
+    const apAngler = document.getElementById("apAngler");
+
+    function apCard(title, valueHtml, subHtml){
+      return `
+        <div class="mini-card" style="border-color: rgba(120,248,255,0.20);">
+          <div class="mini-k">${esc(title)}</div>
+          <div class="mini-v">${valueHtml}</div>
+          <div class="mini-sub">${subHtml}</div>
+        </div>
+      `;
+    }
+
+    function refreshAnglerProfileOptions(){
+      if(!apAngler) return;
+      const current = apAngler.value || "ALL";
+      const fromData = allDocs.map(d=>d.angler).filter(Boolean);
+      const uniq = Array.from(new Set(["ALL", ...ANGLERS, ...fromData])).filter(Boolean);
+
+      apAngler.innerHTML = "";
+      const allOpt = document.createElement("option");
+      allOpt.value = "ALL";
+      allOpt.textContent = "All";
+      apAngler.appendChild(allOpt);
+
+      uniq.filter(a=>a!=="ALL").forEach(a=>{
+        const o = document.createElement("option");
+        o.value = a;
+        o.textContent = a;
+        apAngler.appendChild(o);
+      });
+
+      if(Array.from(apAngler.options).some(o=>o.value===current)){
+        apAngler.value = current;
+      }
+    }
+
+    function renderAnglerProfile(){
+      const cardsEl = document.getElementById("apCards");
+      const topBody = document.getElementById("apTopSpeciesBody");
+      const recBody = document.getElementById("apRecentBody");
+      const invBody = document.getElementById("apInventoryBody");
+      if(!cardsEl || !topBody || !recBody || !invBody || !apAngler) return;
+
+      const sel = apAngler.value || "ALL";
+      let list = allDocs.slice();
+      if(sel !== "ALL") list = list.filter(d => d.angler === sel);
+
+      if(!list.length){
+        cardsEl.innerHTML = apCard("Total Catches", `<span class="accent">0</span>`, "No catch log data for this selection.");
+        topBody.innerHTML = `<tr><td colspan="4" style="opacity:.7;">No data.</td></tr>`;
+        recBody.innerHTML = `<tr><td colspan="4" style="opacity:.7;">No data.</td></tr>`;
+        invBody.innerHTML = `<tr><td colspan="4" style="opacity:.7;">No data.</td></tr>`;
+        return;
+      }
+
+      // Totals
+      const kept = list.filter(d => (d.keptReleased || d.status) === "Kept").length;
+      const released = list.filter(d => (d.keptReleased || d.status) === "Released").length;
+      const total = kept + released;
+
+      // NEW: catch ratio percent
+      const keptPct = total ? Math.round((kept/total)*100) : 0;
+      const relPct  = total ? (100 - keptPct) : 0;
+
+      // NEW: avg length + avg weight cards
+      const avgLen = averageOfNumeric(list, "length");
+      const avgWt  = averageOfNumeric(list, "weight");
+
+      // Species diversity
+      const uniqSpecies = new Set(list.map(d=>d.species).filter(Boolean));
+      const speciesCounts = countBy(list, "species");
+      const topSpecies = speciesCounts[0] || null;
+
+      // Best day by date count
+      const bestDay = bestDayByCatches(list); // [date, count]
+
+      // Best length/weight
+      const lenList = list.filter(d => safeNum(d.length)!=null);
+      const wtList  = list.filter(d => safeNum(d.weight)!=null);
+      const bestLen = lenList.length ? lenList.reduce((a,b)=> safeNum(b.length)>safeNum(a.length) ? b : a, lenList[0]) : null;
+      const bestWt  = wtList.length ? wtList.reduce((a,b)=> safeNum(b.weight)>safeNum(a.weight) ? b : a, wtList[0]) : null;
+
+      const tripCounts = countBy(list, "trip");
+      const favTrip = tripCounts[0] || null;
+
+      // Cards (includes your requested new ones)
+      const cards = [];
+
+      cards.push(apCard(
+        "Total Catches",
+        `<span class="accent">${esc(list.length)}</span>`,
+        sel==="ALL" ? "All anglers combined." : `For <span class="pill">${esc(sel)}</span>.`
+      ));
+
+      cards.push(apCard(
+        "Catch Ratio (Kept vs Released)",
+        `<span class="mono"><span style="color:var(--good); font-weight:950;">${keptPct}%</span> kept · <span style="color:var(--bad); font-weight:950;">${relPct}%</span> released</span>`,
+        `<span class="pill">Kept: <b>${kept}</b></span> <span class="pill">Released: <b>${released}</b></span>`
+      ));
+
+      cards.push(apCard(
+        "Average Length",
+        avgLen != null ? `<span class="accent">${avgLen.toFixed(1)}</span> in` : `<span class="accent">—</span>`,
+        "Based on numeric length entries only."
+      ));
+
+      cards.push(apCard(
+        "Average Weight",
+        avgWt != null ? `<span class="accent">${avgWt.toFixed(1)}</span> lb` : `<span class="accent">—</span>`,
+        "Based on numeric weight entries only."
+      ));
+
+      cards.push(apCard(
+        "Best Day (Most Catches)",
+        bestDay ? `<span class="accent">${esc(bestDay[0])}</span>` : `<span class="accent">—</span>`,
+        bestDay ? `<span class="pill">Catches: <b>${esc(bestDay[1])}</b></span>` : "No dated entries."
+      ));
+
+      cards.push(apCard(
+        "Species Diversity",
+        `<span class="accent">${esc(uniqSpecies.size)}</span>`,
+        topSpecies ? `Top species: <span class="pill"><b>${esc(topSpecies[0])}</b></span> (${esc(topSpecies[1])})` : "No species data."
+      ));
+
+      cards.push(apCard(
+        "Personal Best (Length)",
+        bestLen ? `<span class="accent">${esc(bestLen.length)}</span> in` : `<span class="accent">—</span>`,
+        bestLen ? `${esc(bestLen.species||"Unknown")} · <span class="pill">${esc(bestLen.trip||"—")}</span> · ${esc(bestLen.date||"—")}` : "No length data recorded."
+      ));
+
+      cards.push(apCard(
+        "Personal Best (Weight)",
+        bestWt ? `<span class="accent">${esc(bestWt.weight)}</span> lb` : `<span class="accent">—</span>`,
+        bestWt ? `${esc(bestWt.species||"Unknown")} · <span class="pill">${esc(bestWt.trip||"—")}</span> · ${esc(bestWt.date||"—")}` : "No weight data recorded."
+      ));
+
+      if(favTrip){
+        cards.push(apCard(
+          "Favorite Trip (Most Catches)",
+          `<span class="accent">${esc(favTrip[0])}</span>`,
+          `<span class="pill">Catches: <b>${esc(favTrip[1])}</b></span>`
+        ));
+      }
+
+      cardsEl.innerHTML = cards.join("");
+
+      // Top species breakdown
+      const speciesMap = new Map();
+      for(const d of list){
+        const sp = d?.species;
+        if(!sp) continue;
+        if(!speciesMap.has(sp)) speciesMap.set(sp, { total:0, kept:0, released:0 });
+        const row = speciesMap.get(sp);
+        const st = (d.keptReleased || d.status || "");
+        if(st==="Kept") row.kept++;
+        else if(st==="Released") row.released++;
+        row.total++;
+      }
+
+      const topRows = Array.from(speciesMap.entries())
+        .map(([species,st]) => ({ species, ...st }))
+        .sort((a,b)=> (b.total-a.total) || a.species.localeCompare(b.species))
+        .slice(0,10);
+
+      topBody.innerHTML = topRows.length ? topRows.map(r=>`
+        <tr>
+          <td>${esc(r.species)}</td>
+          <td><span class="pill"><b>${esc(r.total)}</b></span></td>
+          <td><span class="pill"><b>${esc(r.kept)}</b></span></td>
+          <td><span class="pill"><b>${esc(r.released)}</b></span></td>
+        </tr>
+      `).join("") : `<tr><td colspan="4" style="opacity:.7;">No data.</td></tr>`;
+
+      // Recent catches
+      const recent = list.slice().sort((a,b)=> (b.date||"").localeCompare(a.date||"")).slice(0,12);
+      recBody.innerHTML = recent.length ? recent.map(d=>{
+        const st = (d.keptReleased || d.status || "");
+        const cls = st==="Kept" ? "kept" : "released";
+        return `
+          <tr>
+            <td>${esc(d.date||"—")}</td>
+            <td><span class="pill">${esc(d.trip||"—")}</span></td>
+            <td>${esc(d.species||"Unknown")}</td>
+            <td><span class="status-chip ${cls}">${esc(st||"—")}</span></td>
+          </tr>
+        `;
+      }).join("") : `<tr><td colspan="4" style="opacity:.7;">No data.</td></tr>`;
+
+      // === NEW: Catch Inventory table (ALL species, with exact formatting)
+      const invRows = Array.from(speciesMap.entries())
+        .map(([species,st]) => ({ species, ...st }))
+        .sort((a,b)=> (b.total-a.total) || a.species.localeCompare(b.species));
+
+      invBody.innerHTML = invRows.length ? invRows.map(r=>`
+        <tr>
+          <td class="inv-species">${esc(r.species)}</td>
+          <td class="inv-total">${esc(r.total)}</td>
+          <td class="inv-center">${esc(r.released)}</td>
+          <td class="inv-center">${esc(r.kept)}</td>
+        </tr>
+      `).join("") : `<tr><td colspan="4" style="opacity:.7;">No data.</td></tr>`;
+    }
+
+    function initAnglerProfileUI(){
+      if(!apAngler) return;
+      refreshAnglerProfileOptions();
+      apAngler.addEventListener("change", renderAnglerProfile);
+      renderAnglerProfile();
+    }
+
     // Init
     async function init(){
       const c = await getBuoy();
@@ -1797,12 +2515,10 @@
         <div class="${stat.cls}" style="font-weight:900;">${stat.text}</div>
         <div style="opacity:.9; margin-top:6px;">Score: ${s}/8</div>
       `;
-
       document.getElementById("bite").innerHTML = `
         <div style="color:var(--teal); font-weight:900;">Fishing Outlook</div>
         <div style="margin-top:6px;">${biteText(c,s)}</div>
       `;
-
       document.getElementById("fishable").textContent = `${monthly()} days`;
 
       fillSelect($("trip"), TRIPS, "Select a trip…");
@@ -1819,12 +2535,17 @@
       attachFilterListeners();
       initLeaderboardsUI();
       initTripSummaryUI();
-      startCatchListener();
+      initAnglerProfileUI();
 
+      // apply saved view on load
+      setCatchView(catchView);
+
+      startCatchListener();
       renderMiniLeaderboards();
       renderLeaderboards();
       refreshTripSummaryDateOptions();
       renderTripSummary();
+      renderAnglerProfile();
     }
 
     init();
@@ -1846,4 +2567,5 @@
     }
   </script>
 </body>
+v2.0.16
 </html>
