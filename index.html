@@ -902,6 +902,11 @@
             <label>Date</label>
             <select id="tsDate"></select>
           </div>
+
+          <div class="filter-card" style="max-width:320px;">
+            <label>Trip Name</label>
+            <select id="tsTrip"></select>
+          </div>
         </div>
         <div id="tsHighlights" class="mini-grid"></div>
       </div>
@@ -2204,6 +2209,7 @@
 
     // ===== Trip Summary (unchanged logic, uses wide tables) =====
     const tsDate = document.getElementById("tsDate");
+    const tsTrip = document.getElementById("tsTrip");
 
     function getTripSummaryAvailableDates(){
       const dates = Array.from(new Set(allDocs.map(d => d?.date).filter(Boolean)));
@@ -2212,28 +2218,49 @@
     }
     function refreshTripSummaryDateOptions(){
       if(!tsDate) return;
-      const dates = getTripSummaryAvailableDates();
+
+      const selectedTrip = tsTrip?.value || "ALL";
+
+      let docs = allDocs.slice();
+      if(selectedTrip !== "ALL"){
+        docs = docs.filter(d => d?.trip === selectedTrip);
+      }
+
+      const dates = Array.from(new Set(docs.map(d => d?.date).filter(Boolean)));
+      dates.sort();
+      dates.reverse();
+
       const today = new Date().toISOString().slice(0,10);
       const current = tsDate.value;
+
       tsDate.innerHTML = "";
+
       if(!dates.length){
         const o = document.createElement("option");
-        o.value = today; o.textContent = today;
+        o.value = today;
+        o.textContent = today;
         tsDate.appendChild(o);
         tsDate.value = today;
         return;
       }
+
       for(const d of dates){
         const o = document.createElement("option");
-        o.value = d; o.textContent = d;
+        o.value = d;
+        o.textContent = d;
         tsDate.appendChild(o);
       }
+
       if(current && dates.includes(current)) tsDate.value = current;
       else if(dates.includes(today)) tsDate.value = today;
       else tsDate.value = dates[0];
     }
     function tripSummaryDate(){
       return (tsDate?.value) || new Date().toISOString().slice(0,10);
+    }
+
+    function tripSummaryTrip(){
+      return (tsTrip?.value) || "ALL";
     }
     function tsCard(title, valueHtml, subHtml){
       return `
@@ -2252,7 +2279,13 @@
       if(!highlightsEl || !headEl || !bodyEl) return;
 
       const date = tripSummaryDate();
-      const dayDocs = allDocs.filter(d => d?.date === date);
+      const selectedTrip = tripSummaryTrip();
+
+      let dayDocs = allDocs.filter(d => d?.date === date);
+
+      if(selectedTrip !== "ALL"){
+        dayDocs = dayDocs.filter(d => d?.trip === selectedTrip);
+      }
 
       const keptCt = dayDocs.filter(d => (d.keptReleased || d.status) === "Kept").length;
       const relCt  = dayDocs.filter(d => (d.keptReleased || d.status) === "Released").length;
@@ -2295,8 +2328,8 @@
 
       highlightsEl.innerHTML = [
         tsCard("Total Fish Caught", `<span class="accent">${esc(totalCt)}</span>`, `Kept <span class="pill"><b>${esc(keptCt)}</b></span> · Released <span class="pill"><b>${esc(relCt)}</b></span>`),
-        tsCard("Biggest Fish (Length)", biggest ? `<span class="accent">${esc(biggest.length)}</span> in` : `<span class="accent">—</span>`,
-          biggest ? `${esc(biggest.species || "Unknown")}${biggest.angler ? ` · ${esc(biggest.angler)}` : ""}` : `No length recorded on <span class="mono">${esc(date)}</span>.`),
+        tsCard("Biggest Fish (Length)", biggest ? `<span class="accent">${esc(biggest.angler || "Unknown")}</span>` : `<span class="accent">—</span>`,
+          biggest ? `${esc(biggest.species || "Unknown")} · ${esc(biggest.length || "—")} in` : `No length recorded on <span class="mono">${esc(date)}</span>.`),
         tsCard("Angler with the Most Catch", topAngler ? `<span class="accent">${esc(topAngler[0])}</span> (${esc(topAngler[1])})` : `<span class="accent">—</span>`,
           `Total catch entries on <span class="mono">${esc(date)}</span>.`),
         tsCard("Angler with the Most Species", bestDiversity ? `<span class="accent">${esc(bestDiversity.a)}</span> (${esc(bestDiversity.count)})` : `<span class="accent">—</span>`,
@@ -2381,8 +2414,26 @@
     }
 
     function initTripSummaryUI(){
-      if(!tsDate) return;
+      if(!tsDate || !tsTrip) return;
+
+      tsTrip.innerHTML = '<option value="ALL">All Trips</option>';
+
+      const uniqueTrips = Array.from(new Set(allDocs.map(d => d?.trip).filter(Boolean))).sort();
+
+      uniqueTrips.forEach(trip => {
+        const o = document.createElement("option");
+        o.value = trip;
+        o.textContent = trip;
+        tsTrip.appendChild(o);
+      });
+
+      tsTrip.addEventListener("change", () => {
+        refreshTripSummaryDateOptions();
+        renderTripSummary();
+      });
+
       tsDate.addEventListener("change", renderTripSummary);
+
       refreshTripSummaryDateOptions();
       renderTripSummary();
     }
@@ -2976,5 +3027,5 @@
     }
   </script>
 </body>
-  v.2.1.1
+  v.2.1.2
 </html>
