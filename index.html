@@ -899,13 +899,12 @@
         <div class="hint">Select a date (only days with catches are shown) to view catch log highlights for that day.</div>
         <div class="filters" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
           <div class="filter-card" style="max-width:320px;">
-            <label>Date</label>
-            <select id="tsDate"></select>
-          </div>
-
-          <div class="filter-card" style="max-width:320px;">
             <label>Trip Name</label>
             <select id="tsTrip"></select>
+          </div>
+          <div class="filter-card" style="max-width:320px;">
+            <label>Date</label>
+            <select id="tsDate"></select>
           </div>
         </div>
         <div id="tsHighlights" class="mini-grid"></div>
@@ -1651,6 +1650,36 @@
       }
     }
 
+
+    function syncTripSummaryFilters(){
+      const tsTrip = $("tsTrip");
+      const tsDate = $("tsDate");
+      if(!tsTrip || !tsDate) return;
+
+      const trips = [...new Set(allDocs.map(d => d.trip).filter(Boolean))].sort();
+      tsTrip.innerHTML = '<option value="ALL">All Trips</option>' +
+        trips.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join("");
+
+      const selectedTrip = tsTrip.value || "ALL";
+      let dateSource = allDocs.slice();
+      if(selectedTrip !== "ALL"){
+        dateSource = dateSource.filter(d => d.trip === selectedTrip);
+      }
+
+      const dates = [...new Set(dateSource.map(d => d.date).filter(Boolean))].sort().reverse();
+      const currentDate = tsDate.value;
+
+      tsDate.innerHTML = dates.map(d => `<option value="${esc(d)}">${esc(formatDisplayDate(d))}</option>`).join("");
+
+      if(currentDate && dates.includes(currentDate)){
+        tsDate.value = currentDate;
+      }
+
+      if(!tsDate.value && dates.length){
+        tsDate.value = dates[0];
+      }
+    }
+
     function applyFilters(){
       const f = getFilters();
       let filtered = allDocs.slice();
@@ -2209,7 +2238,6 @@
 
     // ===== Trip Summary (unchanged logic, uses wide tables) =====
     const tsDate = document.getElementById("tsDate");
-    const tsTrip = document.getElementById("tsTrip");
 
     function getTripSummaryAvailableDates(){
       const dates = Array.from(new Set(allDocs.map(d => d?.date).filter(Boolean)));
@@ -2217,50 +2245,10 @@
       return dates;
     }
     function refreshTripSummaryDateOptions(){
-      if(!tsDate) return;
-
-      const selectedTrip = tsTrip?.value || "ALL";
-
-      let docs = allDocs.slice();
-      if(selectedTrip !== "ALL"){
-        docs = docs.filter(d => d?.trip === selectedTrip);
-      }
-
-      const dates = Array.from(new Set(docs.map(d => d?.date).filter(Boolean)));
-      dates.sort();
-      dates.reverse();
-
-      const today = new Date().toISOString().slice(0,10);
-      const current = tsDate.value;
-
-      tsDate.innerHTML = "";
-
-      if(!dates.length){
-        const o = document.createElement("option");
-        o.value = today;
-        o.textContent = today;
-        tsDate.appendChild(o);
-        tsDate.value = today;
-        return;
-      }
-
-      for(const d of dates){
-        const o = document.createElement("option");
-        o.value = d;
-        o.textContent = d;
-        tsDate.appendChild(o);
-      }
-
-      if(current && dates.includes(current)) tsDate.value = current;
-      else if(dates.includes(today)) tsDate.value = today;
-      else tsDate.value = dates[0];
+      syncTripSummaryFilters();
     }
     function tripSummaryDate(){
       return (tsDate?.value) || new Date().toISOString().slice(0,10);
-    }
-
-    function tripSummaryTrip(){
-      return (tsTrip?.value) || "ALL";
     }
     function tsCard(title, valueHtml, subHtml){
       return `
@@ -2278,13 +2266,14 @@
       const speciesBodyEl = document.getElementById("tsSpeciesBody");
       if(!highlightsEl || !headEl || !bodyEl) return;
 
+      syncTripSummaryFilters();
+
+      const trip = $("tsTrip")?.value || "ALL";
       const date = tripSummaryDate();
-      const selectedTrip = tripSummaryTrip();
 
       let dayDocs = allDocs.filter(d => d?.date === date);
-
-      if(selectedTrip !== "ALL"){
-        dayDocs = dayDocs.filter(d => d?.trip === selectedTrip);
+      if(trip !== "ALL"){
+        dayDocs = dayDocs.filter(d => d?.trip === trip);
       }
 
       const keptCt = dayDocs.filter(d => (d.keptReleased || d.status) === "Kept").length;
@@ -2313,7 +2302,7 @@
       if(!dayDocs.length){
         highlightsEl.innerHTML = [
           tsCard("Total Fish Caught", `<span class="accent">0</span>`, `Kept <span class="pill"><b>0</b></span> · Released <span class="pill"><b>0</b></span>`),
-          tsCard("Biggest Fish (Length)", `<span class="accent">—</span>`, `No catches logged on <span class="mono">${esc(date)}</span>.`),
+          tsCard("Biggest Catch Angler", `<span class="accent">—</span>`, `No catches logged on <span class="mono">${esc(date)}</span>.`),
           tsCard("Angler with the Most Catch", `<span class="accent">—</span>`, "No data for selected date."),
           tsCard("Angler with the Most Species", `<span class="accent">—</span>`, "No data for selected date.")
         ].join("");
@@ -2328,7 +2317,7 @@
 
       highlightsEl.innerHTML = [
         tsCard("Total Fish Caught", `<span class="accent">${esc(totalCt)}</span>`, `Kept <span class="pill"><b>${esc(keptCt)}</b></span> · Released <span class="pill"><b>${esc(relCt)}</b></span>`),
-        tsCard("Biggest Fish (Length)", biggest ? `<span class="accent">${esc(biggest.angler || "Unknown")}</span>` : `<span class="accent">—</span>`,
+        tsCard("Biggest Catch Angler", biggest ? `<span class="accent">${esc(biggest.angler || "Unknown")}</span>` : `<span class="accent">—</span>`,
           biggest ? `${esc(biggest.species || "Unknown")} · ${esc(biggest.length || "—")} in` : `No length recorded on <span class="mono">${esc(date)}</span>.`),
         tsCard("Angler with the Most Catch", topAngler ? `<span class="accent">${esc(topAngler[0])}</span> (${esc(topAngler[1])})` : `<span class="accent">—</span>`,
           `Total catch entries on <span class="mono">${esc(date)}</span>.`),
@@ -2414,27 +2403,20 @@
     }
 
     function initTripSummaryUI(){
-      if(!tsDate || !tsTrip) return;
-
-      tsTrip.innerHTML = '<option value="ALL">All Trips</option>';
-
-      const uniqueTrips = Array.from(new Set(allDocs.map(d => d?.trip).filter(Boolean))).sort();
-
-      uniqueTrips.forEach(trip => {
-        const o = document.createElement("option");
-        o.value = trip;
-        o.textContent = trip;
-        tsTrip.appendChild(o);
-      });
-
-      tsTrip.addEventListener("change", () => {
-        refreshTripSummaryDateOptions();
-        renderTripSummary();
-      });
+      const tsDate = $("tsDate");
+      const tsTrip = $("tsTrip");
+      if(!tsDate) return;
 
       tsDate.addEventListener("change", renderTripSummary);
 
-      refreshTripSummaryDateOptions();
+      if(tsTrip){
+        tsTrip.addEventListener("change", ()=>{
+          syncTripSummaryFilters();
+          renderTripSummary();
+        });
+      }
+
+      syncTripSummaryFilters();
       renderTripSummary();
     }
 
